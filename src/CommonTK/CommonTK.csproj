@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <Deterministic>false</Deterministic>
-    <RootNamespace>SAP.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+    <RootNamespace>SAPTeam.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

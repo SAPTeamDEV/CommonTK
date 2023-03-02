@@ -6,11 +6,15 @@
     <Nullable>enable</Nullable>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <Deterministic>false</Deterministic>
-    <RootNamespace>SAP.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+    <RootNamespace>SAPTeam.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Include="..\SharedAssemblyInfo.cs" Link="Properties\SharedAssemblyInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CommonTK\CommonTK.csproj" />
   </ItemGroup>
 
 </Project>

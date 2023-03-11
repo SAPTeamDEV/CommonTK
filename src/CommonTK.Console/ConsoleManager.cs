@@ -30,6 +30,8 @@ public class ConsoleManager
         _ = DeleteMenu(GetSystemMenu(GetConsoleWindow(), false), SC_CLOSE, MF_BYCOMMAND);
     }
 
+    public static ConsoleType Type { get; set; }
+
     /// <summary>
     /// Checks if The Application has Console.
     /// </summary>
@@ -131,7 +133,7 @@ public class ConsoleManager
     public static void AttachProcess(Process process)
     {
         Thread.Sleep(1000);
-        // Info.Application = ApplicationType.Console;
+        Type = ConsoleType.Native;
         AttachConsole(process.Id);
         process.Kill();
         System.Console.Clear();
@@ -153,7 +155,7 @@ public class ConsoleManager
                 pField = "s_error";
                 break;
         }
-        System.Reflection.FieldInfo fControl = type.GetField(pField, System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+        System.Reflection.FieldInfo fControl = type.GetField(pField, BindingFlags.Static | BindingFlags.NonPublic);
         Debug.Assert(fControl != null);
         fControl.SetValue(obj, obj);
     }

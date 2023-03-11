@@ -1,4 +1,4 @@
-﻿namespace WindowsPro.Extensions.StatusProvider;
+﻿namespace SAPTeam.CommonTK;
 
 public interface IStatusProvider
 {

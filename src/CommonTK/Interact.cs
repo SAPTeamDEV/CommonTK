@@ -34,14 +34,13 @@ public static class Interact
         SetFocus(handle);
     }
 
-    /*
     /// <summary>
     /// Set text of current <see cref="IStatusProvider"/> class.
     /// </summary>
     /// <param name="status">New text for current <see cref="IStatusProvider"/>.</param>
     public static void SetStatus(string status)
     {
-        Info.StatusClass.Write(status);
+        StatusProvider.Current.Write(status);
     }
 
     /// <summary>
@@ -49,13 +48,12 @@ public static class Interact
     /// </summary>
     public static void ClearStatus()
     {
-        Info.StatusClass.Clear();
+        StatusProvider.Current.Clear();
     }
 
     internal static void UnsetStatus()
     {
         ClearStatus();
-        Info.StatusClass = StatusProvider.Empty;
+        StatusProvider.Current = StatusProvider.Empty;
     }
-    */
 }

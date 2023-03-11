@@ -1,5 +1,4 @@
-﻿/*
- namespace WindowsPro.Extensions.StatusProvider;
+﻿namespace SAPTeam.CommonTK.Console;
 
 public class ConsoleStatusProvider : IStatusProvider
 {
@@ -13,14 +12,14 @@ public class ConsoleStatusProvider : IStatusProvider
 
     private void Focus()
     {
-        currentPosition = (Console.CursorLeft, Console.CursorTop);
-        Console.SetCursorPosition(0, line);
+        currentPosition = (System.Console.CursorLeft, System.Console.CursorTop);
+        System.Console.SetCursorPosition(0, line);
     }
 
     private void UnFocus()
     {
         if (currentPosition.left == -1 || currentPosition.top == -1) throw new ApplicationException("Focus method must be called before calling UnFocus");
-        Console.SetCursorPosition(currentPosition.left, currentPosition.top);
+        System.Console.SetCursorPosition(currentPosition.left, currentPosition.top);
     }
 
     public void Clear()
@@ -38,4 +37,3 @@ public class ConsoleStatusProvider : IStatusProvider
         UnFocus();
     }
 }
-*/

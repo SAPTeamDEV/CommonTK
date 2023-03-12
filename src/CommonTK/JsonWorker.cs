@@ -9,7 +9,8 @@ public class JsonWorker
 
     protected JsonSerializer js = new()
     {
-        Formatting = Formatting.Indented
+        Formatting = Formatting.Indented,
+        NullValueHandling = NullValueHandling.Ignore
     };
 
     public JsonWorker(string file)

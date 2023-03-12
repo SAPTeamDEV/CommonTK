@@ -167,15 +167,6 @@ public class ConsoleManager
     {
         ForceSet(ConsoleField.Out, null);
         ForceSet(ConsoleField.Error, null);
-        /*
-        Type type = typeof(Console);
-        System.Reflection.FieldInfo _out = type.GetField("s_out", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
-        System.Reflection.FieldInfo _error = type.GetField("s_error", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
-        Debug.Assert(_out != null);
-        Debug.Assert(_error != null);
-        _out.SetValue(null, null);
-        _error.SetValue(null, null);
-        */
     }
 
     private static void SetOutAndErrorNull()

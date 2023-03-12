@@ -41,7 +41,7 @@ public static class ConsoleManager
     /// <summary>
     /// Creates a new console instance if the process is not attached to a console already.
     /// </summary>
-    private static void Show()
+    private static void AllocateConsole()
     {
         if (!HasConsole)
         {
@@ -53,7 +53,7 @@ public static class ConsoleManager
     /// <summary> 
     /// If the process has a console attached to it, it will be detached and no longer visible. Writing to the System.Console is still possible, but no output will be shown.
     /// </summary>
-    private static void Hide()
+    private static void ReleaseConsole()
     {
         if (HasConsole)
         {
@@ -69,11 +69,11 @@ public static class ConsoleManager
     {
         if (HasConsole)
         {
-            Hide();
+            ReleaseConsole();
         }
         else
         {
-            Show();
+            AllocateConsole();
         }
     }
 
@@ -82,7 +82,7 @@ public static class ConsoleManager
     /// </summary>
     public static void HideConsole()
     {
-        Hide();
+        ReleaseConsole();
     }
 
     /// <summary>
@@ -95,7 +95,7 @@ public static class ConsoleManager
             switch (mode)
             {
                 case ConsoleLaunchMode.Allocation:
-                    Show();
+                    AllocateConsole();
                     break;
                 case ConsoleLaunchMode.AttachParent:
                     AttachToParent();

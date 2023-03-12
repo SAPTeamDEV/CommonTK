@@ -1,6 +1,6 @@
 ﻿using SAPTeam.CommonTK.Console.ConsoleForm.Controls;
 
-namespace WindowsPro.ConsoleForm;
+namespace SAPTeam.CommonTK.Console.ConsoleForm;
 
 public partial class Interface
 {

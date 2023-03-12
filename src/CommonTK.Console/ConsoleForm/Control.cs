@@ -1,6 +1,4 @@
-﻿using WindowsPro.ConsoleForm;
-
-namespace SAPTeam.CommonTK.Console.ConsoleForm;
+﻿namespace SAPTeam.CommonTK.Console.ConsoleForm;
 
 public abstract class Control : IControl
 {

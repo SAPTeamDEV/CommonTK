@@ -1,4 +1,4 @@
-﻿namespace WindowsPro.ConsoleForm;
+﻿namespace SAPTeam.CommonTK.Console.ConsoleForm;
 
 public partial class Interface
 {
@@ -7,7 +7,7 @@ public partial class Interface
     public void AddSubForm(Form subForm)
     {
         subForms.Add(subForm);
-        Console.Clear();
+        System.Console.Clear();
         subForm.Platform = this;
         subForm.CreateObjects();
         SetActiveForm(subForm);

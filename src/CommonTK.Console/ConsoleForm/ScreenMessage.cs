@@ -1,9 +1,4 @@
-﻿using SAPTeam.CommonTK.Console;
-using SAPTeam.CommonTK.Console.ConsoleForm;
-
-using Timer = SAPTeam.CommonTK.Timer;
-
-namespace WindowsPro.ConsoleForm;
+﻿namespace SAPTeam.CommonTK.Console.ConsoleForm;
 
 public partial class Interface
 {

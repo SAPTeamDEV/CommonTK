@@ -1,9 +1,7 @@
-﻿using SAPTeam.CommonTK.Console;
-using SAPTeam.CommonTK.Console.ConsoleForm;
-using SAPTeam.CommonTK.Console.ConsoleForm.Controls;
+﻿using SAPTeam.CommonTK.Console.ConsoleForm.Controls;
 using SAPTeam.CommonTK.Contexts;
 
-namespace WindowsPro.ConsoleForm;
+namespace SAPTeam.CommonTK.Console.ConsoleForm;
 
 /// <summary>
 /// Generic Class for creating Selectable elements through Console Interface.
@@ -50,7 +48,7 @@ public partial class Interface
     {
         rootForm = activeForm = form;
         disposableWriter = rootForm.UseDisposableWriter ? new(true) : null;
-        bufferWidth = Console.BufferWidth;
+        bufferWidth = System.Console.BufferWidth;
         titleLine = GetLine();
     }
 
@@ -62,7 +60,7 @@ public partial class Interface
         }
         else
         {
-            Console.Clear();
+            System.Console.Clear();
         }
         RaiseTitle();
         foreach (var item in activeForm.Container.Values)
@@ -78,17 +76,17 @@ public partial class Interface
         Refresh();
         if (activeForm.FocusToTop && disposableWriter == null && OperatingSystem.IsWindows())
         {
-            Console.WindowTop = titleLine;
+            System.Console.WindowTop = titleLine;
         }
-        Console.CursorVisible = false;
+        System.Console.CursorVisible = false;
         RaiseStart();
         while (!hasExited)
         {
-            ConsoleKeyInfo keyInfo = Console.ReadKey(true);
-            if (bufferWidth != Console.BufferWidth || keyInfo.Key == ConsoleKey.F5)
+            ConsoleKeyInfo keyInfo = System.Console.ReadKey(true);
+            if (bufferWidth != System.Console.BufferWidth || keyInfo.Key == ConsoleKey.F5)
             {
                 Refresh();
-                bufferWidth = Console.BufferWidth;
+                bufferWidth = System.Console.BufferWidth;
             }
             if (keyInfo.Key == ConsoleKey.Escape)
             {
@@ -126,6 +124,6 @@ public partial class Interface
             disposableWriter.Dispose();
         }
         hasExited = true;
-        Console.CursorVisible = true;
+        System.Console.CursorVisible = true;
     }
 }

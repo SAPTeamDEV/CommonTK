@@ -1,7 +1,7 @@
 ﻿using SAPTeam.CommonTK.Console.ConsoleForm.Controls;
 using SAPTeam.CommonTK.Contexts;
 
-namespace WindowsPro.ConsoleForm;
+namespace SAPTeam.CommonTK.Console.ConsoleForm;
 
 public partial class Form
 {

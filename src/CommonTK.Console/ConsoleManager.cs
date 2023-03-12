@@ -51,7 +51,10 @@ public static class ConsoleManager
     /// <param name="mode">
     /// Determines method that used for launching a new Console. if there is an existing Console, this value is ignored.
     /// </param>
-    public static void ShowConsole(ConsoleLaunchMode mode)
+    /// <param name="canClose">
+    /// Determines console window can be closed without handling or Need to be closed in expected way.
+    /// </param>
+    public static void ShowConsole(ConsoleLaunchMode mode, bool canClose = false)
     {
         if (!HasConsole)
         {
@@ -70,7 +73,11 @@ public static class ConsoleManager
             Mode = mode;
 
             System.Console.Title = AppDomain.CurrentDomain.FriendlyName;
-            DisableCloseButton();
+
+            if (!canClose)
+            {
+                DisableCloseButton();
+            }
         }
         else
         {

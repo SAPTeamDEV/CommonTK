@@ -15,6 +15,11 @@ public class Timer
     private bool paused;
 
     /// <summary>
+    /// Gets running state of this timer.
+    /// </summary>
+    public bool IsRunning => running;
+
+    /// <summary>
     /// Creates new <see cref="Timer"/> and starts it.
     /// </summary>
     /// <param name="msec">

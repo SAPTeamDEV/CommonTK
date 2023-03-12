@@ -105,7 +105,7 @@ public static class ConsoleManager
                     break;
             }
 
-            System.Console.Title = Assembly.GetExecutingAssembly().GetName().Name;
+            System.Console.Title = AppDomain.CurrentDomain.FriendlyName;
             DisableCloseButton();
         }
         else

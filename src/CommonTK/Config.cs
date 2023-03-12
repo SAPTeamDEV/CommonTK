@@ -3,7 +3,7 @@ using Newtonsoft.Json.Linq;
 
 namespace SAPTeam.CommonTK;
 
-internal class Config<T> : JsonWorker
+public class Config<T> : JsonWorker
     where T : new()
 {
     public T Prefs;

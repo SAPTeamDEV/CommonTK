@@ -10,10 +10,10 @@ namespace SAPTeam.CommonTK.Console;
 public static class ConsoleManager
 {
     private const string kernel32_DllName = "kernel32.dll";
-    public const int SW_HIDE = 0;
-    public const int SW_SHOW = 5;
-    public const int MF_BYCOMMAND = 0x00000000;
-    public const int SC_CLOSE = 0xF060;
+    private const int SW_HIDE = 0;
+    private const int SW_SHOW = 5;
+    private const int MF_BYCOMMAND = 0x00000000;
+    private const int SC_CLOSE = 0xF060;
 
     [DllImport(kernel32_DllName)] private static extern bool AllocConsole();
     [DllImport(kernel32_DllName)] private static extern bool FreeConsole();
@@ -30,13 +30,72 @@ public static class ConsoleManager
         _ = DeleteMenu(GetSystemMenu(GetConsoleWindow(), false), SC_CLOSE, MF_BYCOMMAND);
     }
 
+    /// <summary>
+    /// Gets or Sets Type of current Application's console Text rendering.
+    /// </summary>
     public static ConsoleType Type { get; set; }
+
+    /// <summary>
+    /// Gets console Launching method.
+    /// </summary>
     public static ConsoleLaunchMode Mode { get; private set; }
 
     /// <summary>
     /// Checks if The Application has Console.
     /// </summary>
     public static bool HasConsole => GetConsoleWindow() != IntPtr.Zero;
+
+    /// <summary>
+    /// Shows up existing Console Window, if Console Window not found then creates a new Console.
+    /// </summary>
+    /// <param name="mode">
+    /// Determines method that used for launching a new Console. if there is an existing Console, this value is ignored.
+    /// </param>
+    public static void ShowConsole(ConsoleLaunchMode mode)
+    {
+        if (!HasConsole)
+        {
+            switch (mode)
+            {
+                case ConsoleLaunchMode.Allocation:
+                    AllocateConsole();
+                    break;
+                case ConsoleLaunchMode.AttachParent:
+                    AttachToParent();
+                    break;
+                case ConsoleLaunchMode.AttachProcess:
+                    AttachProcess(CreateConsole());
+                    break;
+            }
+            Mode = mode;
+
+            System.Console.Title = AppDomain.CurrentDomain.FriendlyName;
+            DisableCloseButton();
+        }
+        else
+        {
+            ShowWindow(GetConsoleWindow(), SW_SHOW);
+            Interact.BringToFront(GetConsoleWindow());
+        }
+    }
+
+    /// <summary>
+    /// Hides or Releases Application Console.
+    /// </summary>
+    /// <param name="release">
+    /// Determines that current Console should be closed or just hide it.
+    /// </param>
+    public static void HideConsole(bool release = true)
+    {
+        if (release)
+        {
+            ReleaseConsole();
+        }
+        else
+        {
+            ShowWindow(GetConsoleWindow(), SW_HIDE);
+        }
+    }
 
     /// <summary>
     /// Creates a new console instance if the process is not attached to a console already.
@@ -63,62 +122,9 @@ public static class ConsoleManager
     }
 
     /// <summary>
-    /// Shows or Hides Application's Console window.
-    /// </summary>
-    public static void ToggleConsole()
-    {
-        if (HasConsole)
-        {
-            ReleaseConsole();
-        }
-        else
-        {
-            AllocateConsole();
-        }
-    }
-
-    /// <summary>
-    /// Releases Application Console.
-    /// </summary>
-    public static void HideConsole()
-    {
-        ReleaseConsole();
-    }
-
-    /// <summary>
-    /// Shows up existing Console Window, if Console Window not found then creates a new Console.
-    /// </summary>
-    public static void ShowConsole(ConsoleLaunchMode mode)
-    {
-        if (!HasConsole)
-        {
-            switch (mode)
-            {
-                case ConsoleLaunchMode.Allocation:
-                    AllocateConsole();
-                    break;
-                case ConsoleLaunchMode.AttachParent:
-                    AttachToParent();
-                    break;
-                case ConsoleLaunchMode.AttachProcess:
-                    AttachProcess(CreateConsole());
-                    break;
-            }
-
-            System.Console.Title = AppDomain.CurrentDomain.FriendlyName;
-            DisableCloseButton();
-        }
-        else
-        {
-            Interact.BringToFront(GetConsoleWindow());
-            // ShowWindow(GetConsoleWindow(), SW_SHOW);
-        }
-    }
-
-    /// <summary>
     /// Takes control of the Caller's Console.
     /// </summary>
-    public static void AttachToParent()
+    private static void AttachToParent()
     {
         if (!HasConsole)
         {
@@ -130,7 +136,7 @@ public static class ConsoleManager
     /// Creates a new Console process.
     /// </summary>
     /// <returns><see cref="Process"/> object of new Console.</returns>
-    public static Process CreateConsole()
+    private static Process CreateConsole()
     {
         ProcessStartInfo startInfo = new()
         {
@@ -144,7 +150,7 @@ public static class ConsoleManager
     /// Attaches to given <see cref="Process"/> Console and kills that process.
     /// </summary>
     /// <param name="process">A Process that have Console.</param>
-    public static void AttachProcess(Process process)
+    private static void AttachProcess(Process process)
     {
         Thread.Sleep(1000);
         Type = ConsoleType.Native;
@@ -153,7 +159,7 @@ public static class ConsoleManager
         System.Console.Clear();
     }
 
-    public static void ForceSet(ConsoleField field, object? obj)
+    private static void ForceSet(ConsoleField field, object? obj)
     {
         Type type = typeof(System.Console);
         string pField = "";

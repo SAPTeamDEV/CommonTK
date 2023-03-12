@@ -1,6 +1,4 @@
-﻿using SAPTeam.CommonTK.Contexts;
-
-namespace SAPTeam.CommonTK.Console.Contexts;
+﻿namespace SAPTeam.CommonTK.Contexts;
 
 public class RedirectConsole : Context
 {

@@ -1,6 +1,6 @@
-﻿using SAPTeam.CommonTK.Contexts;
+﻿using SAPTeam.CommonTK.Console;
 
-namespace SAPTeam.CommonTK.Console.Contexts;
+namespace SAPTeam.CommonTK.Contexts;
 
 public class DisposableWriter : Context
 {

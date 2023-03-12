@@ -1,4 +1,4 @@
-﻿namespace SAPTeam.CommonTK.Contexts;
+﻿namespace SAPTeam.CommonTK;
 
 public class ContextContainer
 {

@@ -61,7 +61,10 @@ public class ConsoleManager
         }
     }
 
-    public static void Toggle()
+    /// <summary>
+    /// Shows or Hides Application's Console window.
+    /// </summary>
+    public static void ToggleConsole()
     {
         if (HasConsole)
         {

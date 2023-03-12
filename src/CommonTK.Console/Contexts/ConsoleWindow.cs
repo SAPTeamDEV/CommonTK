@@ -1,16 +1,25 @@
-﻿namespace SAPTeam.CommonTK.Contexts;
+﻿using SAPTeam.CommonTK.Console;
+
+namespace SAPTeam.CommonTK.Contexts;
 
 public class ConsoleWindow : Context
 {
+    ConsoleLaunchMode mode;
+
+    public ConsoleWindow(ConsoleLaunchMode mode = ConsoleLaunchMode.Allocation) : base(mode)
+    {
+        
+    }
+
     protected override void ArgsHandler(dynamic[] args)
     {
-        throw new NotImplementedException();
+        mode = args[0];
     }
 
     protected override void CreateContext()
     {
         Interface = InteractInterface.Console;
-        ShowConsole();
+        ShowConsole(mode);
     }
 
     protected override void DisposeContext()

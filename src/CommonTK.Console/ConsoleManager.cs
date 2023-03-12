@@ -7,7 +7,7 @@ namespace SAPTeam.CommonTK.Console;
 /// <summary>
 /// Represent methods for control Application consoles.
 /// </summary>
-public class ConsoleManager
+public static class ConsoleManager
 {
     private const string kernel32_DllName = "kernel32.dll";
     public const int SW_HIDE = 0;
@@ -31,6 +31,7 @@ public class ConsoleManager
     }
 
     public static ConsoleType Type { get; set; }
+    public static ConsoleLaunchMode Mode { get; private set; }
 
     /// <summary>
     /// Checks if The Application has Console.
@@ -87,15 +88,25 @@ public class ConsoleManager
     /// <summary>
     /// Shows up existing Console Window, if Console Window not found then creates a new Console.
     /// </summary>
-    public static void ShowConsole()
+    public static void ShowConsole(ConsoleLaunchMode mode)
     {
         if (!HasConsole)
         {
-            Show();
+            switch (mode)
+            {
+                case ConsoleLaunchMode.Allocation:
+                    Show();
+                    break;
+                case ConsoleLaunchMode.AttachParent:
+                    AttachToParent();
+                    break;
+                case ConsoleLaunchMode.AttachProcess:
+                    AttachProcess(CreateConsole());
+                    break;
+            }
+
             System.Console.Title = Assembly.GetExecutingAssembly().GetName().Name;
             DisableCloseButton();
-            // AllocConsole();
-            // AttachProcess(CreateConsole());
         }
         else
         {

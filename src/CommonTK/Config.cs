@@ -6,7 +6,7 @@ namespace SAPTeam.CommonTK;
 public class Config<T> : JsonWorker
     where T : new()
 {
-    public T Prefs;
+    public T Prefs { get; }
 
     public Config(string configPath) : base(configPath)
     {

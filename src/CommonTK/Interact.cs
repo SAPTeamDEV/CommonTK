@@ -81,10 +81,21 @@ public static class Interact
 
     /// <summary>
     /// Clears text of current <see cref="IStatusProvider"/>.
+    /// if class implements <see cref="IMultiStatusProvider"/> you can provide <paramref name="message"/>, otherwise it will ignored.
     /// </summary>
-    public static void ClearStatus()
+    /// <param name="message">
+    /// A specific message that will be removed.
+    /// </param>
+    public static void ClearStatus(string message = null)
     {
-        StatusProvider.Current.Clear();
+        if (StatusProvider.Current is IMultiStatusProvider msp && message != null)
+        {
+            msp.Clear(message);
+        }
+        else
+        {
+            StatusProvider.Current.Clear();
+        }
     }
 
     /// <summary>
@@ -100,7 +111,10 @@ public static class Interact
             RemoveStatus();
         }
 
-        statusProvider.Clear();
+        if (StatusProvider.Current is not IMultiStatusProvider)
+        {
+            statusProvider.Clear();
+        }
         StatusProvider.Current = statusProvider;
     }
 

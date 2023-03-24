@@ -8,6 +8,7 @@ namespace SAPTeam.CommonTK
 {
     public enum ProgressBarType
     {
+        None,
         Wait,
         Block
     }

@@ -9,5 +9,7 @@ namespace SAPTeam.CommonTK
     public interface IProgressStatusProvider : IStatusProvider
     {
         void Write(string message, ProgressBarType type);
+
+        void Increment(int value);
     }
 }

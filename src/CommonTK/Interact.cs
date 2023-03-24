@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 
 namespace SAPTeam.CommonTK;
 
@@ -53,6 +54,24 @@ public static class Interact
         else if (StatusProvider.Current is IProgressStatusProvider ps)
         {
             ps.Write(status, progress);
+        }
+        else
+        {
+            throw new InvalidOperationException("Operation is not supported in current status provider.");
+        }
+    }
+
+    /// <summary>
+    /// Advances progress of status.
+    /// </summary>
+    /// <param name="value">
+    /// New value of progress bar. if value is -1, uses default step value of progressbar.
+    /// </param>
+    public static void IncrementProgressStatus(int value = -1)
+    {
+        if (StatusProvider.Current is IProgressStatusProvider ps)
+        {
+            ps.Increment(value);
         }
         else
         {

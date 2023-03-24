@@ -37,10 +37,27 @@ public static class Interact
     /// <summary>
     /// Set text of current <see cref="IStatusProvider"/> class.
     /// </summary>
-    /// <param name="status">New text for current <see cref="IStatusProvider"/>.</param>
-    public static void SetStatus(string status)
+    /// <param name="status">
+    /// New text for current <see cref="IStatusProvider"/>.
+    /// </param>
+    /// <param name="progress">
+    /// Type of progress bar.
+    /// Note this feature must be supported by <see cref="StatusProvider.Current"/>.
+    /// </param>
+    public static void SetStatus(string status, ProgressBarType progress = ProgressBarType.None)
     {
-        StatusProvider.Current.Write(status);
+        if (progress == ProgressBarType.None)
+        {
+            StatusProvider.Current.Write(status);
+        }
+        else if (StatusProvider.Current is IProgressStatusProvider ps)
+        {
+            ps.Write(status, progress);
+        }
+        else
+        {
+            throw new InvalidOperationException("Operation is not supported in current status provider.");
+        }
     }
 
     /// <summary>
@@ -49,15 +66,6 @@ public static class Interact
     public static void ClearStatus()
     {
         StatusProvider.Current.Clear();
-    }
-
-    /// <summary>
-    /// Resets and Removes current global <see cref="IStatusProvider"/>.
-    /// </summary>
-    public static void RemoveStatus()
-    {
-        ClearStatus();
-        StatusProvider.Current = StatusProvider.Empty;
     }
 
     /// <summary>
@@ -75,5 +83,14 @@ public static class Interact
 
         statusProvider.Clear();
         StatusProvider.Current = statusProvider;
+    }
+
+    /// <summary>
+    /// Resets and Removes current global <see cref="IStatusProvider"/>.
+    /// </summary>
+    public static void RemoveStatus()
+    {
+        ClearStatus();
+        StatusProvider.Current = StatusProvider.Empty;
     }
 }

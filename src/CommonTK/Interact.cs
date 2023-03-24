@@ -51,9 +51,29 @@ public static class Interact
         StatusProvider.Current.Clear();
     }
 
-    internal static void UnsetStatus()
+    /// <summary>
+    /// Resets and Removes current global <see cref="IStatusProvider"/>.
+    /// </summary>
+    public static void RemoveStatus()
     {
         ClearStatus();
         StatusProvider.Current = StatusProvider.Empty;
+    }
+
+    /// <summary>
+    /// Sets new <see cref="IStatusProvider"/> class as global Status Provider.
+    /// </summary>
+    /// <param name="statusProvider">
+    /// The new status provider object.
+    /// </param>
+    public static void AssignStatus(IStatusProvider statusProvider)
+    {
+        if (StatusProvider.Current != StatusProvider.Empty)
+        {
+            RemoveStatus();
+        }
+
+        statusProvider.Clear();
+        StatusProvider.Current = statusProvider;
     }
 }

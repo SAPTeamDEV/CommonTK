@@ -7,6 +7,15 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <Deterministic>false</Deterministic>
     <RootNamespace>SAPTeam.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+    <AssemblyName>SAPTeam.$(MSBuildProjectName)</AssemblyName>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>CommonTK</Title>
+    <Authors>Alireza Poodineh</Authors>
+    <Company>SAP Team</Company>
+    <Description>All in One and Multi Purpose .NET Library</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/SAPTeamDEV/CommonTK</RepositoryUrl>
+    <PackageTags>tools;json;settings;status;timer</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,6 +24,13 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

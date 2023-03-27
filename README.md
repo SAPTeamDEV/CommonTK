@@ -1,4 +1,8 @@
 # CommonTK - All in One and Multi Purpose .NET Library
+[![Nuget](https://img.shields.io/nuget/v/SAPTeam.CommonTK?label=CommonTK)](https://www.nuget.org/packages/SAPTeam.CommonTK)
+[![Nuget](https://img.shields.io/nuget/v/SAPTeam.CommonTK.Console?label=CommonTK.Console)](https://www.nuget.org/packages/SAPTeam.CommonTK.Console)
+![Nuget](https://img.shields.io/nuget/dt/SAPTeam.CommonTK)
+
 This library contains every things that you need for a Professional application.
 
 ## Installation

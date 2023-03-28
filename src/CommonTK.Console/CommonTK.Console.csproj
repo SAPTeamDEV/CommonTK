@@ -15,7 +15,7 @@
     <RepositoryUrl>https://github.com/SAPTeamDEV/CommonTK</RepositoryUrl>
     <PackageTags>console;console-form;console-manager;color-type;create-console;console-launcher;</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <NoWarn>NETSDK1</NoWarn>
+    <NoWarn>NETSDK1138</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

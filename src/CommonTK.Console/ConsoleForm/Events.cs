@@ -1,51 +1,52 @@
 ﻿using SAPTeam.CommonTK.Console.ConsoleForm.Controls;
 
-namespace SAPTeam.CommonTK.Console.ConsoleForm;
-
-public partial class Interface
+namespace SAPTeam.CommonTK.Console.ConsoleForm
 {
-    public event Action? Title;
-    public event Action<ConsoleOption>? OnEnter;
-    public event Action? OnStart;
-    public event Action? OnClose;
-    public event Action<ConsoleKeyInfo>? KeyPressed;
-
-    public void ClearEvents()
+    public partial class Interface
     {
-        Title = null;
-        OnEnter = null;
-        OnStart = null;
-        OnClose = null;
-        KeyPressed = null;
-    }
+        public event Action? Title;
+        public event Action<ConsoleOption>? OnEnter;
+        public event Action? OnStart;
+        public event Action? OnClose;
+        public event Action<ConsoleKeyInfo>? KeyPressed;
 
-    private void RaiseStart()
-    {
-        Action start = OnStart;
-        start?.Invoke();
-    }
+        public void ClearEvents()
+        {
+            Title = null;
+            OnEnter = null;
+            OnStart = null;
+            OnClose = null;
+            KeyPressed = null;
+        }
 
-    private void RaiseClose()
-    {
-        Action close = OnClose;
-        close?.Invoke();
-    }
+        private void RaiseStart()
+        {
+            Action start = OnStart;
+            start?.Invoke();
+        }
 
-    private void RaiseTitle()
-    {
-        Action title = Title;
-        title?.Invoke();
-    }
+        private void RaiseClose()
+        {
+            Action close = OnClose;
+            close?.Invoke();
+        }
 
-    private void RaiseKeyPressed(ConsoleKeyInfo key)
-    {
-        Action<ConsoleKeyInfo> keyPressed = KeyPressed;
-        keyPressed?.Invoke(key);
-    }
+        private void RaiseTitle()
+        {
+            Action title = Title;
+            title?.Invoke();
+        }
 
-    private void RaiseEnter(ConsoleOption option)
-    {
-        Action<ConsoleOption> enter = OnEnter;
-        enter?.Invoke(option);
+        private void RaiseKeyPressed(ConsoleKeyInfo key)
+        {
+            Action<ConsoleKeyInfo> keyPressed = KeyPressed;
+            keyPressed?.Invoke(key);
+        }
+
+        private void RaiseEnter(ConsoleOption option)
+        {
+            Action<ConsoleOption> enter = OnEnter;
+            enter?.Invoke(option);
+        }
     }
 }

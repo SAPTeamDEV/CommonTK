@@ -1,5 +1,6 @@
-﻿namespace SAPTeam.CommonTK;
-
-public interface IContext
+﻿namespace SAPTeam.CommonTK
 {
+    public interface IContext
+    {
+    }
 }

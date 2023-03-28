@@ -1,34 +1,35 @@
-﻿namespace SAPTeam.CommonTK;
-
-public class ContextContainer
+﻿namespace SAPTeam.CommonTK
 {
-    private readonly List<IContext> contexts = new();
-
-    public bool HasContext<Context>()
+    public class ContextContainer
     {
-        return GetContext<Context>() != null;
-    }
+        private readonly List<IContext> contexts = new();
 
-    public void SetContect(IContext context)
-    {
-        contexts.Add(context);
-    }
-
-    public Context GetContext<Context>()
-    {
-        foreach (var context in contexts)
+        public bool HasContext<Context>()
         {
-            if (context is Context obj)
-            {
-                return obj;
-            }
+            return GetContext<Context>() != null;
         }
 
-        return default;
-    }
+        public void SetContect(IContext context)
+        {
+            contexts.Add(context);
+        }
 
-    public void DisposeContext(IContext context)
-    {
-        contexts.Remove(context);
+        public Context GetContext<Context>()
+        {
+            foreach (var context in contexts)
+            {
+                if (context is Context obj)
+                {
+                    return obj;
+                }
+            }
+
+            return default;
+        }
+
+        public void DisposeContext(IContext context)
+        {
+            contexts.Remove(context);
+        }
     }
 }

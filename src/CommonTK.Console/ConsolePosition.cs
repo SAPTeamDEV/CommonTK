@@ -1,8 +1,9 @@
-﻿namespace SAPTeam.CommonTK.Console;
-
-public enum ConsolePosition
+﻿namespace SAPTeam.CommonTK.Console
 {
-    None,
-    Top,
-    Bottom
+    public enum ConsolePosition
+    {
+        None,
+        Top,
+        Bottom
+    }
 }

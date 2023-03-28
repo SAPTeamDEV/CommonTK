@@ -1,8 +1,9 @@
-﻿namespace SAPTeam.CommonTK.Console;
-
-public enum ConsoleField
+﻿namespace SAPTeam.CommonTK.Console
 {
-    In,
-    Out,
-    Error
+    public enum ConsoleField
+    {
+        In,
+        Out,
+        Error
+    }
 }

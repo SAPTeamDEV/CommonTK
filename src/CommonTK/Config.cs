@@ -1,33 +1,34 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace SAPTeam.CommonTK;
-
-public class Config<T> : JsonWorker
-    where T : new()
+namespace SAPTeam.CommonTK
 {
-    public T Prefs { get; }
-
-    public Config(string configPath) : base(configPath)
+    public class Config<T> : JsonWorker
+        where T : new()
     {
-        if (!File.Exists(FileName))
+        public T Prefs { get; }
+
+        public Config(string configPath) : base(configPath)
         {
-            Write(new T());
+            if (!File.Exists(FileName))
+            {
+                Write(new T());
+            }
+            JObject cData = Open();
+            Prefs = Parse<T>(cData.CreateReader());
         }
-        JObject cData = Open();
-        Prefs = Parse<T>(cData.CreateReader());
-    }
 
-    public void Write()
-    {
-        Write(Prefs);
-    }
+        public void Write()
+        {
+            Write(Prefs);
+        }
 
-    private void Write(T cObject)
-    {
-        StringWriter sw = new();
-        JsonTextWriter jw = new(sw);
-        ToJson(jw, cObject);
-        Save(sw);
+        private void Write(T cObject)
+        {
+            StringWriter sw = new();
+            JsonTextWriter jw = new(sw);
+            ToJson(jw, cObject);
+            Save(sw);
+        }
     }
 }

@@ -1,7 +1,8 @@
-﻿namespace SAPTeam.CommonTK;
-
-public interface IStatusProvider
+﻿namespace SAPTeam.CommonTK
 {
-    public void Clear();
-    public void Write(string message);
+    public interface IStatusProvider
+    {
+        void Clear();
+        void Write(string message);
+    }
 }

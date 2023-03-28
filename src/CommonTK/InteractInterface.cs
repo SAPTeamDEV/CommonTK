@@ -1,8 +1,9 @@
-﻿namespace SAPTeam.CommonTK;
-
-public enum InteractInterface
+﻿namespace SAPTeam.CommonTK
 {
-    None,
-    Console,
-    UI
+    public enum InteractInterface
+    {
+        None,
+        Console,
+        UI
+    }
 }

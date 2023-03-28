@@ -1,8 +1,9 @@
-﻿namespace SAPTeam.CommonTK.Console;
-
-public enum ConsoleType
+﻿namespace SAPTeam.CommonTK.Console
 {
-    None,
-    Native,
-    External
+    public enum ConsoleType
+    {
+        None,
+        Native,
+        External
+    }
 }

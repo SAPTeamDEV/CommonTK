@@ -1,6 +1,7 @@
-﻿namespace SAPTeam.CommonTK.Console.ConsoleForm;
-
-internal interface ISelectableControl : IControl
+﻿namespace SAPTeam.CommonTK.Console.ConsoleForm
 {
-    void Select();
+    internal interface ISelectableControl : IControl
+    {
+        void Select();
+    }
 }

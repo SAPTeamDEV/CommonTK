@@ -1,16 +1,17 @@
-﻿namespace SAPTeam.CommonTK.Console.ConsoleForm;
-
-public interface IControl
+﻿namespace SAPTeam.CommonTK.Console.ConsoleForm
 {
-    public int Line { get; init; }
-    public string Text { get; init; }
+    public interface IControl
+    {
+        int Line { get; }
+        string Text { get; }
 
-    public Interface Parent { get; }
+        Interface Parent { get; }
 
-    public bool Selectable { get; }
+        bool Selectable { get; }
 
-    public void Write();
-    public void Clear();
-    public void Focus();
-    public void Update();
+        void Write();
+        void Clear();
+        void Focus();
+        void Update();
+    }
 }

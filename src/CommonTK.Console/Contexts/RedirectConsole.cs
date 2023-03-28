@@ -1,28 +1,29 @@
-﻿namespace SAPTeam.CommonTK.Contexts;
-
-public class RedirectConsole : Context
+﻿namespace SAPTeam.CommonTK.Contexts
 {
-    private TextWriter? consoleOut;
-    private StringWriter? consoleOutVirtual;
-
-    public int Line { get; set; }
-
-    protected override void ArgsHandler(dynamic[] args)
+    public class RedirectConsole : Context
     {
-        throw new NotImplementedException();
-    }
+        private TextWriter? consoleOut;
+        private StringWriter? consoleOutVirtual;
 
-    protected override void CreateContext()
-    {
-        consoleOut = System.Console.Out;
-        consoleOutVirtual = new();
-        System.Console.SetOut(consoleOutVirtual);
-    }
+        public int Line { get; set; }
 
-    protected override void DisposeContext()
-    {
-        System.Console.SetOut(consoleOut);
-        consoleOut = null;
-        consoleOutVirtual.Dispose();
+        protected override void ArgsHandler(dynamic[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void CreateContext()
+        {
+            consoleOut = System.Console.Out;
+            consoleOutVirtual = new();
+            System.Console.SetOut(consoleOutVirtual);
+        }
+
+        protected override void DisposeContext()
+        {
+            System.Console.SetOut(consoleOut);
+            consoleOut = null;
+            consoleOutVirtual.Dispose();
+        }
     }
 }

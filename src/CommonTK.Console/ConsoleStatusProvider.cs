@@ -1,39 +1,40 @@
-﻿namespace SAPTeam.CommonTK.Console;
-
-public class ConsoleStatusProvider : IStatusProvider
+﻿namespace SAPTeam.CommonTK.Console
 {
-    private readonly int line;
-    private (int left, int top) currentPosition = (-1, -1);
-
-    public ConsoleStatusProvider(int line)
+    public class ConsoleStatusProvider : IStatusProvider
     {
-        this.line = line;
-    }
+        private readonly int line;
+        private (int left, int top) currentPosition = (-1, -1);
 
-    private void Focus()
-    {
-        currentPosition = (System.Console.CursorLeft, System.Console.CursorTop);
-        System.Console.SetCursorPosition(0, line);
-    }
+        public ConsoleStatusProvider(int line)
+        {
+            this.line = line;
+        }
 
-    private void UnFocus()
-    {
-        if (currentPosition.left == -1 || currentPosition.top == -1) throw new ApplicationException("Focus method must be called before calling UnFocus");
-        System.Console.SetCursorPosition(currentPosition.left, currentPosition.top);
-    }
+        private void Focus()
+        {
+            currentPosition = (System.Console.CursorLeft, System.Console.CursorTop);
+            System.Console.SetCursorPosition(0, line);
+        }
 
-    public void Clear()
-    {
-        Focus();
-        ClearLine(true);
-        UnFocus();
-    }
+        private void UnFocus()
+        {
+            if (currentPosition.left == -1 || currentPosition.top == -1) throw new ApplicationException("Focus method must be called before calling UnFocus");
+            System.Console.SetCursorPosition(currentPosition.left, currentPosition.top);
+        }
 
-    public void Write(string message)
-    {
-        Clear();
-        Focus();
-        Echo(message, false);
-        UnFocus();
+        public void Clear()
+        {
+            Focus();
+            ClearLine(true);
+            UnFocus();
+        }
+
+        public void Write(string message)
+        {
+            Clear();
+            Focus();
+            Echo(message, false);
+            UnFocus();
+        }
     }
 }

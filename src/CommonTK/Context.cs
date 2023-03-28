@@ -1,55 +1,56 @@
-﻿namespace SAPTeam.CommonTK;
-
-public abstract class Context : IContext, IDisposable
+﻿namespace SAPTeam.CommonTK
 {
-    private bool disposedValue;
-
-    public static ContextContainer Current { get; } = new();
-    public static InteractInterface Interface { get; set; }
-
-    public Context(params dynamic[] args)
+    public abstract class Context : IContext, IDisposable
     {
-        if (args.Length > 0)
-        {
-            ArgsHandler(args);
-        }
-        Current.SetContect(this);
-        CreateContext();
-    }
+        private bool disposedValue;
 
-    protected abstract void CreateContext();
-    protected abstract void DisposeContext();
-    protected abstract void ArgsHandler(dynamic[] args);
+        public static ContextContainer Current { get; } = new();
+        public static InteractInterface Interface { get; set; }
 
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!disposedValue)
+        public Context(params dynamic[] args)
         {
-            if (disposing)
+            if (args.Length > 0)
             {
-                // TODO: dispose managed state (managed objects)
+                ArgsHandler(args);
             }
-
-            // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-            // TODO: set large fields to null
-            Current.DisposeContext(this);
-            DisposeContext();
-
-            disposedValue = true;
+            Current.SetContect(this);
+            CreateContext();
         }
-    }
 
-    // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-    ~Context()
-    {
-        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        Dispose(disposing: false);
-    }
+        protected abstract void CreateContext();
+        protected abstract void DisposeContext();
+        protected abstract void ArgsHandler(dynamic[] args);
 
-    public void Dispose()
-    {
-        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects)
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: set large fields to null
+                Current.DisposeContext(this);
+                DisposeContext();
+
+                disposedValue = true;
+            }
+        }
+
+        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+        ~Context()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: false);
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
     }
 }

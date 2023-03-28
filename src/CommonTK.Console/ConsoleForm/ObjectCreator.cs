@@ -7,30 +7,32 @@ namespace SAPTeam.CommonTK.Console.ConsoleForm
     {
         public void CreateObjects()
         {
-            using RedirectConsole cv = new();
-            Title();
-
-            if (Items.Count > 0)
+            using (RedirectConsole cv = new RedirectConsole())
             {
-                foreach (var section in Items.OrderBy(key => key.Key))
+                Title();
+
+                if (Items.Count > 0)
                 {
-                    if (Items[section.Key].Count == 0) continue;
-                    ConsoleSection secClass = AddSection(section.Key);
-                    foreach (var option in section.Value)
+                    foreach (var section in Items.OrderBy(key => key.Key))
                     {
-                        AddOption(option, secClass);
+                        if (Items[section.Key].Count == 0) continue;
+                        ConsoleSection secClass = AddSection(section.Key);
+                        foreach (var option in section.Value)
+                        {
+                            AddOption(option, secClass);
+                        }
                     }
                 }
-            }
-            else if (ExecutableItems.Count > 0)
-            {
-                foreach (var section in ExecutableItems.OrderBy(key => key.Key))
+                else if (ExecutableItems.Count > 0)
                 {
-                    if (ExecutableItems[section.Key].Count == 0) continue;
-                    ConsoleSection secClass = AddSection(section.Key);
-                    foreach (var data in section.Value)
+                    foreach (var section in ExecutableItems.OrderBy(key => key.Key))
                     {
-                        AddOption(data.Value, data.Key, secClass);
+                        if (ExecutableItems[section.Key].Count == 0) continue;
+                        ConsoleSection secClass = AddSection(section.Key);
+                        foreach (var data in section.Value)
+                        {
+                            AddOption(data.Value, data.Key, secClass);
+                        }
                     }
                 }
             }
@@ -38,18 +40,18 @@ namespace SAPTeam.CommonTK.Console.ConsoleForm
 
         private ConsoleSection AddSection(string section)
         {
-            ConsoleSection secClass = new(Platform, Utils.GetLine(), section);
+            ConsoleSection secClass = new ConsoleSection(Platform, Utils.GetLine(), section);
             Container[Utils.GetLine()] = secClass;
             secClass.Write();
             Utils.Echo();
             return secClass;
         }
 
-        private ConsoleOption AddOption(string option, ConsoleSection? secClass)
+        private ConsoleOption AddOption(string option, ConsoleSection secClass)
         {
             if (First == 0) First = Current = Utils.GetLine();
             Last = Utils.GetLine();
-            ConsoleOption opClass = new(Platform, Utils.GetLine(), option, secClass);
+            ConsoleOption opClass = new ConsoleOption(Platform, Utils.GetLine(), option, secClass);
             Container[Utils.GetLine()] = opClass;
             opClass.Write();
             Utils.Echo();

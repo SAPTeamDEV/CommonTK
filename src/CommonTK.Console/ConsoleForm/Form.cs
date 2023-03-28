@@ -4,12 +4,12 @@ namespace SAPTeam.CommonTK.Console.ConsoleForm
 {
     public partial class Form
     {
-        public Interface? Platform { get; set; }
+        public Interface Platform { get; set; }
 
-        public Dictionary<string, Dictionary<string, string>> ExecutableItems { get; } = new();
-        public Dictionary<string, List<string>> Items { get; } = new();
+        public Dictionary<string, Dictionary<string, string>> ExecutableItems { get; } = new Dictionary<string, Dictionary<string, string>>();
+        public Dictionary<string, List<string>> Items { get; } = new Dictionary<string, List<string>>();
 
-        public Dictionary<int, IControl> Container { get; } = new();
+        public Dictionary<int, IControl> Container { get; } = new Dictionary<int, IControl>();
 
         public int First { get; set; }
         public int Last { get; set; }
@@ -25,7 +25,7 @@ namespace SAPTeam.CommonTK.Console.ConsoleForm
 
             if (rootForm)
             {
-                Platform = new(this);
+                Platform = new Interface(this);
                 SetRootProperties();
                 SetReceivers();
                 CreateObjects();

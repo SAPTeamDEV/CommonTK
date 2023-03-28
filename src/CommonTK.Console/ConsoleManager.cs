@@ -145,7 +145,7 @@ namespace SAPTeam.CommonTK.Console
         /// <returns><see cref="Process"/> object of new Console.</returns>
         private static Process CreateConsole()
         {
-            ProcessStartInfo startInfo = new()
+            ProcessStartInfo startInfo = new ProcessStartInfo()
             {
                 FileName = "cmd.exe"
             };
@@ -166,7 +166,7 @@ namespace SAPTeam.CommonTK.Console
             System.Console.Clear();
         }
 
-        private static void ForceSet(ConsoleField field, object? obj)
+        private static void ForceSet(ConsoleField field, object obj)
         {
             Type type = typeof(System.Console);
             string pField = "";

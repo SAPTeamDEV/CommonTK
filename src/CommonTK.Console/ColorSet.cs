@@ -2,13 +2,13 @@
 {
     public struct ColorSet
     {
-        private static ColorSet colors = new();
+        private static ColorSet colors = new ColorSet();
 
         public readonly ConsoleColor Back;
         public readonly ConsoleColor Fore;
 
-        public static ColorSet ScreenMesage => new(ConsoleColor.White, ConsoleColor.Black);
-        public static ColorSet InvertedScreenMesage => new(ConsoleColor.Black, ConsoleColor.White);
+        public static ColorSet ScreenMesage => new ColorSet(ConsoleColor.White, ConsoleColor.Black);
+        public static ColorSet InvertedScreenMesage => new ColorSet(ConsoleColor.Black, ConsoleColor.White);
 
         internal static ColorSet Current { get => colors; set { colors = value; Utils.ResetColor(); } }
 

@@ -111,7 +111,7 @@ namespace SAPTeam.CommonTK
                 RemoveStatus();
             }
 
-            if (StatusProvider.Current is not IMultiStatusProvider)
+            if (!(StatusProvider.Current is IMultiStatusProvider))
             {
                 statusProvider.Clear();
             }

@@ -1,10 +1,12 @@
-﻿namespace SAPTeam.CommonTK
+﻿using System;
+
+namespace SAPTeam.CommonTK
 {
     public abstract class Context : IContext, IDisposable
     {
         private bool disposedValue;
 
-        public static ContextContainer Current { get; } = new();
+        public static ContextContainer Current { get; } = new ContextContainer();
         public static InteractInterface Interface { get; set; }
 
         public Context(params dynamic[] args)

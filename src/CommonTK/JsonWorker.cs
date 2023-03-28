@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using System.IO;
+
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace SAPTeam.CommonTK
@@ -7,7 +9,7 @@ namespace SAPTeam.CommonTK
     {
         public readonly string FileName;
 
-        protected JsonSerializer js = new()
+        protected JsonSerializer js = new JsonSerializer()
         {
             Formatting = Formatting.Indented,
             NullValueHandling = NullValueHandling.Ignore
@@ -47,8 +49,10 @@ namespace SAPTeam.CommonTK
 
         protected virtual void Save(TextWriter writer)
         {
-            using StreamWriter file = new(FileName);
-            file.WriteLine(writer.ToString());
+            using (StreamWriter file = new StreamWriter(FileName))
+            {
+                file.WriteLine(writer.ToString());
+            }
         }
     }
 }

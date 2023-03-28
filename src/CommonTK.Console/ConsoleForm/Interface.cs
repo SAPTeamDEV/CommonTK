@@ -42,7 +42,7 @@ namespace SAPTeam.CommonTK.Console.ConsoleForm
 
         public int Spacing => rootForm.First - titleLine;
 
-        public ColorSet ColorSchema { get; set; } = new(ConsoleColor.White, ConsoleColor.Black);
+        public ColorSet ColorSchema { get; set; } = new ColorSet(ConsoleColor.White, ConsoleColor.Black);
 
         private bool hasExited;
 
@@ -51,7 +51,7 @@ namespace SAPTeam.CommonTK.Console.ConsoleForm
             rootForm = activeForm = form;
             if (rootForm.UseDisposableWriter)
             {
-                disposableWriter = new(true);
+                disposableWriter = new DisposableWriter(true);
             }
             else
             {

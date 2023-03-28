@@ -2,8 +2,8 @@
 {
     public class RedirectConsole : Context
     {
-        private TextWriter? consoleOut;
-        private StringWriter? consoleOutVirtual;
+        private TextWriter consoleOut;
+        private StringWriter consoleOutVirtual;
 
         public int Line { get; set; }
 
@@ -15,7 +15,7 @@
         protected override void CreateContext()
         {
             consoleOut = System.Console.Out;
-            consoleOutVirtual = new();
+            consoleOutVirtual = new StringWriter();
             System.Console.SetOut(consoleOutVirtual);
         }
 

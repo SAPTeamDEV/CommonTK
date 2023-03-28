@@ -2,7 +2,7 @@
 {
     public partial class Interface
     {
-        private readonly List<Form> subForms = new();
+        private readonly List<Form> subForms = new List<Form>();
 
         public void AddSubForm(Form subForm)
         {

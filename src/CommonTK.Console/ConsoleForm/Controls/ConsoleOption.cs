@@ -3,11 +3,11 @@
     public class ConsoleOption : Control, ISelectableControl
     {
         public override bool Selectable => true;
-        public string? Identifier { get; set; }
+        public string Identifier { get; set; }
 
-        public ConsoleSection? Section;
+        public ConsoleSection Section;
 
-        public ConsoleOption(Interface parent, int line, string text, ConsoleSection? section) : base(parent, line, text)
+        public ConsoleOption(Interface parent, int line, string text, ConsoleSection section) : base(parent, line, text)
         {
             Section = section;
         }

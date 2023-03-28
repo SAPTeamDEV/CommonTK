@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using System.IO;
+
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace SAPTeam.CommonTK
@@ -25,8 +27,8 @@ namespace SAPTeam.CommonTK
 
         private void Write(T cObject)
         {
-            StringWriter sw = new();
-            JsonTextWriter jw = new(sw);
+            StringWriter sw = new StringWriter();
+            JsonTextWriter jw = new JsonTextWriter(sw);
             ToJson(jw, cObject);
             Save(sw);
         }

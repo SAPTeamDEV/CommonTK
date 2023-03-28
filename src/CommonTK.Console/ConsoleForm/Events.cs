@@ -4,11 +4,11 @@ namespace SAPTeam.CommonTK.Console.ConsoleForm
 {
     public partial class Interface
     {
-        public event Action? Title;
-        public event Action<ConsoleOption>? OnEnter;
-        public event Action? OnStart;
-        public event Action? OnClose;
-        public event Action<ConsoleKeyInfo>? KeyPressed;
+        public event Action Title;
+        public event Action<ConsoleOption> OnEnter;
+        public event Action OnStart;
+        public event Action OnClose;
+        public event Action<ConsoleKeyInfo> KeyPressed;
 
         public void ClearEvents()
         {

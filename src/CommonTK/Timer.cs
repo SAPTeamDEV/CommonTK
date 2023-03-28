@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
+using System.Threading;
 
 namespace SAPTeam.CommonTK
 {
@@ -9,7 +11,7 @@ namespace SAPTeam.CommonTK
     {
         private int delay;
         private Action callback;
-        private Thread? thread;
+        private Thread thread;
         private bool repeat;
         private bool running;
         private bool paused;
@@ -36,7 +38,7 @@ namespace SAPTeam.CommonTK
         /// </returns>
         public static Timer Set(int msec, Action callback, bool repeat = false)
         {
-            Timer timer = new()
+            Timer timer = new Timer()
             {
                 delay = msec,
                 callback = callback,

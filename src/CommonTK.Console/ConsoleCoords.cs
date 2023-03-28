@@ -2,6 +2,14 @@
 {
     public struct ConsoleCoords
     {
+        public static ConsoleCoords ScreenMessage => new ConsoleCoords()
+        {
+            X = 3,
+            Position = ConsolePosition.Bottom,
+            IsStatic = false,
+            Center = true
+        };
+
         public int X { get; set; }
         public int Y { get; set; }
         public int Length { get; set; }

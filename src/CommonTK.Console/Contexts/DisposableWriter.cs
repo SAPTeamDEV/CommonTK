@@ -4,8 +4,8 @@ namespace SAPTeam.CommonTK.Contexts
 {
     public class DisposableWriter : Context
     {
-        private readonly List<ConsoleCoords> coords = new();
-        private readonly List<int> lines = new();
+        private readonly List<ConsoleCoords> coords = new List<ConsoleCoords>();
+        private readonly List<int> lines = new List<int>();
         private bool lineClear;
         private ConsoleColor backColor;
         private ConsoleColor foreColor;
@@ -17,12 +17,12 @@ namespace SAPTeam.CommonTK.Contexts
 
         protected override void CreateContext()
         {
-            ColorSet.Current = new(backColor, foreColor);
+            ColorSet.Current = new ColorSet(backColor, foreColor);
         }
 
         protected override void DisposeContext()
         {
-            ColorSet.Current = new();
+            ColorSet.Current = new ColorSet();
 
             Clear();
 
@@ -55,7 +55,7 @@ namespace SAPTeam.CommonTK.Contexts
             if (!lines.Contains(x))
             {
                 lines.Add(x);
-                coords.Add(new() { Length = length, X = x });
+                coords.Add(new ConsoleCoords() { Length = length, X = x });
             }
         }
 

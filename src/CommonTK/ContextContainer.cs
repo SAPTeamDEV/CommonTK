@@ -1,8 +1,10 @@
-﻿namespace SAPTeam.CommonTK
+﻿using System.Collections.Generic;
+
+namespace SAPTeam.CommonTK
 {
     public class ContextContainer
     {
-        private readonly List<IContext> contexts = new();
+        private readonly List<IContext> contexts = new List<IContext>();
 
         public bool HasContext<Context>()
         {

@@ -9,7 +9,7 @@ namespace SAPTeam.CommonTK.Console
     {
         public string Text;
         private readonly ConsoleColor[] colors;
-        private readonly string? clearText;
+        private readonly string clearText;
 
         public IEnumerable<(string text, ConsoleColor? color)> ColorizedString { get; }
 

@@ -2,17 +2,9 @@
 {
     public partial class Interface
     {
-        public static ConsoleCoords ScreenMessageCoords => new ConsoleCoords()
-        {
-            X = 3,
-            Position = ConsolePosition.Bottom,
-            IsStatic = false,
-            Center = true
-        };
-
         public void ScreenMessage(string message, int msec = 3000)
         {
-            ScreenMessage(message, msec, ScreenMessageCoords.ResolveX() == Index ? ColorSet.InvertedScreenMesage : ColorSet.ScreenMesage, ScreenMessageCoords);
+            ScreenMessage(message, msec, ConsoleCoords.ScreenMessage.ResolveX() == Index ? ColorSet.InvertedScreenMesage : ColorSet.ScreenMesage, ConsoleCoords.ScreenMessage);
         }
 
         public void ScreenMessage(string message, int msec, ColorSet colors, ConsoleCoords coordinates)

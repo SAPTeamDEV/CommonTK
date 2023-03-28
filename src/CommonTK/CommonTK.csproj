@@ -14,6 +14,7 @@
     <RepositoryUrl>https://github.com/SAPTeamDEV/CommonTK</RepositoryUrl>
     <PackageTags>tools;json;settings;status;timer</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>

@@ -25,7 +25,7 @@
         public void Clear()
         {
             Focus();
-            ClearLine(true);
+            Utils.ClearLine(true);
             UnFocus();
         }
 
@@ -33,7 +33,7 @@
         {
             Clear();
             Focus();
-            Echo(message, false);
+            Utils.Echo(message, false);
             UnFocus();
         }
     }

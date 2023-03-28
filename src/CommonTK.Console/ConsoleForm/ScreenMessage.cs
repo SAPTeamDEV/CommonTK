@@ -2,28 +2,36 @@
 {
     public partial class Interface
     {
+        public static ConsoleCoords ScreenMessageCoords => new ConsoleCoords()
+        {
+            X = 3,
+            Position = ConsolePosition.Bottom,
+            IsStatic = false,
+            Center = true
+        };
+
         public void ScreenMessage(string message, int msec = 3000)
         {
-            ScreenMessage(message, msec, ConsoleCoords.ScreenMessage.ResolveX() == Index ? ColorSet.InvertedScreenMesage : ColorSet.ScreenMesage, ConsoleCoords.ScreenMessage);
+            ScreenMessage(message, msec, ScreenMessageCoords.ResolveX() == Index ? ColorSet.InvertedScreenMesage : ColorSet.ScreenMesage, ScreenMessageCoords);
         }
 
         public void ScreenMessage(string message, int msec, ColorSet colors, ConsoleCoords coordinates)
         {
             if (coordinates.Center)
             {
-                coordinates.Y = GetCenterPosition(message.Length);
+                coordinates.Y = Utils.GetCenterPosition(message.Length);
             }
             coordinates.Focus();
             colors.ChangeColor();
-            Echo(message, false);
-            ResetColor();
+            Utils.Echo(message, false);
+            Utils.ResetColor();
             Timer.Set(msec, onEnd);
 
             void onEnd()
             {
                 coordinates.Focus();
-                ResetColor();
-                ClearLine(true);
+                Utils.ResetColor();
+                Utils.ClearLine(true);
                 int actX = coordinates.ResolveX();
                 if (actX == Index && activeForm.Container[Index] is ISelectableControl opClass)
                 {

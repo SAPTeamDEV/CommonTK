@@ -38,21 +38,21 @@ namespace SAPTeam.CommonTK.Console.ConsoleForm
 
         private ConsoleSection AddSection(string section)
         {
-            ConsoleSection secClass = new(Platform, GetLine(), section);
-            Container[GetLine()] = secClass;
+            ConsoleSection secClass = new(Platform, Utils.GetLine(), section);
+            Container[Utils.GetLine()] = secClass;
             secClass.Write();
-            Echo();
+            Utils.Echo();
             return secClass;
         }
 
         private ConsoleOption AddOption(string option, ConsoleSection? secClass)
         {
-            if (First == 0) First = Current = GetLine();
-            Last = GetLine();
-            ConsoleOption opClass = new(Platform, GetLine(), option, secClass);
-            Container[GetLine()] = opClass;
+            if (First == 0) First = Current = Utils.GetLine();
+            Last = Utils.GetLine();
+            ConsoleOption opClass = new(Platform, Utils.GetLine(), option, secClass);
+            Container[Utils.GetLine()] = opClass;
             opClass.Write();
-            Echo();
+            Utils.Echo();
             return opClass;
         }
 

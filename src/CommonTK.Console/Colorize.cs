@@ -9,7 +9,7 @@ namespace SAPTeam.CommonTK.Console
     {
         public string Text;
         private readonly ConsoleColor[] colors;
-        private readonly string? clearText = null;
+        private readonly string? clearText;
 
         public IEnumerable<(string text, ConsoleColor? color)> ColorizedString { get; }
 
@@ -17,6 +17,7 @@ namespace SAPTeam.CommonTK.Console
         {
             Text = text;
             this.colors = colors;
+            clearText = null;
 
             var pieces = Regex.Split(text, @"(\[[^\]]*\])");
             ColorizedString = new (string text, ConsoleColor? color)[pieces.Length];
@@ -26,9 +27,17 @@ namespace SAPTeam.CommonTK.Console
             for (int i = 0; i < pieces.Length; i++)
             {
                 string piece = pieces[i];
+                bool formatted = false;
+
                 if (piece.StartsWith("[") && piece.EndsWith("]"))
                 {
-                    ColorizedString = ColorizedString.Append((piece[1..^1], colors.Length == 0 ? null : colors[Math.Min(ci, colors.Length - 1)])) as IEnumerable<(string, ConsoleColor?)>;
+                    formatted = true;
+                    piece = piece.Substring(1, piece.Length - 1);
+                }
+
+                if (formatted && colors.Length > 0)
+                {
+                    ColorizedString = ColorizedString.Append((piece, colors[Math.Min(ci, colors.Length - 1)])) as IEnumerable<(string, ConsoleColor?)>;
                     ci++;
                 }
                 else

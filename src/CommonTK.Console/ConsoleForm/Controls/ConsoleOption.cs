@@ -18,7 +18,7 @@
             Clear();
             Parent.ColorSchema.ChangeColor();
             Update();
-            ResetColor();
+            Utils.ResetColor();
         }
 
         public override void Write()

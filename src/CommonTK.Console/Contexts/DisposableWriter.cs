@@ -36,11 +36,11 @@ namespace SAPTeam.CommonTK.Contexts
                 System.Console.CursorTop = coord.X;
                 if (lineClear)
                 {
-                    ClearLine(true, null);
+                    Utils.ClearLine(true, null);
                 }
                 else
                 {
-                    ClearLine(true, coord.Length);
+                    Utils.ClearLine(true, coord.Length);
                 }
             }
 

@@ -2,25 +2,23 @@
 {
     public struct ConsoleCoords
     {
-        public static ConsoleCoords ScreenMessage => new()
+        public int X { get; set; }
+        public int Y { get; set; }
+        public int Length { get; set; }
+        public ConsolePosition Position { get; set; }
+        public bool IsStatic { get; set; }
+        public bool Center { get; set; }
+
+        public ConsoleCoords(int x, int y)
         {
-            X = 3,
-            Position = ConsolePosition.Bottom,
-            IsStatic = false,
-            Center = true
-        };
+            X = x;
+            Y = y;
 
-        public int X { get; set; } = default;
-        public int Y { get; set; } = default;
-        public int Length { get; set; } = default;
-        public ConsolePosition Position { get; set; } = default;
-        public bool IsStatic { get; set; } = true;
-        public bool Center { get; set; } = false;
-
-        public ConsoleCoords()
-        {
-
-        }
+        Length = default;
+        Position = default;
+        IsStatic = true;
+        Center = false;
+    }
 
         public void Focus()
         {

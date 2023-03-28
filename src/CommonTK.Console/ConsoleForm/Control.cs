@@ -24,12 +24,12 @@
 
         public void Clear()
         {
-            Focus(ClearInLine);
+            Focus(Utils.ClearInLine);
         }
 
         public void Focus()
         {
-            SetCursor(0, Line, Parent.Spacing);
+            Utils.SetCursor(0, Line, Parent.Spacing);
         }
 
         public void Focus(params Method[] methods)
@@ -45,9 +45,9 @@
         {
             if (centerize)
             {
-                text = new string(' ', GetCenterPosition(text.Length)) + text;
+                text = new string(' ', Utils.GetCenterPosition(text.Length)) + text;
             }
-            Echo(text, false);
+            Utils.Echo(text, false);
         }
 
         public virtual void Write()

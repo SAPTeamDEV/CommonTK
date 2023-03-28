@@ -22,11 +22,11 @@
 
         public void CloseSubForm()
         {
-            if (activeForm == subForms[^1])
+            if (activeForm == subForms.Last())
             {
                 RaiseClose();
                 subForms.RemoveAt(subForms.Count - 1);
-                SetActiveForm(subForms.Count > 0 ? subForms[^1] : rootForm);
+                SetActiveForm(subForms.Count > 0 ? subForms.Last() : rootForm);
             }
         }
     }

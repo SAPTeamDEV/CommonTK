@@ -58,7 +58,7 @@ namespace SAPTeam.CommonTK.Console.ConsoleForm
                 disposableWriter = null;
             }
             bufferWidth = System.Console.BufferWidth;
-            titleLine = GetLine();
+            titleLine = Utils.GetLine();
         }
 
         public void Refresh()
@@ -75,7 +75,7 @@ namespace SAPTeam.CommonTK.Console.ConsoleForm
             foreach (var item in activeForm.Container.Values)
             {
                 item.Write();
-                Echo();
+                Utils.Echo();
             }
             if (activeForm.Container.Count > 0 && activeForm.Container[Index] is ConsoleOption opClass) opClass.Select();
         }

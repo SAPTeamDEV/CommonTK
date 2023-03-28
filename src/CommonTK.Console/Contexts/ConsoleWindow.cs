@@ -23,12 +23,12 @@ namespace SAPTeam.CommonTK.Contexts
         protected override void CreateContext()
         {
             Interface = InteractInterface.Console;
-            ShowConsole(mode, canClose);
+            ConsoleManager.ShowConsole(mode, canClose);
         }
 
         protected override void DisposeContext()
         {
-            HideConsole(release);
+            ConsoleManager.HideConsole(release);
             Interface = InteractInterface.UI;
         }
     }

@@ -10,15 +10,9 @@
         public static ColorSet ScreenMesage => new(ConsoleColor.White, ConsoleColor.Black);
         public static ColorSet InvertedScreenMesage => new(ConsoleColor.Black, ConsoleColor.White);
 
-        internal static ColorSet Current { get => colors; set { colors = value; ResetColor(); } }
+        internal static ColorSet Current { get => colors; set { colors = value; Utils.ResetColor(); } }
 
-        public ColorSet()
-        {
-            Back = ConsoleColor.Black;
-            Fore = ConsoleColor.Gray;
-        }
-
-        public ColorSet(ConsoleColor back, ConsoleColor fore)
+        public ColorSet(ConsoleColor back = ConsoleColor.Black, ConsoleColor fore = ConsoleColor.Gray)
         {
             Back = back;
             Fore = fore;

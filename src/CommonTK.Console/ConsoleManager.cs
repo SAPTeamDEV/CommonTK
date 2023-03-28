@@ -12,17 +12,17 @@ namespace SAPTeam.CommonTK.Console
     /// </summary>
     public static class ConsoleManager
     {
-        private const string kernel32_DllName = "kernel32.dll";
+        private const string Kernel32_DllName = "kernel32.dll";
         private const int SW_HIDE = 0;
         private const int SW_SHOW = 5;
         private const int MF_BYCOMMAND = 0x00000000;
         private const int SC_CLOSE = 0xF060;
 
-        [DllImport(kernel32_DllName)] private static extern bool AllocConsole();
-        [DllImport(kernel32_DllName)] private static extern bool FreeConsole();
-        [DllImport(kernel32_DllName)] private static extern IntPtr GetConsoleWindow();
-        [DllImport(kernel32_DllName)] private static extern int GetConsoleOutputCP();
-        [DllImport(kernel32_DllName)] private static extern bool AttachConsole(int dwProcessId);
+        [DllImport(Kernel32_DllName)] private static extern bool AllocConsole();
+        [DllImport(Kernel32_DllName)] private static extern bool FreeConsole();
+        [DllImport(Kernel32_DllName)] private static extern IntPtr GetConsoleWindow();
+        [DllImport(Kernel32_DllName)] private static extern int GetConsoleOutputCP();
+        [DllImport(Kernel32_DllName)] private static extern bool AttachConsole(int dwProcessId);
 
         [DllImport("user32.dll")] private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
         [DllImport("user32.dll")] private static extern int DeleteMenu(IntPtr hMenu, int nPosition, int wFlags);

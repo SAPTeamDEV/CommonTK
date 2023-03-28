@@ -17,7 +17,6 @@ namespace SAPTeam.CommonTK.Console
         /// </summary>
         /// <param name="text">Message Text.</param>
         /// <param name="newLine">Insert Line Terminator at the end of text. (For Console)</param>
-        /// <exception cref="InterfacrNotImplementedException"></exception>
         public static void Echo(string text = "", bool newLine = true)
         {
             if (text == null)
@@ -89,7 +88,12 @@ namespace SAPTeam.CommonTK.Console
         /// <summary>
         /// Clears Previous or Current line contents and set cursor to Beginning of that line.
         /// </summary>
-        /// <param name="inLineClear">Clear this Line.</param>
+        /// <param name="inLineClear">
+        /// Determines that with line is cleared. if <see langword="true"/> current line is cleared, otherwise The previous line is cleared.
+        /// </param>
+        /// <param name="length">
+        /// Length of characters to be cleared, if <see langword="null"/> the entire line is cleared.
+        /// </param>
         public static void ClearLine(bool inLineClear = false, int? length = null)
         {
             System.Console.SetCursorPosition(0, System.Console.CursorTop - (inLineClear ? 0 : 1));

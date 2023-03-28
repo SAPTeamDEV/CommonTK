@@ -4,21 +4,33 @@
     <TargetFrameworks>netstandard2.0;net461;net5.0-windows</TargetFrameworks>
     <UseWindowsForms>true</UseWindowsForms>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <Deterministic>false</Deterministic>
+    <Deterministic>True</Deterministic>
     <RootNamespace>SAPTeam.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
     <AssemblyName>SAPTeam.$(MSBuildProjectName)</AssemblyName>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>CommonTK.Console</Title>
     <Authors>Alireza Poodineh</Authors>
     <Company>SAP Team</Company>
-    <Description>All in One and Multi Purpose .NET Library for Professional Console actions</Description>
-    <RepositoryType></RepositoryType>
+    <Description>All in One and Multi Purpose .NET Library for Professional Console actions.
+
+This library contains toolset of classes and methods that can be used by .NET Applications to perform Deep level Controls on Console.
+Key features of this library are:
+
+- Console Form: A way different way to Interact with your users. A Console User Interface!
+- Creating and Using console windows in Desktop Applications in The easiest way!
+- Colorize Your console text output!
+- Global Color Set.
+ and more...
+
+For Getting started with this library and See more features you can visit the github page.</Description>
+    <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/SAPTeamDEV/CommonTK</RepositoryUrl>
     <PackageTags>console;console-form;console-manager;color-type;create-console;console-launcher;</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <NoWarn>NETSDK1138</NoWarn>
-    <NeutralLanguage>en</NeutralLanguage>
+    <NoWarn>NETSDK1138;CS1591</NoWarn>
+    <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

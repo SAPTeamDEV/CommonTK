@@ -3,18 +3,48 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <Deterministic>false</Deterministic>
+    <Deterministic>True</Deterministic>
     <RootNamespace>SAPTeam.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
     <AssemblyName>SAPTeam.$(MSBuildProjectName)</AssemblyName>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>CommonTK</Title>
     <Authors>Alireza Poodineh</Authors>
     <Company>SAP Team</Company>
-    <Description>All in One and Multi Purpose .NET Library</Description>
+    <Description>All in One and Multi Purpose .NET Library.
+
+This library contains toolset of Interfaces and classes that can be used by .NET Applications
+Key features of this library are:
+
+- Provides classes to Read/Write json files that can be used as app settings.
+- Base context class that can be used for creating Disposable contexts. (a collection of Console -related Contexts is available in SAPTeam.CommonTk.Console)
+- Various Status Providers that can be implemented and used for showing application status.
+ and more...
+
+For Getting started with this library you can visit the github page.</Description>
     <RepositoryUrl>https://github.com/SAPTeamDEV/CommonTK</RepositoryUrl>
     <PackageTags>tools;json;settings;status;timer</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<ProduceReferenceAssembly>True</ProduceReferenceAssembly>
+	<GenerateDocumentationFile>True</GenerateDocumentationFile>
+	<RepositoryType>git</RepositoryType>
+	<PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
+    <NoWarn>1701;1702;CS1591</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
+    <NoWarn>1701;1702;CS1591</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net461|AnyCPU'">
+    <NoWarn>1701;1702;CS1591</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net461|AnyCPU'">
+    <NoWarn>1701;1702;CS1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

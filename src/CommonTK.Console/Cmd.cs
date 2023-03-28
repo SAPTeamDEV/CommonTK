@@ -1,4 +1,7 @@
 ﻿using System;
+#if NET5_0 && WINDOWS
+using System.Windows.Forms;
+#endif
 
 using SAPTeam.CommonTK.Contexts;
 
@@ -46,14 +49,14 @@ namespace SAPTeam.CommonTK.Console
                     }
                     break;
 
-                    /*
-                    case InteractInterface.UI:
-                        MessageBox.Show(text, Properties.Resources.AppName);
+#if NET5_0 && WINDOWS
+                case InteractInterface.UI:
+                        MessageBox.Show(text, AppDomain.CurrentDomain.FriendlyName);
                         break;
+#endif
 
-                    default:
-                        throw new InterfacrNotImplementedException();
-                    */
+                default:
+                        throw new InvalidOperationException();
             }
         }
 

@@ -1,4 +1,6 @@
-﻿using SAPTeam.CommonTK.Console.ConsoleForm.Controls;
+﻿using System;
+
+using SAPTeam.CommonTK.Console.ConsoleForm.Controls;
 
 namespace SAPTeam.CommonTK.Console.ConsoleForm
 {

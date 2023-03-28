@@ -1,4 +1,7 @@
-﻿namespace SAPTeam.CommonTK.Contexts
+﻿using System;
+using System.IO;
+
+namespace SAPTeam.CommonTK.Contexts
 {
     public class RedirectConsole : Context
     {

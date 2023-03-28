@@ -1,4 +1,6 @@
-﻿namespace SAPTeam.CommonTK.Console
+﻿using System;
+
+namespace SAPTeam.CommonTK.Console
 {
     public struct ColorSet
     {

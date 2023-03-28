@@ -1,4 +1,7 @@
-﻿namespace SAPTeam.CommonTK.Console.ConsoleForm
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace SAPTeam.CommonTK.Console.ConsoleForm
 {
     public partial class Interface
     {

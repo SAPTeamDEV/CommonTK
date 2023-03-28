@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 
 using SAPTeam.CommonTK.Console.ConsoleForm.Controls;
 using SAPTeam.CommonTK.Contexts;

@@ -1,4 +1,6 @@
-﻿using SAPTeam.CommonTK.Contexts;
+﻿using System;
+
+using SAPTeam.CommonTK.Contexts;
 
 namespace SAPTeam.CommonTK.Console
 {

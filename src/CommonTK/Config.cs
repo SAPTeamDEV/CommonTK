@@ -12,10 +12,6 @@ namespace SAPTeam.CommonTK
 
         public Config(string configPath) : base(configPath)
         {
-            if (!File.Exists(FileName))
-            {
-                Write(new T());
-            }
             JObject cData = Open();
             Prefs = Parse<T>(cData.CreateReader());
         }

@@ -38,6 +38,8 @@ namespace SAPTeam.CommonTK
             {
                 StringWriter sw = new StringWriter();
                 JsonTextWriter jw = new JsonTextWriter(sw);
+                jw.WriteStartObject();
+                jw.WriteEndObject();
                 Save(sw);
             }
         }
@@ -78,6 +80,7 @@ namespace SAPTeam.CommonTK
         /// A new instance of <typeparamref name="T"/> initialized with <paramref name="reader"/> values.
         /// </returns>
         protected virtual T Parse<T>(JsonReader reader)
+            where T : new()
         {
             return js.Deserialize<T>(reader);
         }

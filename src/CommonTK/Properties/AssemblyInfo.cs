@@ -7,6 +7,12 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyTitle("CommonTK")]
 [assembly: AssemblyDescription("")]
+[assembly: AssemblyProduct("Common Toolkit")]
+[assembly: AssemblyCompany("SAP Team")]
+[assembly: AssemblyCopyright("Copyright © SAP Team 2022")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 

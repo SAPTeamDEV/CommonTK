@@ -1,6 +1,11 @@
-﻿namespace SAPTeam.CommonTK
+﻿using System;
+
+namespace SAPTeam.CommonTK
 {
-    public interface IContext
+    /// <summary>
+    /// Defines A Disposable Context that can be used to set some properties of do particular actions in specified conditions.
+    /// </summary>
+    public interface IContext : IDisposable
     {
     }
 }

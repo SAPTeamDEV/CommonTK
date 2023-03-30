@@ -34,7 +34,7 @@ For Getting started with this library you can visit the github page.</Descriptio
 	<PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
 	<Copyright>Copyright © SAP Team 2023</Copyright>
 	<SignAssembly>True</SignAssembly>
-	<AssemblyOriginatorKeyFile>E:\Projects\Workspace\CommonTK\CommonTK.snk</AssemblyOriginatorKeyFile>
+	<AssemblyOriginatorKeyFile>CommonTK.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
     <Deterministic>True</Deterministic>
     <RootNamespace>SAPTeam.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
     <AssemblyName>SAPTeam.$(MSBuildProjectName)</AssemblyName>

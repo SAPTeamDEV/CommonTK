@@ -8,8 +8,11 @@
     <AssemblyName>SAPTeam.$(MSBuildProjectName)</AssemblyName>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>CommonTK</Title>
+    <AssemblyTitle>.NET Common Toolkit</AssemblyTitle>
+    <Product>All in One and Multi Purpose .NET Library</Product>
     <Authors>Alireza Poodineh</Authors>
     <Company>SAP Team</Company>
+    
     <Description>All in One and Multi Purpose .NET Library.
 
 This library contains toolset of Interfaces and classes that can be used by .NET Applications
@@ -29,6 +32,9 @@ For Getting started with this library you can visit the github page.</Descriptio
 	<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	<RepositoryType>git</RepositoryType>
 	<PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
+	<Copyright>Copyright © SAP Team 2023</Copyright>
+	<SignAssembly>True</SignAssembly>
+	<AssemblyOriginatorKeyFile>E:\Projects\Workspace\CommonTK\CommonTK.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">

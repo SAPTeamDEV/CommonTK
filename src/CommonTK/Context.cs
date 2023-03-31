@@ -19,6 +19,9 @@ namespace SAPTeam.CommonTK
 
         /// <summary>
         /// Gets or Sets the process interaction Interface.
+        /// <para>
+        /// This value must be set by application for the first time.
+        /// </para>
         /// </summary>
         public static InteractInterface Interface { get; set; }
 

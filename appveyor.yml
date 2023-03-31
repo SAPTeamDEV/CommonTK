@@ -12,7 +12,7 @@ build_script:
   - cmd: dotnet pack -c Release
 
 artifacts:
-  - path: src\CommonTK*\bin\Release\SAPTeam.CommonTK.*.nupkg
+  - path: src\CommonTK*\bin\Release\SAPTeam.CommonTK.*.*nupkg
 
 deploy:
   provider: NuGet
@@ -20,4 +20,4 @@ deploy:
     branch: master
   api_key:
     secure: 2JgiRhKTzQyXmzR9JYLL6f9aNfxEKvr0pF0NxqQ1YY59O1Z5xQqI9kmDgFEiJe4y
-  skip_symbols: true
+  skip_symbols: false

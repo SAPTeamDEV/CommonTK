@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 
 namespace SAPTeam.CommonTK
 {
@@ -10,6 +11,8 @@ namespace SAPTeam.CommonTK
     /// </summary>
     public abstract class Context : IContext
     {
+		[DllImport("kernel32.dll")] private static extern IntPtr GetConsoleWindow();
+		
         private bool disposedValue;
 
         /// <summary>
@@ -19,11 +22,8 @@ namespace SAPTeam.CommonTK
 
         /// <summary>
         /// Gets or Sets the process interaction Interface.
-        /// <para>
-        /// This value must be set by application for the first time.
-        /// </para>
         /// </summary>
-        public static InteractInterface Interface { get; set; }
+        public static InteractInterface Interface { get; set; } = GetConsoleWindow() != IntPtr.Zero ? InteractInterface.Console : InteractInterface.UI;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Context"/> class.

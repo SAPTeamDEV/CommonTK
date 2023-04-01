@@ -12,7 +12,7 @@ build_script:
   - cmd: dotnet pack -c Release
 
 artifacts:
-  - path: src\CommonTK*\bin\Release\SAPTeam.CommonTK.*.*nupkg
+  - path: CommonTK*\bin\Release\SAPTeam.CommonTK.*.*nupkg
 
 deploy:
   provider: NuGet

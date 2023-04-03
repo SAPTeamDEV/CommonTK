@@ -7,7 +7,7 @@ namespace SAPTeam.CommonTK
     /// </summary>
     public class ContextContainer
     {
-        private readonly List<IContext> contexts = new List<IContext>();
+        private readonly Dictionary<string, IContext> contexts = new Dictionary<string, IContext>();
 
         /// <summary>
         /// Checks that the current session has the specified type of context.
@@ -32,7 +32,7 @@ namespace SAPTeam.CommonTK
         /// </param>
         public void SetContect(IContext context)
         {
-            contexts.Add(context);
+            contexts[context.GetType().Name] = context;
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace SAPTeam.CommonTK
         {
             foreach (var context in contexts)
             {
-                if (context is Context obj)
+                if (context.Value is Context obj)
                 {
                     return obj;
                 }
@@ -60,7 +60,7 @@ namespace SAPTeam.CommonTK
 
         internal void DisposeContext(IContext context)
         {
-            contexts.Remove(context);
+            contexts.Remove(context.GetType().Name);
         }
     }
 }

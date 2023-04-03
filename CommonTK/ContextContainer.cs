@@ -61,7 +61,10 @@ namespace SAPTeam.CommonTK
         /// </param>
         public void SetContect(IContext context)
         {
-            contexts[context.GetType().Name] = context;
+            lock (contexts)
+            {
+                contexts[context.GetType().Name] = context;
+            }
         }
 
         /// <summary>
@@ -124,7 +127,10 @@ namespace SAPTeam.CommonTK
 
         internal void DisposeContext(IContext context)
         {
-            contexts.Remove(context.GetType().Name);
+            lock (contexts)
+            {
+                contexts.Remove(context.GetType().Name);
+            }
         }
     }
 }

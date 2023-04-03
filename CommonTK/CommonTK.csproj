@@ -29,7 +29,7 @@ For Getting started with this library you can visit the github page.</Descriptio
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <PackageTags>tools;json;settings;status;timer</PackageTags>
+    <PackageTags>tools;toolkit;utility;json;settings;config;status;timer;context;status-provider</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<ProduceReferenceAssembly>True</ProduceReferenceAssembly>

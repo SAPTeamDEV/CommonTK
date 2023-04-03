@@ -37,7 +37,7 @@ namespace SAPTeam.CommonTK
             {
                 ArgsHandler(args);
             }
-            Current.SetContect(this);
+            Current.SetContext(this);
             CreateContext();
         }
 

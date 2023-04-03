@@ -9,6 +9,7 @@ namespace SAPTeam.CommonTK
     public class ContextContainer
     {
         private readonly Dictionary<string, IContext> contexts = new Dictionary<string, IContext>();
+        object lockObj = new object();
 
         /// <summary>
         /// Checks that the current session has the specified type of context.
@@ -59,9 +60,14 @@ namespace SAPTeam.CommonTK
         /// <param name="context">
         /// A Context object.
         /// </param>
-        public void SetContect(IContext context)
+        public void SetContext(IContext context)
         {
-            lock (contexts)
+            if (contexts.ContainsKey(context.GetType().Name))
+            {
+                throw new InvalidOperationException("An instance of this context already exist");
+            }
+
+            lock (lockObj)
             {
                 contexts[context.GetType().Name] = context;
             }
@@ -127,7 +133,7 @@ namespace SAPTeam.CommonTK
 
         internal void DisposeContext(IContext context)
         {
-            lock (contexts)
+            lock (lockObj)
             {
                 contexts.Remove(context.GetType().Name);
             }

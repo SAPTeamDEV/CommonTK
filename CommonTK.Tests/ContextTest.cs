@@ -7,7 +7,7 @@ namespace CommonTK.Tests
         [Fact]
         public void RegisterContextTest()
         {
-            using (var context = new DummyContext())
+            using (var context = new DummyContext(true))
             {
                 Assert.True(Context.Current.HasContext<DummyContext>());
                 Assert.True(Context.Current.HasContext(typeof(DummyContext)));
@@ -24,7 +24,7 @@ namespace CommonTK.Tests
         [Fact]
         public void GetContextTest()
         {
-            using (var context = new DummyContext())
+            using (var context = new DummyContext(true))
             {
                 Assert.Equal(Context.Current.GetContext<DummyContext>(), context);
                 Assert.Equal(Context.Current.GetContext(typeof(DummyContext)), context);
@@ -53,6 +53,15 @@ namespace CommonTK.Tests
             }
 
             Assert.Equal(InteractInterface.UI, Context.Interface);
+        }
+
+        [Fact]
+        public void DuplicateContextTest()
+        {
+            using (var context = new DummyContext(true))
+            {
+                Assert.Throws<InvalidOperationException>(() => new DummyContext(true));
+            }
         }
     }
 }

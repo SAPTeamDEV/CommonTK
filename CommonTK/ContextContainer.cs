@@ -15,13 +15,13 @@ namespace SAPTeam.CommonTK
         /// Checks that the current session has the specified type of context.
         /// </summary>
         /// <typeparam name="Context">
-        /// A class type that implements the <see cref="Context"/> as base class.
+        /// A class type that implements the <see cref="IContext"/>.
         /// </typeparam>
         /// <returns>
         /// returns <see langword="true"/> if the current session has an instance of <typeparamref name="Context"/>. otherwise it return <see langword="false"/>.
         /// </returns>
         public bool HasContext<Context>()
-            where Context : CommonTK.Context
+            where Context : IContext
         {
             return GetContext<Context>() != null;
         }
@@ -74,16 +74,31 @@ namespace SAPTeam.CommonTK
         }
 
         /// <summary>
+        /// Creates a new Context and registers it.
+        /// </summary>
+        /// <typeparam name="Context">
+        /// A class type that implements the <see cref="IContext"/>.
+        /// </typeparam>
+        /// <returns>
+        /// A new instance of <typeparamref name="Context"/>.
+        /// </returns>
+        public Context SetContext<Context>()
+            where Context : IContext, new()
+        {
+            return new Context();
+        }
+
+        /// <summary>
         /// Gets the context object that matches with <typeparamref name="Context"/> name.
         /// </summary>
         /// <typeparam name="Context">
-        /// A class type that implements the <see cref="Context"/> as base class.
+        /// A class type that implements the <see cref="IContext"/>.
         /// </typeparam>
         /// <returns>
         /// An existing instance of matching <typeparamref name="Context"/> type. if there is no matching contexts it returns <see href="default"/>.
         /// </returns>
         public Context GetContext<Context>()
-            where Context : CommonTK.Context
+            where Context : IContext
         {
             if (contexts.ContainsKey(typeof(Context).Name))
             {

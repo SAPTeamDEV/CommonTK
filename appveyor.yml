@@ -11,6 +11,12 @@ build_script:
   - cmd: dotnet build -c Release
   - cmd: dotnet pack -c Release
 
+test_script:
+  - cmd: cd %APPVEYOR_BUILD_FOLDER%\CommonTK.Tests\
+  - cmd: dotnet restore
+  - cmd: dotnet build
+  - cmd: dotnet test
+
 artifacts:
   - path: CommonTK*\bin\Release\SAPTeam.CommonTK.*.*nupkg
 

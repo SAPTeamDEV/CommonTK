@@ -26,9 +26,9 @@ namespace CommonTK.Tests
         {
             using (var context = new DummyContext(true))
             {
-                Assert.Equal(Context.Current.GetContext<DummyContext>(), context);
-                Assert.Equal(Context.Current.GetContext(typeof(DummyContext)), context);
-                Assert.Equal(Context.Current.GetContext(typeof(DummyContext).Name), context);
+                Assert.Equal(context, Context.Current.GetContext<DummyContext>());
+                Assert.Equal(context, Context.Current.GetContext(typeof(DummyContext)));
+                Assert.Equal(context, Context.Current.GetContext(typeof(DummyContext).Name));
             }
         }
 
@@ -62,6 +62,18 @@ namespace CommonTK.Tests
             {
                 Assert.Throws<InvalidOperationException>(() => new DummyContext(true));
             }
+        }
+
+        [Fact]
+        public void RegisterTypeContextTest()
+        {
+            using (var context = Context.Current.SetContext<DummyContext>())
+            {
+                Assert.True(Context.Current.HasContext<DummyContext>());
+                Assert.Equal(context, Context.Current.GetContext<DummyContext>());
+            }
+
+            Assert.False(Context.Current.HasContext<DummyContext>());
         }
     }
 }

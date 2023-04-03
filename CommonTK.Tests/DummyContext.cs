@@ -13,6 +13,11 @@ namespace CommonTK.Tests
         public bool IsTest { get; set; }
         public InteractInterface PreStat { get; set; }
 
+        public DummyContext(): base()
+        {
+            
+        }
+
         public DummyContext(bool isTest = false): base(isTest)
         {
             

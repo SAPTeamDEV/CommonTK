@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 
 using SAPTeam.CommonTK;
 
-namespace CommonTK.Tests
+namespace SAPTeam.CommonTK.Tests
 {
     internal class DummyContext2 : Context
     {
         bool created;
 
-        public DummyContext2(): this(false)
+        public DummyContext2() : this(false)
         {
-            
+
         }
 
         public DummyContext2(bool isGlobal = true)
@@ -36,7 +36,7 @@ namespace CommonTK.Tests
 
         protected override void DisposeContext()
         {
-            
+
         }
     }
 }

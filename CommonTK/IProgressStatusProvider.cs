@@ -15,6 +15,11 @@ namespace SAPTeam.CommonTK
     public interface IProgressStatusProvider : IStatusProvider
     {
         /// <summary>
+        /// Gets or Sets a value indicating the type of status progress bar.
+        /// </summary>
+        ProgressBarType Type { get; set; }
+
+        /// <summary>
         /// Writes the new status text with specified <paramref name="type"/> to the Status Provider.
         /// </summary>
         /// <param name="message">

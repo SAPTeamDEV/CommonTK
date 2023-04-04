@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 using SAPTeam.CommonTK;
 
-namespace CommonTK.Tests
+namespace SAPTeam.CommonTK.Tests
 {
     internal class DummyContext : Context
     {
         public bool IsTest { get; set; }
         public InteractInterface PreStat { get; set; }
 
-        public DummyContext(): this(false)
+        public DummyContext() : this(false)
         {
-            
+
         }
         public DummyContext(bool isTest = false, bool isGlobal = true)
         {

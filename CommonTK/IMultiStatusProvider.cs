@@ -6,6 +6,7 @@ namespace SAPTeam.CommonTK
     /// Implements an <see cref="IStatusProvider"/> with multi status processing support.
     /// <para>
     /// Classes that implements this interface can set the <see cref="IStatusProvider.Clear()"/> to throw <see cref="NotImplementedException"/>.
+    /// But implementing the <see cref="IDisposable.Dispose()"/> is mandatory for handling the status changing events.
     /// Also these classes must implement a way to store statuses.
     /// </para>
     /// </summary>

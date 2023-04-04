@@ -1,9 +1,11 @@
-﻿namespace SAPTeam.CommonTK
+﻿using System;
+
+namespace SAPTeam.CommonTK
 {
     /// <summary>
     /// Provides mechanisms for interacting with users and notifying them.
     /// </summary>
-    public interface IStatusProvider
+    public interface IStatusProvider : IDisposable
     {
         /// <summary>
         /// Clears the text of Status Provider

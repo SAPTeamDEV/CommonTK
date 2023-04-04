@@ -1,6 +1,6 @@
 using SAPTeam.CommonTK;
 
-namespace CommonTK.Tests
+namespace SAPTeam.CommonTK.Tests
 {
     public class ContextTest
     {

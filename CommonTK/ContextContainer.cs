@@ -8,22 +8,22 @@ namespace SAPTeam.CommonTK
     /// </summary>
     public class ContextContainer
     {
-        private readonly Dictionary<string, IContext> contexts = new Dictionary<string, IContext>();
+        private readonly Dictionary<string, Context> contexts = new Dictionary<string, Context>();
         object lockObj = new object();
 
         /// <summary>
         /// Checks that the current session has the specified type of context.
         /// </summary>
-        /// <typeparam name="Context">
-        /// A class type that implements the <see cref="IContext"/>.
+        /// <typeparam name="TContext">
+        /// A class type that implements the <see cref="Context"/> as base class.
         /// </typeparam>
         /// <returns>
-        /// returns <see langword="true"/> if the current session has an instance of <typeparamref name="Context"/>. otherwise it return <see langword="false"/>.
+        /// returns <see langword="true"/> if the current session has an instance of <typeparamref name="TContext"/>. otherwise it return <see langword="false"/>.
         /// </returns>
-        public bool HasContext<Context>()
-            where Context : IContext
+        public bool HasContext<TContext>()
+            where TContext : Context
         {
-            return GetContext<Context>() != null;
+            return GetContext<TContext>() != null;
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace SAPTeam.CommonTK
         /// <param name="context">
         /// A Context object.
         /// </param>
-        public void SetContext(IContext context)
+        public void SetContext(Context context)
         {
             if (contexts.ContainsKey(context.GetType().Name))
             {
@@ -76,33 +76,33 @@ namespace SAPTeam.CommonTK
         /// <summary>
         /// Creates a new Context and registers it.
         /// </summary>
-        /// <typeparam name="Context">
-        /// A class type that implements the <see cref="IContext"/>.
+        /// <typeparam name="TContext">
+        /// A class type that implements the <see cref="Context"/> as base class.
         /// </typeparam>
         /// <returns>
-        /// A new instance of <typeparamref name="Context"/>.
+        /// A new instance of <typeparamref name="TContext"/>.
         /// </returns>
-        public Context SetContext<Context>()
-            where Context : IContext, new()
+        public TContext SetContext<TContext>()
+            where TContext : Context, new()
         {
-            return new Context();
+            return new TContext();
         }
 
         /// <summary>
-        /// Gets the context object that matches with <typeparamref name="Context"/> name.
+        /// Gets the context object that matches with <typeparamref name="TContext"/> name.
         /// </summary>
-        /// <typeparam name="Context">
-        /// A class type that implements the <see cref="IContext"/>.
+        /// <typeparam name="TContext">
+        /// A class type that implements the <see cref="Context"/> as base class.
         /// </typeparam>
         /// <returns>
-        /// An existing instance of matching <typeparamref name="Context"/> type. if there is no matching contexts it returns <see href="default"/>.
+        /// An existing instance of matching <typeparamref name="TContext"/> type. if there is no matching contexts it returns <see href="default"/>.
         /// </returns>
-        public Context GetContext<Context>()
-            where Context : IContext
+        public TContext GetContext<TContext>()
+            where TContext : Context
         {
-            if (contexts.ContainsKey(typeof(Context).Name))
+            if (contexts.ContainsKey(typeof(TContext).Name))
             {
-                return (Context)contexts[typeof(Context).Name];
+                return (TContext)contexts[typeof(TContext).Name];
             }
 
             return default;
@@ -117,7 +117,7 @@ namespace SAPTeam.CommonTK
         /// <returns>
         /// An existing instance of matching <paramref name="contextType"/> type. if there is no matching contexts it returns <see href="default"/>.
         /// </returns>
-        public IContext GetContext(Type contextType)
+        public Context GetContext(Type contextType)
         {
             if (contexts.ContainsKey(contextType.Name))
             {
@@ -136,7 +136,7 @@ namespace SAPTeam.CommonTK
         /// <returns>
         /// An existing instance of matching <paramref name="contextName"/> type name. if there is no matching contexts it returns <see href="default"/>.
         /// </returns>
-        public IContext GetContext(string contextName)
+        public Context GetContext(string contextName)
         {
             if (contexts.ContainsKey(contextName))
             {
@@ -146,7 +146,7 @@ namespace SAPTeam.CommonTK
             return default;
         }
 
-        internal void DisposeContext(IContext context)
+        internal void DisposeContext(Context context)
         {
             lock (lockObj)
             {

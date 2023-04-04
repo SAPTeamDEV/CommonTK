@@ -4,12 +4,9 @@ using System.Runtime.InteropServices;
 namespace SAPTeam.CommonTK
 {
     /// <summary>
-    /// Base class of Context classes. this abstract class initializes and registers the <see cref="Context"/> instances into <see cref="Context.Current"/>.
-    /// <para>
-    /// Don't replace the class constructor, either override <see langword="abstract"/> methods.
-    /// </para>
+    /// Defines a disposable Context that can be used to set some properties or do particular actions in a specified <see cref="Context"/>.
     /// </summary>
-    public abstract class Context : IContext
+    public abstract class Context : IDisposable
     {
 		[DllImport("kernel32.dll")] private static extern IntPtr GetConsoleWindow();
 		

@@ -11,18 +11,39 @@ namespace SAPTeam.CommonTK
         private bool disposedValue;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Context"/> class.
+        /// Gets the name identifier of this context.
         /// </summary>
-        /// <param name="args">
-        /// Arguments that be passed to <see cref="ArgsHandler(dynamic[])"/> method.
+        public string Name => GetType().Name;
+
+        /// <summary>
+        /// Gets or Sets a value indicating whether this context is globally registered.
+        /// </summary>
+        public bool IsGlobal { get; private set; }
+
+        /// <summary>
+        /// Initializes a new context.
+        /// This method must be called in the end of context constructor.
+        /// </summary>
+        /// <param name="global">
+        /// Determines whether to register this context globally.
         /// </param>
-        public Context(params dynamic[] args)
+        /// <exception cref="InvalidOperationException"></exception>
+        protected void Initialize(bool global)
         {
-            if (args.Length > 0)
+            IsGlobal = global;
+            if (IsGlobal)
             {
-                ArgsHandler(args);
+                if (contexts.ContainsKey(Name))
+                {
+                    throw new InvalidOperationException("An instance of this context already exist");
+                }
+
+                lock (lockObj)
+                {
+                    contexts[Name] = this;
+                }
             }
-            SetContext(this);
+
             CreateContext();
         }
 
@@ -37,32 +58,21 @@ namespace SAPTeam.CommonTK
         protected abstract void DisposeContext();
 
         /// <summary>
-        /// This method called only when that an argument or arguments passed to the constructor.
-        /// </summary>
-        /// <param name="args">
-        /// An array of arguments that passed to the constructor.
-        /// </param>
-        protected abstract void ArgsHandler(dynamic[] args);
-
-        /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         /// <param name="disposing">
         /// Determines the dispose stage.
         /// </param>
-        protected virtual void Dispose(bool disposing)
+        void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
-                if (disposing)
-                {
-                    // TODO: dispose managed state (managed objects)
-                }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-                // TODO: set large fields to null
-                DisposeContext(this);
                 DisposeContext();
+
+                lock (lockObj)
+                {
+                    contexts.Remove(Name);
+                }
 
                 disposedValue = true;
             }
@@ -71,7 +81,6 @@ namespace SAPTeam.CommonTK
         /// <inheritdoc/>
         public void Dispose()
         {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }

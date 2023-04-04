@@ -9,7 +9,7 @@ namespace SAPTeam.CommonTK
         [DllImport("kernel32.dll")] private static extern IntPtr GetConsoleWindow();
 
         static readonly Dictionary<string, Context> contexts = new Dictionary<string, Context>();
-        static object lockObj = new object();
+        static readonly object lockObj = new object();
 
         /// <summary>
         /// Gets or Sets the process interaction Interface.
@@ -57,25 +57,6 @@ namespace SAPTeam.CommonTK
         public static bool HasContext(string contextName)
         {
             return GetContext(contextName) != null;
-        }
-
-        /// <summary>
-        /// Registers a new Context.
-        /// </summary>
-        /// <param name="context">
-        /// A Context object.
-        /// </param>
-        public static void SetContext(Context context)
-        {
-            if (contexts.ContainsKey(context.GetType().Name))
-            {
-                throw new InvalidOperationException("An instance of this context already exist");
-            }
-
-            lock (lockObj)
-            {
-                contexts[context.GetType().Name] = context;
-            }
         }
 
         /// <summary>
@@ -149,14 +130,6 @@ namespace SAPTeam.CommonTK
             }
 
             return default;
-        }
-
-        internal static void DisposeContext(Context context)
-        {
-            lock (lockObj)
-            {
-                contexts.Remove(context.GetType().Name);
-            }
         }
     }
 }

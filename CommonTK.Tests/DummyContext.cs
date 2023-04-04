@@ -13,19 +13,14 @@ namespace CommonTK.Tests
         public bool IsTest { get; set; }
         public InteractInterface PreStat { get; set; }
 
-        public DummyContext(): base()
+        public DummyContext(): this(false)
         {
             
         }
-
-        public DummyContext(bool isTest = false): base(isTest)
+        public DummyContext(bool isTest = false, bool isGlobal = true)
         {
-            
-        }
-
-        protected override void ArgsHandler(dynamic[] args)
-        {
-            IsTest = args[0];
+            IsTest = isTest;
+            Initialize(isGlobal);
         }
 
         protected override void CreateContext()

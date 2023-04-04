@@ -75,5 +75,17 @@ namespace CommonTK.Tests
 
             Assert.False(Context.HasContext<DummyContext>());
         }
+
+        [Fact]
+        public void PrivateContextTest()
+        {
+            using (var context = new DummyContext(true, false))
+            {
+                Assert.False(Context.HasContext<DummyContext>());
+                Assert.False(context.IsGlobal);
+            }
+
+            Assert.False(Context.HasContext<DummyContext>());
+        }
     }
 }

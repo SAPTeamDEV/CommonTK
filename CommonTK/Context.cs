@@ -16,9 +16,14 @@ namespace SAPTeam.CommonTK
         public string Name => GetType().Name;
 
         /// <summary>
-        /// Gets or Sets a value indicating whether this context is globally registered.
+        /// Gets a value indicating whether this context is globally registered.
         /// </summary>
-        public bool IsGlobal { get; private set; }
+        public bool IsGlobal => contexts.ContainsValue(this);
+
+        /// <summary>
+        /// Gets a value indicating whether this context is running.
+        /// </summary>
+        public bool IsRunning { get; private set; }
 
         /// <summary>
         /// Initializes a new context.
@@ -30,12 +35,11 @@ namespace SAPTeam.CommonTK
         /// <exception cref="InvalidOperationException"></exception>
         protected void Initialize(bool global)
         {
-            IsGlobal = global;
-            if (IsGlobal)
+            if (global)
             {
-                if (contexts.ContainsKey(Name))
+                if (Exists(Name))
                 {
-                    throw new InvalidOperationException("An instance of this context already exist");
+                    throw new InvalidOperationException("An instance of this context already exists");
                 }
 
                 lock (lockObj)
@@ -44,7 +48,11 @@ namespace SAPTeam.CommonTK
                 }
             }
 
-            CreateContext();
+            if (!IsRunning)
+            {
+                IsRunning = true;
+                CreateContext();
+            }
         }
 
         /// <summary>
@@ -67,11 +75,18 @@ namespace SAPTeam.CommonTK
         {
             if (!disposedValue)
             {
-                DisposeContext();
-
-                lock (lockObj)
+                if (IsRunning)
                 {
-                    contexts.Remove(Name);
+                    DisposeContext();
+                    IsRunning = false;
+                }
+
+                if (IsGlobal)
+                {
+                    lock (lockObj)
+                    {
+                        contexts.Remove(Name);
+                    }
                 }
 
                 disposedValue = true;

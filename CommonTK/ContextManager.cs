@@ -17,6 +17,27 @@ namespace SAPTeam.CommonTK
         public static InteractInterface Interface { get; set; } = GetConsoleWindow() != IntPtr.Zero ? InteractInterface.Console : InteractInterface.UI;
 
         /// <summary>
+        /// Creates a new Context and registers it globally.
+        /// </summary>
+        /// <typeparam name="TContext">
+        /// A class type that implements the <see cref="Context"/> as base class.
+        /// </typeparam>
+        /// <returns>
+        /// A new instance of <typeparamref name="TContext"/>.
+        /// </returns>
+        public static TContext Register<TContext>()
+            where TContext : Context, new()
+        {
+            var context = new TContext();
+            if (!context.IsGlobal)
+            {
+                context.Initialize(true);
+            }
+
+            return context;
+        }
+
+        /// <summary>
         /// Checks that the current session has the specified type of context.
         /// </summary>
         /// <typeparam name="TContext">
@@ -25,10 +46,10 @@ namespace SAPTeam.CommonTK
         /// <returns>
         /// returns <see langword="true"/> if the current session has an instance of <typeparamref name="TContext"/>. otherwise it return <see langword="false"/>.
         /// </returns>
-        public static bool HasContext<TContext>()
+        public static bool Exists<TContext>()
             where TContext : Context
         {
-            return GetContext<TContext>() != null;
+            return contexts.ContainsKey(typeof(TContext).Name);
         }
 
         /// <summary>
@@ -40,9 +61,9 @@ namespace SAPTeam.CommonTK
         /// <returns>
         /// returns <see langword="true"/> if the current session has an instance of <paramref name="contextType"/>. otherwise it return <see langword="false"/>.
         /// </returns>
-        public static bool HasContext(Type contextType)
+        public static bool Exists(Type contextType)
         {
-            return GetContext(contextType) != null;
+            return contexts.ContainsKey(contextType.Name);
         }
 
         /// <summary>
@@ -54,24 +75,9 @@ namespace SAPTeam.CommonTK
         /// <returns>
         /// returns <see langword="true"/> if the current session has an instance of <paramref name="contextName"/>. otherwise it return <see langword="false"/>.
         /// </returns>
-        public static bool HasContext(string contextName)
+        public static bool Exists(string contextName)
         {
-            return GetContext(contextName) != null;
-        }
-
-        /// <summary>
-        /// Creates a new Context and registers it.
-        /// </summary>
-        /// <typeparam name="TContext">
-        /// A class type that implements the <see cref="Context"/> as base class.
-        /// </typeparam>
-        /// <returns>
-        /// A new instance of <typeparamref name="TContext"/>.
-        /// </returns>
-        public static TContext SetContext<TContext>()
-            where TContext : Context, new()
-        {
-            return new TContext();
+            return contexts.ContainsKey(contextName);
         }
 
         /// <summary>
@@ -81,18 +87,11 @@ namespace SAPTeam.CommonTK
         /// A class type that implements the <see cref="Context"/> as base class.
         /// </typeparam>
         /// <returns>
-        /// An existing instance of matching <typeparamref name="TContext"/> type. if there is no matching contexts it returns <see href="default"/>.
+        /// An existing instance of matching <typeparamref name="TContext"/> type. if there is no matching contexts it throws an <see cref="KeyNotFoundException"/>.
         /// </returns>
+        /// <exception cref="KeyNotFoundException"></exception>
         public static TContext GetContext<TContext>()
-            where TContext : Context
-        {
-            if (contexts.ContainsKey(typeof(TContext).Name))
-            {
-                return (TContext)contexts[typeof(TContext).Name];
-            }
-
-            return default;
-        }
+            where TContext : Context => (TContext)contexts[typeof(TContext).Name];
 
         /// <summary>
         /// Gets the context object that matches with <paramref name="contextType"/> type name.
@@ -101,17 +100,10 @@ namespace SAPTeam.CommonTK
         /// A context class type.
         /// </param>
         /// <returns>
-        /// An existing instance of matching <paramref name="contextType"/> type. if there is no matching contexts it returns <see href="default"/>.
+        /// An existing instance of matching <paramref name="contextType"/> type. if there is no matching contexts it throws an <see cref="KeyNotFoundException"/>.
         /// </returns>
-        public static Context GetContext(Type contextType)
-        {
-            if (contexts.ContainsKey(contextType.Name))
-            {
-                return contexts[contextType.Name];
-            }
-
-            return default;
-        }
+        /// <exception cref="KeyNotFoundException"></exception>
+        public static Context GetContext(Type contextType) => contexts[contextType.Name];
 
         /// <summary>
         /// Gets the context object that matches with <paramref name="contextName"/> key.
@@ -120,16 +112,9 @@ namespace SAPTeam.CommonTK
         /// Name of a context class.
         /// </param>
         /// <returns>
-        /// An existing instance of matching <paramref name="contextName"/> type name. if there is no matching contexts it returns <see href="default"/>.
+        /// An existing instance of matching <paramref name="contextName"/> type. if there is no matching contexts it throws an <see cref="KeyNotFoundException"/>.
         /// </returns>
-        public static Context GetContext(string contextName)
-        {
-            if (contexts.ContainsKey(contextName))
-            {
-                return contexts[contextName];
-            }
-
-            return default;
-        }
+        /// <exception cref="KeyNotFoundException"></exception>
+        public static Context GetContext(string contextName) => contexts[contextName];
     }
 }

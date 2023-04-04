@@ -9,16 +9,16 @@ namespace CommonTK.Tests
         {
             using (var context = new DummyContext(true))
             {
-                Assert.True(Context.HasContext<DummyContext>());
-                Assert.True(Context.HasContext(typeof(DummyContext)));
-                Assert.True(Context.HasContext(typeof(DummyContext).Name));
-                Assert.True(Context.HasContext("DummyContext"));
-                Assert.False(Context.HasContext("DummyContext2"));
+                Assert.True(Context.Exists<DummyContext>());
+                Assert.True(Context.Exists(typeof(DummyContext)));
+                Assert.True(Context.Exists(typeof(DummyContext).Name));
+                Assert.True(Context.Exists("DummyContext"));
+                Assert.False(Context.Exists("DummyContext2"));
             }
 
-            Assert.False(Context.HasContext<DummyContext>());
-            Assert.False(Context.HasContext(typeof(DummyContext)));
-            Assert.False(Context.HasContext(typeof(DummyContext).Name));
+            Assert.False(Context.Exists<DummyContext>());
+            Assert.False(Context.Exists(typeof(DummyContext)));
+            Assert.False(Context.Exists(typeof(DummyContext).Name));
         }
 
         [Fact]
@@ -67,13 +67,13 @@ namespace CommonTK.Tests
         [Fact]
         public void RegisterTypeContextTest()
         {
-            using (var context = Context.SetContext<DummyContext>())
+            using (var context = Context.Register<DummyContext>())
             {
-                Assert.True(Context.HasContext<DummyContext>());
+                Assert.True(Context.Exists<DummyContext>());
                 Assert.Equal(context, Context.GetContext<DummyContext>());
             }
 
-            Assert.False(Context.HasContext<DummyContext>());
+            Assert.False(Context.Exists<DummyContext>());
         }
 
         [Fact]
@@ -81,11 +81,86 @@ namespace CommonTK.Tests
         {
             using (var context = new DummyContext(true, false))
             {
-                Assert.False(Context.HasContext<DummyContext>());
+                Assert.False(Context.Exists<DummyContext>());
                 Assert.False(context.IsGlobal);
             }
 
-            Assert.False(Context.HasContext<DummyContext>());
+            Assert.False(Context.Exists<DummyContext>());
+        }
+
+        [Fact]
+        public void RunningContextTest()
+        {
+            var context = Context.Register<DummyContext>();
+            Assert.True(context.IsRunning);
+            context.Dispose();
+            Assert.False(context.IsRunning);
+        }
+
+        [Fact]
+        public void GlobalCotextTest()
+        {
+            var context = Context.Register<DummyContext>();
+            Assert.True(context.IsGlobal);
+            context.Dispose();
+            Assert.False(context.IsGlobal);
+        }
+
+        [Fact]
+        public void MultiContextHandlingTest()
+        {
+            using (var context = new DummyContext())
+            {
+                Assert.True(Context.Exists<DummyContext>());
+                Assert.False(Context.Exists<DummyContext2>());
+
+                using (var context2 = new DummyContext2(true))
+                {
+                    Assert.True(Context.Exists<DummyContext>());
+                    Assert.True(Context.Exists<DummyContext2>());
+                }
+
+                Assert.True(Context.Exists<DummyContext>());
+                Assert.False(Context.Exists<DummyContext2>());
+            }
+
+            Assert.False(Context.Exists<DummyContext>());
+            Assert.False(Context.Exists<DummyContext2>());
+        }
+
+        [Fact]
+        public void RegisterPrivateContextTest()
+        {
+            using (var context2 = new DummyContext2())
+            {
+                Assert.False(context2.IsGlobal);
+            }
+
+            using (var context2 = Context.Register<DummyContext2>())
+            {
+                Assert.True(context2.IsGlobal);
+            }
+        }
+
+        [Fact]
+        public void IsGlobalReliablityTest()
+        {
+            using (var context2 = new DummyContext2())
+            {
+                Assert.False(context2.IsGlobal);
+
+                using (var context2b = new DummyContext2())
+                {
+                    Assert.False(context2b.IsGlobal);
+
+                    using (var context2c = new DummyContext2(true))
+                    {
+                        Assert.False(context2.IsGlobal);
+                        Assert.False(context2b.IsGlobal);
+                        Assert.True(context2c.IsGlobal);
+                    }
+                }
+            }
         }
     }
 }

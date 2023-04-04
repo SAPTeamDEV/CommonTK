@@ -9,16 +9,16 @@ namespace CommonTK.Tests
         {
             using (var context = new DummyContext(true))
             {
-                Assert.True(Context.Current.HasContext<DummyContext>());
-                Assert.True(Context.Current.HasContext(typeof(DummyContext)));
-                Assert.True(Context.Current.HasContext(typeof(DummyContext).Name));
-                Assert.True(Context.Current.HasContext("DummyContext"));
-                Assert.False(Context.Current.HasContext("DummyContext2"));
+                Assert.True(Context.HasContext<DummyContext>());
+                Assert.True(Context.HasContext(typeof(DummyContext)));
+                Assert.True(Context.HasContext(typeof(DummyContext).Name));
+                Assert.True(Context.HasContext("DummyContext"));
+                Assert.False(Context.HasContext("DummyContext2"));
             }
 
-            Assert.False(Context.Current.HasContext<DummyContext>());
-            Assert.False(Context.Current.HasContext(typeof(DummyContext)));
-            Assert.False(Context.Current.HasContext(typeof(DummyContext).Name));
+            Assert.False(Context.HasContext<DummyContext>());
+            Assert.False(Context.HasContext(typeof(DummyContext)));
+            Assert.False(Context.HasContext(typeof(DummyContext).Name));
         }
 
         [Fact]
@@ -26,9 +26,9 @@ namespace CommonTK.Tests
         {
             using (var context = new DummyContext(true))
             {
-                Assert.Equal(context, Context.Current.GetContext<DummyContext>());
-                Assert.Equal(context, Context.Current.GetContext(typeof(DummyContext)));
-                Assert.Equal(context, Context.Current.GetContext(typeof(DummyContext).Name));
+                Assert.Equal(context, Context.GetContext<DummyContext>());
+                Assert.Equal(context, Context.GetContext(typeof(DummyContext)));
+                Assert.Equal(context, Context.GetContext(typeof(DummyContext).Name));
             }
         }
 
@@ -67,13 +67,13 @@ namespace CommonTK.Tests
         [Fact]
         public void RegisterTypeContextTest()
         {
-            using (var context = Context.Current.SetContext<DummyContext>())
+            using (var context = Context.SetContext<DummyContext>())
             {
-                Assert.True(Context.Current.HasContext<DummyContext>());
-                Assert.Equal(context, Context.Current.GetContext<DummyContext>());
+                Assert.True(Context.HasContext<DummyContext>());
+                Assert.Equal(context, Context.GetContext<DummyContext>());
             }
 
-            Assert.False(Context.Current.HasContext<DummyContext>());
+            Assert.False(Context.HasContext<DummyContext>());
         }
     }
 }

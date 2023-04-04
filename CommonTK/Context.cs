@@ -6,21 +6,9 @@ namespace SAPTeam.CommonTK
     /// <summary>
     /// Defines a disposable Context that can be used to set some properties or do particular actions in a specified <see cref="Context"/>.
     /// </summary>
-    public abstract class Context : IDisposable
+    public abstract partial class Context : IDisposable
     {
-		[DllImport("kernel32.dll")] private static extern IntPtr GetConsoleWindow();
-		
         private bool disposedValue;
-
-        /// <summary>
-        /// Gets the Global Context Container.
-        /// </summary>
-        public static ContextContainer Current { get; } = new ContextContainer();
-
-        /// <summary>
-        /// Gets or Sets the process interaction Interface.
-        /// </summary>
-        public static InteractInterface Interface { get; set; } = GetConsoleWindow() != IntPtr.Zero ? InteractInterface.Console : InteractInterface.UI;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Context"/> class.
@@ -34,17 +22,17 @@ namespace SAPTeam.CommonTK
             {
                 ArgsHandler(args);
             }
-            Current.SetContext(this);
+            SetContext(this);
             CreateContext();
         }
 
         /// <summary>
-        /// This method called after the constructor has successfully registers the Context into <see cref="Current"/>.
+        /// This method called after the constructor has successfully registers the Context.
         /// </summary>
         protected abstract void CreateContext();
 
         /// <summary>
-        /// This method called after that the Context has unloaded in <see cref="Current"/>.
+        /// This method called when the context is disposing.
         /// </summary>
         protected abstract void DisposeContext();
 
@@ -73,7 +61,7 @@ namespace SAPTeam.CommonTK
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer
                 // TODO: set large fields to null
-                Current.DisposeContext(this);
+                DisposeContext(this);
                 DisposeContext();
 
                 disposedValue = true;

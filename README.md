@@ -4,7 +4,8 @@
 [![Nuget](https://img.shields.io/nuget/v/SAPTeam.CommonTK)](https://www.nuget.org/packages/SAPTeam.CommonTK)
 [![Nuget](https://img.shields.io/nuget/dt/SAPTeam.CommonTK)](https://www.nuget.org/packages/SAPTeam.CommonTK)
 
-This library has many Features and also provides Interfaces can be used in `CommonTK.Console` library and other .NET Application.
+This library has many Features and also provides Interfaces can be used in .NET Applications.
+This library has rich Interfaces that can be implemented and used by .NET libraries to create amazing features.
 
 ## Installation
 You can install this library with Package manager console.
@@ -14,19 +15,98 @@ SAPTeam.CommonTK
 PM> Install-Package SAPTeam.CommonTK
 ```
 
+## Whats's News in version 2.0!
+The new version of CommonTK Arrived with rewriting the everything!
+* Introduce the Action Group mechanism for control code execution process.
+* Change the Context initialization mechanism and defining new variables.
+* Add ability to create private contexts.
+* Change the underlying storing contexts implementation for better performance.
+* Add test suit for improving predictable behavior.
+* Merge `Context` and `ContextContainer` for providing a simple managing interface.
+* Integrate all functions of static `Interact` class to `StatusProvider` class.
+* Removed unnecessary class inheritances.
+* and many minor patches to the entire library.
+
 ## Features
 
 ### Contexts
-Contexts is a key feature in this library. With contexts you can set a global situation and this change is visible across the program using `Context.Current.HasContext<IContext>()`.
+Contexts is a key feature in this library. With contexts you can set a global situation and this change is visible to the entire process using `Context.Exists<Context>()`.
 
-For using this feature you can implement a new class from `IContext` interface and `Context` base class, or use Contexts available in `CommonTK.Console` library.
+For using this feature you can implement a new class from `Context` abstract class, or use Contexts available in `CommonTK.Console` library.
 
-### `JsonWorker` and `Config`
-`JsonWorker` is a base class for doing Json-related actions. A best place to use Json file, is Application onfig.
-`Config` class do it simply Just by getting a file name and a `Serializer` class.
+Here is an example of implementing a new context with the new API:
+```
+public class ExampleContext : Context
+{
+    // Defines the context Action Groups.
+	// Action Group names can be anything, but using the below method will generate an standardized string for defining an action group name.
+    // A context can have multi action groups.
+    // The action groups only applied in the global contexts.
+    public override string[] Groups => new string[] { Context.ActionGroup(ActionScope.Application, "sample_action") };
 
-This class gives you config data in `Config.Prefs` property that you can make changes on it and save changes using `Config.Write()` method.
-This is the Simplest way to save your Application settings or other type of data!
+    public ExampleContext()
+    {
+        // Initializes the context. MUST be called in the end of the constructor.
+        // If the argument is false, the context is not registered in the global dictionary.
+        // Private contexts can be mandatory registered as global by initializing it with:
+        // Context.Register<ExampleContext>();
+        // This method only works for parameterless contexts.
+        Initialize(true);
+    }
+
+    protected override void CreateContext()
+    {
+        // Put your codes here...
+        // After finishing this method, All specified action groups locked until running DisposeContext()
+    }
+
+    protected override void DisposeContext()
+    {
+        // In this stage, the action groups will be unlocked.
+        // Put your dispose codes here...
+    }
+}
+```
+
+### Action Groups
+In the new version, we have introduced a new feature called `Action Groups`.
+With this feature you can control execution of specific parts of your codes by defining and locking one or more action groups when a context is being used.
+
+In the above example, the ExampleContext has defined one Action Group specified with `Context.ActionGroup(ActionScope.Application, "sample_action")`.
+We use this action group name for showing the usage of this feature.
+```
+// This method has a conflicting behavior with the ExampleContext.
+// With action groups you can prevent the execution of this method and all methods that uses the same action group name.
+// The action group name of this method is: application.sample_action
+// You can mention the action group name of each method or properties in their xml documentation for easier usage.
+public void ModifyUnintendedValues()
+{
+    // This method will check the passed action group name locking status.
+    // If the action group name is locked, It throws an ActionGroupException and prevents the execution of the rest of the code.
+    Context.QueryGroup(Context.ActionGroup(ActionScope.Application, "sample_action"));
+    // Put your codes after this.
+}
+
+void Main()
+{
+    using (var context = new ExampleContext())
+    {
+        // Calling this method inside the context will cause it to throw an exception.
+        ModifyUnintendedValues();
+    }
+
+    // Calling this method outside the context will run it normally.
+    ModifyUnintendedValues();
+}
+```
+
+### `Config`
+`JsonWorker` was a base class for doing Json-related actions. in version 2.0 the functionalities of this class integrated into `Config` class.
+
+A best place to use Json files, is implementing it for Application config. `Config` class do it simply Just by getting a file name and a `Serializer` class.
+
+This class gives you config data as `Config.Prefs` property that you can make changes on it and save changes using `Config.Write()` method.
+This is the Simplest way to save your Application settings or other types of data!
 
 ```
 public class Entries
@@ -36,9 +116,9 @@ public class Entries
 }
 
 // Loads config.json, if it is not existing create it.
-Config<Entries> config = new("config.json");
+var config = new Config<Entries>("config.json");
 
-// Set new values.
+// Set the new values.
 config.Prefs.UserName = "admin";
 config.Prefs.Password = "12345";
 
@@ -50,13 +130,16 @@ config.Write();
 There is a set of Interfaces and methods to work with `IStatusProvider` classes.
 This feature intended for Interacting with users and must be implemented by Application for work in a specified way.
 
-You can deal with statuses using static methods of `Interact` class or directly with `StatusProvider.Current`.
-First you must Create and Assign a new instance of a class that implements `IStatusProvider` using `Interact.AssignStatus(IStatusProvider)` or:
+You can deal with statuses using static methods of `StatusProvider` class or directly with method provided in each status instances.
+First you must Create and Assign a new instance of a class that implements `IStatusProvider` using the global status provider:
 ```
-StatusProvider.Current = new StatusProvider();
+StatusProvider.Provider = new ExampleStatusProvider();
 ```
 
-There is a variety types of Status Providers. All of that implements `IStatusProvider` as root Interface.
+Also you can create and use infinite local status provider by simply initializing a new instance!
+It is not necessary to set a status provider in global scope, but if you want to use the status provider simply across the different parts of your application using static methods of `StatusProvider` class, you can use it.
+
+There is a variety types of Status Providers. All of these types implements `IStatusProvider` as root Interface.
 
 #### `IStatusProvider`
 This interface has a basic functionality. Just a `Write(string)` and `Clear()` method for writing and clearing text.
@@ -85,15 +168,15 @@ public class UIStatusProvider : IStatusProvider
 ```
 
 #### `IProgressStatusProvider`
-This interface is intended to use when you need to show a message with progress bar.
-It has two method `Write(string, ProgressType)` and `Increment(int)` for writing a message with progress bar and incrementing value of progress bar respectively.
-also Classes that implement this interface can throw exception `Write(string)` is called.
+This interface is intended to use when you need to show a message with a progress bar.
+It has two method `Write(string, ProgressType)` and `Increment(int)` for writing a message with a progress bar and incrementing value of progress bar respectively.
+also Classes that implements this interface can throw exception when the method `Write(string)` is called.
 
 #### `IMultiStatusBar`
 This interface intended for complicated usages. It is useful when you deal with a `Control` that support item collections, such as `StatusStrip`.
 you must declare a method to manage and control multi item collections.
 
-This is a code from my [AndroCtrl](https://github.com/SAPTeamDEV/AndroCtrl) project:
+This is a code from my [AndroCtrl](https://github.com/SAPTeamDEV/AndroCtrl) project (Note: This class is not adopted with the new API):
 ```
 public class AppStatusProvider : IProgressStatusProvider, IMultiStatusProvider
 {
@@ -207,4 +290,5 @@ var timer = CommonTK.Timer.Set(5000. () => Environment.Exit(0), repeat: false);
 Feel free to grab the source, open issues or pull requests.
 
 ## Credits
-Almost all the Classes of this library were extracted from The public API of my private repository `Windows Pro` and published in two libraries, [CommonTK](https://github.com/SAPTeamDEV/CommonTK) and [CommonTK.Console](https://github.com/SAPTeamDEV/CommonTK.Console)
+Almost all the Classes of this library were extracted from The public API of my private repository `Windows Pro` and published in two libraries, [CommonTK](https://github.com/SAPTeamDEV/CommonTK) and [CommonTK.Console](https://github.com/SAPTeamDEV/CommonTK.Console).
+All these classes were rewrote in the new version.

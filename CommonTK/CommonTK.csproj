@@ -15,21 +15,21 @@
     
     <Description>All in One and Multi Purpose .NET Library.
 
-This library contains toolset of Interfaces and classes that can be used by .NET Applications
+This library contains toolset of Interfaces and classes that can be used by .NET Applications.
 Key features of this library are:
 
 - Provides classes to Read/Write json files that can be used as app settings.
-- Base context class that can be used for creating Disposable contexts. (a collection of Console -related Contexts is available in SAPTeam.CommonTk.Console)
-- Various Status Providers that can be implemented and used for showing application status.
+- Base context class that can be used for creating Disposable contexts. (a collection of Console-related Contexts is available in SAPTeam.CommonTk.Console)
+- Various Status Providers that can be implemented and used for displaying application status changes.
  and more...
 
-For Getting started with this library you can visit the github page.</Description>
+For Getting started with this library you can visit our github page.</Description>
     <RepositoryUrl>https://github.com/SAPTeamDEV/CommonTK</RepositoryUrl>
 	<PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <PackageTags>tools;toolkit;utility;json;settings;config;status;timer;context;status-provider</PackageTags>
+    <PackageTags>tools;toolkit;utility;json;settings;config;status;timer;context;status-provider;action-group;code-control</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<ProduceReferenceAssembly>True</ProduceReferenceAssembly>
@@ -39,6 +39,12 @@ For Getting started with this library you can visit the github page.</Descriptio
 	<Copyright>Copyright © SAP Team 2023</Copyright>
 	<SignAssembly>True</SignAssembly>
 	<AssemblyOriginatorKeyFile>CommonTK.snk</AssemblyOriginatorKeyFile>
+	<PackageReleaseNotes>The new version arrived with new features:
+Introducing Action Groups
+Change the Context initialization process
+Integrating the entire Context Container
+
+and many more updates to the API that you can see them in our github page.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">

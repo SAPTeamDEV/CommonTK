@@ -91,7 +91,7 @@ namespace SAPTeam.CommonTK
         public static string ActionGroup(ActionScope scope, string identifier)
         {
             return string.Join(".", scope, identifier)
-                .Replace(' ', '-')
+                .Replace(' ', '_')
                 .ToLower();
         }
 

@@ -5,7 +5,7 @@ using System.Threading;
 namespace SAPTeam.CommonTK
 {
     /// <summary>
-    /// A Timer that runs parameterless method after specified time in separate thread.
+    /// A Timer that runs a parameterless method after specified time in another thread.
     /// </summary>
     public class Timer
     {

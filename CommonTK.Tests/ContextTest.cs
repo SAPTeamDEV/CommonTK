@@ -181,7 +181,7 @@ namespace SAPTeam.CommonTK.Tests
         public void GroupGeneratorTest()
         {
             Assert.Equal("application.test", Context.ActionGroup(ActionScope.Application, "TeSt"));
-            Assert.Equal("application.tes-t", Context.ActionGroup(ActionScope.Application, "TeS t"));
+            Assert.Equal("application.tes_t", Context.ActionGroup(ActionScope.Application, "TeS t"));
             Assert.Equal("application.contexttest", Context.ActionGroup(ActionScope.Application, GetType().Name));
         }
     }

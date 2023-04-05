@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace SAPTeam.CommonTK
@@ -26,6 +27,11 @@ namespace SAPTeam.CommonTK
         public bool IsRunning { get; private set; }
 
         /// <summary>
+        /// Gets the action groups associated with this context.
+        /// </summary>
+        public abstract string[] Groups { get; }
+
+        /// <summary>
         /// Initializes a new context.
         /// This method must be called in the end of context constructor.
         /// </summary>
@@ -35,7 +41,7 @@ namespace SAPTeam.CommonTK
         /// <exception cref="InvalidOperationException"></exception>
         protected void Initialize(bool global)
         {
-            if (global)
+            if (global && !IsGlobal)
             {
                 if (Exists(Name))
                 {
@@ -52,6 +58,21 @@ namespace SAPTeam.CommonTK
             {
                 IsRunning = true;
                 CreateContext();
+
+                if (IsGlobal)
+                {
+                    foreach (string group in Groups)
+                    {
+                        if (groups.ContainsKey(group))
+                        {
+                            groups[group].Add(this);
+                        }
+                        else
+                        {
+                            groups[group] = new List<Context> { this };
+                        }
+                    }
+                }
             }
         }
 
@@ -65,39 +86,27 @@ namespace SAPTeam.CommonTK
         /// </summary>
         protected abstract void DisposeContext();
 
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        /// <param name="disposing">
-        /// Determines the dispose stage.
-        /// </param>
-        void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (IsRunning)
-                {
-                    DisposeContext();
-                    IsRunning = false;
-                }
-
-                if (IsGlobal)
-                {
-                    lock (lockObj)
-                    {
-                        contexts.Remove(Name);
-                    }
-                }
-
-                disposedValue = true;
-            }
-        }
-
         /// <inheritdoc/>
         public void Dispose()
         {
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
+            if (IsRunning)
+            {
+                foreach (string group in Groups)
+                {
+                    groups[group].Remove(this);
+                }
+
+                DisposeContext();
+                IsRunning = false;
+            }
+
+            if (IsGlobal)
+            {
+                lock (lockObj)
+                {
+                    contexts.Remove(Name);
+                }
+            }
         }
     }
 }

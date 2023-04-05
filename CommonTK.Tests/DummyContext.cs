@@ -13,6 +13,8 @@ namespace SAPTeam.CommonTK.Tests
         public bool IsTest { get; set; }
         public InteractInterface PreStat { get; set; }
 
+        public override string[] Groups => new string[] { "global.interface" };
+
         public DummyContext() : this(false)
         {
 

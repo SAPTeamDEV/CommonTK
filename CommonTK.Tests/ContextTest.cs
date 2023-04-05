@@ -162,5 +162,27 @@ namespace SAPTeam.CommonTK.Tests
                 }
             }
         }
+
+        [Fact]
+        public void ActionGroupTest()
+        {
+            using (var context = new DummyContext())
+            {
+                Assert.Throws<ActionGroupException>(() => Context.Interface = InteractInterface.None);
+                using (var context2 = new DummyContext2(true))
+                {
+                    Assert.Throws<ActionGroupException>(() => Context.Interface = InteractInterface.None);
+                }
+                Assert.Throws<ActionGroupException>(() => Context.Interface = InteractInterface.None);
+            }
+        }
+
+        [Fact]
+        public void GroupGeneratorTest()
+        {
+            Assert.Equal("application.test", Context.ActionGroup(ActionScope.Application, "TeSt"));
+            Assert.Equal("application.tes-t", Context.ActionGroup(ActionScope.Application, "TeS t"));
+            Assert.Equal("application.contexttest", Context.ActionGroup(ActionScope.Application, GetType().Name));
+        }
     }
 }

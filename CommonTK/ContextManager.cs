@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace SAPTeam.CommonTK
@@ -9,13 +10,25 @@ namespace SAPTeam.CommonTK
         [DllImport("kernel32.dll")] private static extern IntPtr GetConsoleWindow();
 
         static readonly Dictionary<string, Context> contexts = new Dictionary<string, Context>();
+        static readonly Dictionary<string, List<Context>> groups = new Dictionary<string, List<Context>>();
         static readonly object lockObj = new object();
+        private static InteractInterface interactinterface = GetConsoleWindow() != IntPtr.Zero ? InteractInterface.Console : InteractInterface.UI;
 
         /// <summary>
         /// Gets or Sets the process interaction Interface.
+        /// <para>
+        /// Property setter Action Group: global.interface
+        /// </para>
         /// </summary>
-        public static InteractInterface Interface { get; set; } = GetConsoleWindow() != IntPtr.Zero ? InteractInterface.Console : InteractInterface.UI;
-
+        public static InteractInterface Interface
+        {
+            get => interactinterface;
+            set
+            {
+                QueryGroup(ActionGroup(ActionScope.Global, "interface"));
+                interactinterface = value;
+            }
+        }
         /// <summary>
         /// Creates a new Context and registers it globally.
         /// </summary>
@@ -35,6 +48,51 @@ namespace SAPTeam.CommonTK
             }
 
             return context;
+        }
+
+        /// <summary>
+        /// Queries all provided action groups and checks the locked status of each group.
+        /// If at least one of the specified action groups is locked, it throws a <see cref="ActionGroupException"/>.
+        /// </summary>
+        /// <param name="actionGroups">
+        /// The name of action group or groups that will be queried.
+        /// </param>
+        /// <exception cref="ActionGroupException"></exception>
+        public static void QueryGroup(params string[] actionGroups)
+        {
+            foreach (var group in actionGroups)
+            {
+                if (groups.ContainsKey(group) && groups[group].Count > 0)
+                {
+                    if (groups[group].Count == 1)
+                    {
+                        throw new ActionGroupException($"The action group \"{group}\" is locked by {groups[group][0].Name} context.");
+                    }
+                    else
+                    {
+                        throw new ActionGroupException($"The action group \"{group}\" is locked by {groups[group].Count} contexts.");
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Generates a new action group.
+        /// </summary>
+        /// <param name="scope">
+        /// The scope of action group.
+        /// </param>
+        /// <param name="identifier">
+        /// The unique identifier of action group.
+        /// </param>
+        /// <returns>
+        /// The standardized action group name.
+        /// </returns>
+        public static string ActionGroup(ActionScope scope, string identifier)
+        {
+            return string.Join(".", scope, identifier)
+                .Replace(' ', '-')
+                .ToLower();
         }
 
         /// <summary>

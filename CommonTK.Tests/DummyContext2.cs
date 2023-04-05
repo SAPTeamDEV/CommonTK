@@ -22,6 +22,8 @@ namespace SAPTeam.CommonTK.Tests
             Initialize(isGlobal);
         }
 
+        public override string[] Groups => new string[] { "global.interface" };
+
         protected override void CreateContext()
         {
             if (created)

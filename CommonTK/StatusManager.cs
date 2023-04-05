@@ -9,6 +9,9 @@ namespace SAPTeam.CommonTK
 
         /// <summary>
         /// Gets or Sets the Global Status Provider.
+        /// <para>
+        /// Property setter Action Group: global.status
+        /// </para>
         /// </summary>
         public static IStatusProvider Provider
         {
@@ -18,6 +21,7 @@ namespace SAPTeam.CommonTK
             }
             set
             {
+                Context.QueryGroup(Context.ActionGroup(ActionScope.Global, "status"));
                 lock (lockObj)
                 {
                     if (provider != Empty)

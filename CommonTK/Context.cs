@@ -9,8 +9,6 @@ namespace SAPTeam.CommonTK
     /// </summary>
     public abstract partial class Context : IDisposable
     {
-        private bool disposedValue;
-
         /// <summary>
         /// Gets the name identifier of this context.
         /// </summary>

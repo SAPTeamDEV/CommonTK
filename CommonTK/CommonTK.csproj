@@ -39,12 +39,7 @@ For Getting started with this library you can visit our github page.</Descriptio
 	<Copyright>Copyright © SAP Team 2023</Copyright>
 	<SignAssembly>True</SignAssembly>
 	<AssemblyOriginatorKeyFile>CommonTK.snk</AssemblyOriginatorKeyFile>
-	<PackageReleaseNotes>The new version arrived with new features:
-Introducing Action Groups
-Change the Context initialization process
-Integrating the entire Context Container
-
-and many more updates to the API that you can see them in our github page.</PackageReleaseNotes>
+	<PackageReleaseNotes></PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">

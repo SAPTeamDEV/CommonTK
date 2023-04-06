@@ -183,6 +183,7 @@ namespace SAPTeam.CommonTK.Tests
             Assert.Equal("application.test", Context.ActionGroup(ActionScope.Application, "TeSt"));
             Assert.Equal("application.tes_t", Context.ActionGroup(ActionScope.Application, "TeS t"));
             Assert.Equal("application.contexttest", Context.ActionGroup(ActionScope.Application, GetType().Name));
+            Assert.Equal("application.t.e.s.t", Context.ActionGroup(ActionScope.Application, "T", "e", "S", "t"));
         }
     }
 }

@@ -85,14 +85,24 @@ namespace SAPTeam.CommonTK
         /// <param name="identifier">
         /// The unique identifier of action group.
         /// </param>
+        /// <param name="extras">
+        /// The extra identifier factors.
+        /// </param>
         /// <returns>
         /// The standardized action group name.
         /// </returns>
-        public static string ActionGroup(ActionScope scope, string identifier)
+        public static string ActionGroup(ActionScope scope, string identifier, params string[] extras)
         {
-            return string.Join(".", scope, identifier)
+            var groupName = string.Join(".", scope, identifier, string.Join(".", extras))
                 .Replace(' ', '_')
                 .ToLower();
+
+            if (groupName.EndsWith("."))
+            {
+                return groupName.Substring(0, groupName.Length - 1);
+            }
+
+            return groupName;
         }
 
         /// <summary>

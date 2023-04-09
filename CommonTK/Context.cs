@@ -44,7 +44,7 @@ namespace SAPTeam.CommonTK
         /// Gets the neutral action groups that this context need to access them.
         /// This action groups won't be automatically locked, but can be locked or temporarily unlocked by this context.
         /// </summary>
-        public virtual string[] NeutralGroups { get; }
+        public virtual string[] NeutralGroups => new string[0];
 
         /// <summary>
         /// Initializes a new context.
@@ -152,9 +152,15 @@ namespace SAPTeam.CommonTK
         {
             if (IsRunning)
             {
-                foreach (string group in Groups.Concat(DefaultGroups).Concat(NeutralGroups))
+                if (IsGlobal)
                 {
-                    groups[group].Remove(this);
+                    foreach (string group in Groups.Concat(DefaultGroups).Concat(NeutralGroups))
+                    {
+                        if (groups.ContainsKey(group))
+                        {
+                            groups[group].Remove(this);
+                        }
+                    }
                 }
 
                 DisposeContext();

@@ -10,7 +10,7 @@ namespace SAPTeam.CommonTK
         [DllImport("kernel32.dll")] private static extern IntPtr GetConsoleWindow();
 
         static readonly Dictionary<string, Context> contexts = new Dictionary<string, Context>();
-        static readonly Dictionary<string, List<Context>> groups = new Dictionary<string, List<Context>>();
+        static readonly Dictionary<string, ActionGroupContainer> groups = new Dictionary<string, ActionGroupContainer>();
         static readonly object lockObj = new object();
         private static InteractInterface interactinterface = GetConsoleWindow() != IntPtr.Zero ? InteractInterface.Console : InteractInterface.UI;
 
@@ -51,30 +51,41 @@ namespace SAPTeam.CommonTK
         }
 
         /// <summary>
-        /// Queries all provided action groups and checks the locked status of each group.
+        /// Queries all provided action groups and checks the locked state of each group.
         /// If at least one of the specified action groups is locked, it throws a <see cref="ActionGroupException"/>.
         /// </summary>
-        /// <param name="actionGroups">
+        /// <param name="groups">
         /// The name of action group or groups that will be queried.
         /// </param>
         /// <exception cref="ActionGroupException"></exception>
-        public static void QueryGroup(params string[] actionGroups)
+        public static void QueryGroup(params string[] groups)
         {
-            foreach (var group in actionGroups)
+            foreach (var group in groups)
             {
-                if (groups.ContainsKey(group) && groups[group].Count > 0)
+                if (Context.groups.ContainsKey(group) && Context.groups[group].State == ActionGroupState.Locked)
                 {
-                    if (groups[group].Count == 1)
+                    if (Context.groups[group].Count == 1)
                     {
-                        throw new ActionGroupException($"The action group \"{group}\" is locked by {groups[group][0].Name} context.");
+                        throw new ActionGroupException($"The action group \"{group}\" is locked by {Context.groups[group][0].Name} context.");
                     }
                     else
                     {
-                        throw new ActionGroupException($"The action group \"{group}\" is locked by {groups[group].Count} contexts.");
+                        throw new ActionGroupException($"The action group \"{group}\" is locked by {Context.groups[group].Count} contexts.");
                     }
                 }
             }
         }
+
+        /// <summary>
+        /// Gets the state of the <paramref name="group"/>.
+        /// </summary>
+        /// <param name="group">
+        /// The name of the action group.
+        /// </param>
+        /// <returns>
+        /// A <see cref="ActionGroupState"/> represents the current state of the <paramref name="group"/>.
+        /// </returns>
+        public static ActionGroupState QueryGroupState(string group) => groups[group].State;
 
         /// <summary>
         /// Generates a new action group.

@@ -15,10 +15,11 @@ SAPTeam.CommonTK
 PM> Install-Package SAPTeam.CommonTK
 ```
 
-## Whats's News in version 2.0!
+## Whats's News in version 2!
 The new version of CommonTK Arrived with rewriting the everything!
 * Introduce the Action Group mechanism for control code execution process.
 * Change the Context initialization mechanism and defining new variables.
+* Add `Variable` class for interacting with environment variables.
 * Add ability to create private contexts.
 * Change the underlying storing contexts implementation for better performance.
 * Add test suit for improving predictable behavior.
@@ -31,6 +32,7 @@ The new version of CommonTK Arrived with rewriting the everything!
 
 ### Contexts
 Contexts is a key feature in this library. With contexts you can set a global situation and this change is visible to the entire process using `Context.Exists<Context>()`.
+Also this class hosts some global variables like `Interface` as well as some features like Action Groups.
 
 For using this feature you can implement a new class from `Context` abstract class, or use Contexts available in `CommonTK.Console` library.
 
@@ -125,6 +127,10 @@ config.Prefs.Password = "12345";
 // Save config.json.
 config.Write();
 ```
+
+### Variable
+With this class you can change the environment variable vlaues easily.
+Also because the instances of this class caches the environment values the overall performance of your applications will be increased.
 
 ### Status Providers
 There is a set of Interfaces and methods to work with `IStatusProvider` classes.

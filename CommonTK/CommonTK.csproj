@@ -18,9 +18,10 @@
 This library contains toolset of Interfaces and classes that can be used by .NET Applications.
 Key features of this library are:
 
-- Provides classes to Read/Write json files that can be used as app settings.
-- Base context class that can be used for creating Disposable contexts. (a collection of Console-related Contexts is available in SAPTeam.CommonTk.Console)
-- Various Status Providers that can be implemented and used for displaying application status changes.
+Provides classes to Read/Write json files that can be used as app settings.
+Base context class that can be used for creating Disposable contexts. (a collection of Console-related Contexts is available in SAPTeam.CommonTk.Console)
+Various Status Providers that can be implemented and used for displaying application status changes.
+Represents a caching method for interacting with environment variable without losing the performance.
  and more...
 
 For Getting started with this library you can visit our github page.</Description>
@@ -29,7 +30,7 @@ For Getting started with this library you can visit our github page.</Descriptio
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <PackageTags>tools;toolkit;utility;json;settings;config;status;timer;context;status-provider;action-group;code-control</PackageTags>
+    <PackageTags>tools;toolkit;utility;json;settings;config;status;timer;context;status-provider;action-group;code-control;environment;variables</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<ProduceReferenceAssembly>True</ProduceReferenceAssembly>

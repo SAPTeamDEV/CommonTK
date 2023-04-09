@@ -1,5 +1,7 @@
 using SAPTeam.CommonTK;
 
+using static SAPTeam.CommonTK.Context;
+
 namespace SAPTeam.CommonTK.Tests
 {
     public class ContextTest
@@ -9,16 +11,16 @@ namespace SAPTeam.CommonTK.Tests
         {
             using (var context = new DummyContext(true))
             {
-                Assert.True(Context.Exists<DummyContext>());
-                Assert.True(Context.Exists(typeof(DummyContext)));
-                Assert.True(Context.Exists(typeof(DummyContext).Name));
-                Assert.True(Context.Exists("DummyContext"));
-                Assert.False(Context.Exists("DummyContext2"));
+                Assert.True(Exists<DummyContext>());
+                Assert.True(Exists(typeof(DummyContext)));
+                Assert.True(Exists(typeof(DummyContext).Name));
+                Assert.True(Exists("DummyContext"));
+                Assert.False(Exists("DummyContext2"));
             }
 
-            Assert.False(Context.Exists<DummyContext>());
-            Assert.False(Context.Exists(typeof(DummyContext)));
-            Assert.False(Context.Exists(typeof(DummyContext).Name));
+            Assert.False(Exists<DummyContext>());
+            Assert.False(Exists(typeof(DummyContext)));
+            Assert.False(Exists(typeof(DummyContext).Name));
         }
 
         [Fact]
@@ -26,9 +28,9 @@ namespace SAPTeam.CommonTK.Tests
         {
             using (var context = new DummyContext(true))
             {
-                Assert.Equal(context, Context.GetContext<DummyContext>());
-                Assert.Equal(context, Context.GetContext(typeof(DummyContext)));
-                Assert.Equal(context, Context.GetContext(typeof(DummyContext).Name));
+                Assert.Equal(context, GetContext<DummyContext>());
+                Assert.Equal(context, GetContext(typeof(DummyContext)));
+                Assert.Equal(context, GetContext(typeof(DummyContext).Name));
             }
         }
 
@@ -44,15 +46,15 @@ namespace SAPTeam.CommonTK.Tests
         [Fact]
         public void ContextFunctionalityTest()
         {
-            Assert.Equal(InteractInterface.UI, Context.Interface);
+            Assert.Equal(InteractInterface.UI, Interface);
 
             using (var context = new DummyContext(true))
             {
                 Assert.Equal(InteractInterface.UI, context.PreStat);
-                Assert.Equal(InteractInterface.None, Context.Interface);
+                Assert.Equal(InteractInterface.None, Interface);
             }
 
-            Assert.Equal(InteractInterface.UI, Context.Interface);
+            Assert.Equal(InteractInterface.UI, Interface);
         }
 
         [Fact]
@@ -67,13 +69,13 @@ namespace SAPTeam.CommonTK.Tests
         [Fact]
         public void RegisterTypeContextTest()
         {
-            using (var context = Context.Register<DummyContext>())
+            using (var context = Register<DummyContext>())
             {
-                Assert.True(Context.Exists<DummyContext>());
-                Assert.Equal(context, Context.GetContext<DummyContext>());
+                Assert.True(Exists<DummyContext>());
+                Assert.Equal(context, GetContext<DummyContext>());
             }
 
-            Assert.False(Context.Exists<DummyContext>());
+            Assert.False(Exists<DummyContext>());
         }
 
         [Fact]
@@ -81,17 +83,17 @@ namespace SAPTeam.CommonTK.Tests
         {
             using (var context = new DummyContext(true, false))
             {
-                Assert.False(Context.Exists<DummyContext>());
+                Assert.False(Exists<DummyContext>());
                 Assert.False(context.IsGlobal);
             }
 
-            Assert.False(Context.Exists<DummyContext>());
+            Assert.False(Exists<DummyContext>());
         }
 
         [Fact]
         public void RunningContextTest()
         {
-            var context = Context.Register<DummyContext>();
+            var context = Register<DummyContext>();
             Assert.True(context.IsRunning);
             context.Dispose();
             Assert.False(context.IsRunning);
@@ -100,7 +102,7 @@ namespace SAPTeam.CommonTK.Tests
         [Fact]
         public void GlobalCotextTest()
         {
-            var context = Context.Register<DummyContext>();
+            var context = Register<DummyContext>();
             Assert.True(context.IsGlobal);
             context.Dispose();
             Assert.False(context.IsGlobal);
@@ -111,21 +113,21 @@ namespace SAPTeam.CommonTK.Tests
         {
             using (var context = new DummyContext())
             {
-                Assert.True(Context.Exists<DummyContext>());
-                Assert.False(Context.Exists<DummyContext2>());
+                Assert.True(Exists<DummyContext>());
+                Assert.False(Exists<DummyContext2>());
 
                 using (var context2 = new DummyContext2(true))
                 {
-                    Assert.True(Context.Exists<DummyContext>());
-                    Assert.True(Context.Exists<DummyContext2>());
+                    Assert.True(Exists<DummyContext>());
+                    Assert.True(Exists<DummyContext2>());
                 }
 
-                Assert.True(Context.Exists<DummyContext>());
-                Assert.False(Context.Exists<DummyContext2>());
+                Assert.True(Exists<DummyContext>());
+                Assert.False(Exists<DummyContext2>());
             }
 
-            Assert.False(Context.Exists<DummyContext>());
-            Assert.False(Context.Exists<DummyContext2>());
+            Assert.False(Exists<DummyContext>());
+            Assert.False(Exists<DummyContext2>());
         }
 
         [Fact]
@@ -136,7 +138,7 @@ namespace SAPTeam.CommonTK.Tests
                 Assert.False(context2.IsGlobal);
             }
 
-            using (var context2 = Context.Register<DummyContext2>())
+            using (var context2 = Register<DummyContext2>())
             {
                 Assert.True(context2.IsGlobal);
             }
@@ -168,22 +170,45 @@ namespace SAPTeam.CommonTK.Tests
         {
             using (var context = new DummyContext())
             {
-                Assert.Throws<ActionGroupException>(() => Context.Interface = InteractInterface.None);
+                Assert.Throws<ActionGroupException>(() => Interface = InteractInterface.None);
                 using (var context2 = new DummyContext2(true))
                 {
-                    Assert.Throws<ActionGroupException>(() => Context.Interface = InteractInterface.None);
+                    Assert.Throws<ActionGroupException>(() => Interface = InteractInterface.None);
                 }
-                Assert.Throws<ActionGroupException>(() => Context.Interface = InteractInterface.None);
+                Assert.Throws<ActionGroupException>(() => Interface = InteractInterface.None);
             }
         }
 
         [Fact]
         public void GroupGeneratorTest()
         {
-            Assert.Equal("application.test", Context.ActionGroup(ActionScope.Application, "TeSt"));
-            Assert.Equal("application.tes_t", Context.ActionGroup(ActionScope.Application, "TeS t"));
-            Assert.Equal("application.contexttest", Context.ActionGroup(ActionScope.Application, GetType().Name));
-            Assert.Equal("application.t.e.s.t", Context.ActionGroup(ActionScope.Application, "T", "e", "S", "t"));
+            Assert.Equal("application.test", ActionGroup(ActionScope.Application, "TeSt"));
+            Assert.Equal("application.tes_t", ActionGroup(ActionScope.Application, "TeS t"));
+            Assert.Equal("application.contexttest", ActionGroup(ActionScope.Application, GetType().Name));
+            Assert.Equal("application.t.e.s.t", ActionGroup(ActionScope.Application, "T", "e", "S", "t"));
+        }
+
+        [Fact]
+        public void ProtectedAPITest()
+        {
+            using (var context3 = new DummyContext3())
+            {
+                Assert.Throws<ActionGroupException>(() => QueryGroup("application.test"));
+                QueryGroup("application.test2");
+
+                using (var context2 = new DummyContext2(true, true))
+                {
+                    Assert.Equal(ActionGroupState.Suppressed, QueryGroupState(ActionGroup(ActionScope.Application, "test")));
+                    Assert.Equal(ActionGroupState.Locked, QueryGroupState(ActionGroup(ActionScope.Application, "test2")));
+                    QueryGroup("application.test");
+                    Assert.Throws<ActionGroupException>(() => QueryGroup("application.test2"));
+                }
+
+                Assert.Equal(ActionGroupState.Free, QueryGroupState(ActionGroup(ActionScope.Application, "test2")));
+            }
+
+            Assert.Equal(ActionGroupState.Free, QueryGroupState(ActionGroup(ActionScope.Application, "test")));
+            Assert.Equal(ActionGroupState.Free, QueryGroupState(ActionGroup(ActionScope.Application, "utest")));
         }
     }
 }

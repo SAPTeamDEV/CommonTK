@@ -10,6 +10,8 @@ namespace SAPTeam.CommonTK
     /// </summary>
     public abstract partial class Context : IDisposable
     {
+        bool disposing;
+
         /// <summary>
         /// Gets the context default action groups.
         /// This action groups applied and locked automatically.
@@ -56,6 +58,8 @@ namespace SAPTeam.CommonTK
         /// <exception cref="InvalidOperationException"></exception>
         protected void Initialize(bool global)
         {
+            disposing = false;
+
             if (global && !IsGlobal)
             {
                 if (Exists(Name))
@@ -63,7 +67,7 @@ namespace SAPTeam.CommonTK
                     throw new InvalidOperationException("An instance of this context already exists");
                 }
 
-                lock (lockObj)
+                lock (contextLockObj)
                 {
                     contexts[Name] = this;
                 }
@@ -78,17 +82,24 @@ namespace SAPTeam.CommonTK
                 {
                     foreach (string group in Groups.Concat(DefaultGroups))
                     {
-                        RegisterAction(group);
+                        RegisterAction(group, false);
                     }
                 }
             }
         }
 
-        void RegisterAction(string group)
+        void RegisterAction(string group, bool doRelock)
         {
             if (groups.ContainsKey(group))
             {
-                groups[group].Add(this);
+                if (doRelock && groups[group].IsSuppressor(this))
+                {
+                    groups[group].Relock(this);
+                }
+                else
+                {
+                    groups[group].Add(this);
+                }
             }
             else
             {
@@ -106,13 +117,20 @@ namespace SAPTeam.CommonTK
         /// <exception cref="ActionGroupException"></exception>
         protected void LockGroup(string group)
         {
-            if (Groups.Concat(NeutralGroups).Contains(group))
+            if (!disposing)
             {
-                RegisterAction(group);
+                if (Groups.Concat(NeutralGroups).Contains(group))
+                {
+                    RegisterAction(group, true);
+                }
+                else
+                {
+                    throw new ActionGroupException($"The action group operations for \"{group}\" is not permitted.");
+                }
             }
             else
             {
-                throw new ActionGroupException($"The action group operations for \"{group}\" is not permitted.");
+                throw new ActionGroupException("A disposing context can't interact with action groups.");
             }
         }
 
@@ -126,14 +144,23 @@ namespace SAPTeam.CommonTK
         /// <exception cref="ActionGroupException"></exception>
         protected void SuppressLock(string group)
         {
-            if (Groups.Concat(NeutralGroups).Contains(group))
+            if (!disposing)
             {
-                var container = groups[group];
-                container.IsSuppressed = true;
+                if (Groups.Concat(NeutralGroups).Contains(group))
+                {
+                    lock (groupLockObj)
+                    {
+                        groups[group].Suppress(this);
+                    }
+                }
+                else
+                {
+                    throw new ActionGroupException($"The action group operations for \"{group}\" is not permitted.");
+                }
             }
             else
             {
-                throw new ActionGroupException($"The action group operations for \"{group}\" is not permitted.");
+                throw new ActionGroupException("A disposing context can't interact with action groups.");
             }
         }
 
@@ -150,29 +177,36 @@ namespace SAPTeam.CommonTK
         /// <inheritdoc/>
         public void Dispose()
         {
-            if (IsRunning)
+            if (!disposing)
             {
+                disposing = true;
+
+                if (IsRunning)
+                {
+                    if (IsGlobal)
+                    {
+                        foreach (string group in Groups.Concat(DefaultGroups).Concat(NeutralGroups))
+                        {
+                            if (groups.ContainsKey(group))
+                            {
+                                groups[group].Remove(this);
+                            }
+                        }
+                    }
+
+                    DisposeContext();
+                    IsRunning = false;
+                }
+
                 if (IsGlobal)
                 {
-                    foreach (string group in Groups.Concat(DefaultGroups).Concat(NeutralGroups))
+                    lock (contextLockObj)
                     {
-                        if (groups.ContainsKey(group))
-                        {
-                            groups[group].Remove(this);
-                        }
+                        contexts.Remove(Name);
                     }
                 }
 
-                DisposeContext();
-                IsRunning = false;
-            }
-
-            if (IsGlobal)
-            {
-                lock (lockObj)
-                {
-                    contexts.Remove(Name);
-                }
+                GC.SuppressFinalize(this); 
             }
         }
     }

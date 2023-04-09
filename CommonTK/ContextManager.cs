@@ -11,7 +11,8 @@ namespace SAPTeam.CommonTK
 
         static readonly Dictionary<string, Context> contexts = new Dictionary<string, Context>();
         static readonly Dictionary<string, ActionGroupContainer> groups = new Dictionary<string, ActionGroupContainer>();
-        static readonly object lockObj = new object();
+        static readonly object groupLockObj = new object();
+        static readonly object contextLockObj = new object();
         private static InteractInterface interactinterface = GetConsoleWindow() != IntPtr.Zero ? InteractInterface.Console : InteractInterface.UI;
 
         /// <summary>
@@ -85,7 +86,7 @@ namespace SAPTeam.CommonTK
         /// <returns>
         /// A <see cref="ActionGroupState"/> represents the current state of the <paramref name="group"/>.
         /// </returns>
-        public static ActionGroupState QueryGroupState(string group) => groups[group].State;
+        public static ActionGroupState QueryGroupState(string group) => groups.ContainsKey(group) ? groups[group].State : ActionGroupState.Free;
 
         /// <summary>
         /// Generates a new action group.

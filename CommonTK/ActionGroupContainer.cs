@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SAPTeam.CommonTK
 {
-    internal struct ActionGroupContainer : IEnumerable<Context>
+    internal class ActionGroupContainer : IEnumerable<Context>
     {
         public Context this[int index] { get => Contexts[index]; set => Contexts[index] = value; }
 
@@ -15,23 +15,9 @@ namespace SAPTeam.CommonTK
 
         public List<Context> Contexts { get; }
 
-        private bool suppress;
+        Context suppressor;
 
-        public bool IsSuppressed
-        {
-            get => suppress;
-            set
-            {
-                if (suppress && value == true)
-                {
-                    throw new ActionGroupException("The action group is already supressed.");
-                }
-                else
-                {
-                    suppress = value;
-                }
-            }
-        }
+        public bool IsSuppressed { get; private set; }
 
         public int Count => Contexts.Count;
 
@@ -39,7 +25,45 @@ namespace SAPTeam.CommonTK
         {
             Name = name;
             Contexts = new List<Context>();
-            suppress = false;
+            suppressor = default;
+        }
+
+        public void Suppress(Context suppressor)
+        {
+            if (IsSuppressed)
+            {
+                throw new ActionGroupException("The lock of action group already has suppressed.");
+            }
+
+            this.suppressor = suppressor;
+            IsSuppressed = true;
+        }
+
+        public void Relock(Context suppressor)
+        {
+            if (!IsSuppressed)
+            {
+                throw new ActionGroupException("The lock of action group does not suppressed.");
+            }
+            else if (this.suppressor != suppressor)
+            {
+                throw new ActionGroupException("Only the suppressor context can relock the action group.");
+            }
+            else
+            {
+                this.suppressor = default;
+                IsSuppressed = false;
+            }
+        }
+
+        public bool hasRegistered(Context context)
+        {
+            return Contexts.Contains(context);
+        }
+
+        public bool IsSuppressor(Context context)
+        {
+            return context == suppressor;
         }
 
         public void Add(Context context)
@@ -56,6 +80,11 @@ namespace SAPTeam.CommonTK
 
         public void Remove(Context context)
         {
+            if (suppressor == context)
+            {
+                Relock(context);
+            }
+
             Contexts.Remove(context);
         }
 

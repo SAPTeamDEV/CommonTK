@@ -11,18 +11,25 @@ namespace SAPTeam.CommonTK.Tests
     internal class DummyContext2 : Context
     {
         bool created;
+        bool protectedTest;
 
         public DummyContext2() : this(false)
         {
 
         }
 
-        public DummyContext2(bool isGlobal = true)
+        public DummyContext2(bool isGlobal = true, bool protectedTest = false)
         {
+            this.protectedTest = protectedTest;
+
             Initialize(isGlobal);
         }
 
-        public override string[] Groups => new string[] { "global.interface" };
+        public override string[] Groups => new string[] { "global.interface", ActionGroup(ActionScope.Application, "test") };
+        public override string[] NeutralGroups => new string[]
+        {
+            ActionGroup(ActionScope.Application, "test2")
+        };
 
         protected override void CreateContext()
         {
@@ -33,6 +40,11 @@ namespace SAPTeam.CommonTK.Tests
             else
             {
                 created = true;
+            }
+            if (IsGlobal && protectedTest)
+            {
+                SuppressLock("application.test");
+                LockGroup("application.test2");
             }
         }
 

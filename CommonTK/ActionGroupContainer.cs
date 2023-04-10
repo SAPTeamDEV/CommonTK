@@ -13,7 +13,7 @@ namespace SAPTeam.CommonTK
 
         public ActionGroupState State => IsSuppressed ? ActionGroupState.Suppressed : Contexts.Count > 0 ? ActionGroupState.Locked : ActionGroupState.Free;
 
-        public List<Context> Contexts { get; }
+        List<Context> Contexts { get; }
 
         Context suppressor;
 
@@ -45,7 +45,7 @@ namespace SAPTeam.CommonTK
             {
                 throw new ActionGroupException("The lock of action group does not suppressed.");
             }
-            else if (this.suppressor != suppressor)
+            else if (!IsSuppressor(suppressor))
             {
                 throw new ActionGroupException("Only the suppressor context can relock the action group.");
             }
@@ -56,9 +56,9 @@ namespace SAPTeam.CommonTK
             }
         }
 
-        public bool hasRegistered(Context context)
+        public bool HasRegistered(Context context)
         {
-            return Contexts.Contains(context);
+            return Contexts.Contains(context) ? true : IsSuppressor(context);
         }
 
         public bool IsSuppressor(Context context)
@@ -68,7 +68,11 @@ namespace SAPTeam.CommonTK
 
         public void Add(Context context)
         {
-            if (Contexts.Contains(context))
+            if (IsSuppressed && !IsSuppressor(context))
+            {
+                throw new ActionGroupException($"The action group \"{Name}\" is suppressed by {suppressor.Name}.");
+            }
+            else if (Contexts.Contains(context))
             {
                 throw new ActionGroupException("The action group is already locked by this context.");
             }
@@ -80,7 +84,7 @@ namespace SAPTeam.CommonTK
 
         public void Remove(Context context)
         {
-            if (suppressor == context)
+            if (IsSuppressor(context))
             {
                 Relock(context);
             }

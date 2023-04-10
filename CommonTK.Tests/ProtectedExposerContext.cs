@@ -6,15 +6,20 @@ using System.Threading.Tasks;
 
 namespace SAPTeam.CommonTK.Tests
 {
-    internal class DummyContext3 : Context
+    internal class ProtectedExposerContext : Context
     {
         public override string[] Groups => new string[]
+        {
+            "application.test4"
+        };
+
+        public override string[] NeutralGroups => new string[]
         {
             "application.test",
             "application.test5"
         };
 
-        public DummyContext3()
+        public ProtectedExposerContext()
         {
             Initialize(true);
         }
@@ -28,5 +33,8 @@ namespace SAPTeam.CommonTK.Tests
         {
             
         }
+
+        public void Suppress(string hroup) => SuppressLock(hroup);
+        public void Lock(string group) => LockGroup(group);
     }
 }

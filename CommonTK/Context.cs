@@ -11,6 +11,7 @@ namespace SAPTeam.CommonTK
     public abstract partial class Context : IDisposable
     {
         bool disposing;
+        bool disposed;
 
         /// <summary>
         /// Gets the context default action groups.
@@ -59,6 +60,7 @@ namespace SAPTeam.CommonTK
         protected void Initialize(bool global)
         {
             disposing = false;
+            disposed = false;
 
             if (global && !IsGlobal)
             {
@@ -108,7 +110,7 @@ namespace SAPTeam.CommonTK
         }
 
         /// <summary>
-        /// Locks an action group.
+        /// Locks an action group. if the <paramref name="group"/> has already suppressed by this context, it will be relocked.
         /// The action group must be already declared in <see cref="Groups"/> or <see cref="NeutralGroups"/> properties.
         /// </summary>
         /// <param name="group">
@@ -135,7 +137,7 @@ namespace SAPTeam.CommonTK
         }
 
         /// <summary>
-        /// Suppresses the lock state of an action group.
+        /// Suppresses the lock state of an action group. The suppression state automatically removed in the finalizer.
         /// The action group must be already declared in <see cref="Groups"/> or <see cref="NeutralGroups"/> properties.
         /// </summary>
         /// <param name="group">
@@ -177,7 +179,7 @@ namespace SAPTeam.CommonTK
         /// <inheritdoc/>
         public void Dispose()
         {
-            if (!disposing)
+            if (!disposed)
             {
                 disposing = true;
 
@@ -187,7 +189,7 @@ namespace SAPTeam.CommonTK
                     {
                         foreach (string group in Groups.Concat(DefaultGroups).Concat(NeutralGroups))
                         {
-                            if (groups.ContainsKey(group))
+                            if (groups.ContainsKey(group) && groups[group].HasRegistered(this))
                             {
                                 groups[group].Remove(this);
                             }
@@ -206,7 +208,7 @@ namespace SAPTeam.CommonTK
                     }
                 }
 
-                GC.SuppressFinalize(this); 
+                disposed = true;
             }
         }
     }

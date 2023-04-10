@@ -202,6 +202,30 @@ namespace SAPTeam.CommonTK.Tests
                     Assert.Equal(ActionGroupState.Locked, QueryGroupState(ActionGroup(ActionScope.Application, "test2")));
                     QueryGroup("application.test");
                     Assert.Throws<ActionGroupException>(() => QueryGroup("application.test2"));
+                    Assert.Equal(ActionGroupState.Free, QueryGroupState(ActionGroup(ActionScope.Application, "test4")));
+
+                    using (var exposer = new ProtectedExposerContext())
+                    {
+                        Assert.Equal(ActionGroupState.Locked, QueryGroupState(ActionGroup(ActionScope.Application, "test4")));
+                        Assert.Throws<ActionGroupException>(() => exposer.Suppress("application.test"));
+                        Assert.Throws<ActionGroupException>(() => exposer.Suppress("application.test6"));
+                        Assert.Throws<ActionGroupException>(() => exposer.Lock("application.test"));
+                        Assert.Throws<ActionGroupException>(() => exposer.Lock("application.test3"));
+                        Assert.Throws<ActionGroupException>(() => exposer.Lock("application.test4"));
+                        exposer.Suppress("application.test4");
+                        Assert.Equal(ActionGroupState.Suppressed, QueryGroupState(ActionGroup(ActionScope.Application, "test4")));
+                        exposer.Lock("application.test4");
+                        Assert.Equal(ActionGroupState.Locked, QueryGroupState(ActionGroup(ActionScope.Application, "test4")));
+                        exposer.Suppress("application.test4");
+                        exposer.Suppress("application.test5");
+                        exposer.Dispose();
+                        Assert.Throws<ActionGroupException>(() => exposer.Lock("application.test"));
+                        Assert.Throws<ActionGroupException>(() => exposer.Suppress("application.test"));
+                    }
+
+                    Assert.Equal(ActionGroupState.Free, QueryGroupState(ActionGroup(ActionScope.Application, "test4")));
+                    Assert.Equal(ActionGroupState.Locked, QueryGroupState(ActionGroup(ActionScope.Application, "test5")));
+                    Assert.Equal(ActionGroupState.Suppressed, QueryGroupState(ActionGroup(ActionScope.Application, "test")));
                 }
 
                 Assert.Equal(ActionGroupState.Free, QueryGroupState(ActionGroup(ActionScope.Application, "test2")));

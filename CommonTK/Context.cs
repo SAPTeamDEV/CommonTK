@@ -13,6 +13,10 @@ namespace SAPTeam.CommonTK
         bool disposing;
         bool disposed;
 
+        string[] allowedGroups;
+        string[] ownedGroups;
+        string[] contextGroups;
+
         /// <summary>
         /// Gets the context default action groups.
         /// This action groups applied and locked automatically.
@@ -62,6 +66,10 @@ namespace SAPTeam.CommonTK
             disposing = false;
             disposed = false;
 
+            allowedGroups = Groups.Concat(NeutralGroups).ToArray();
+            ownedGroups = Groups.Concat(DefaultGroups).ToArray();
+            contextGroups = ownedGroups.Concat(NeutralGroups).ToArray();
+
             if (global && !IsGlobal)
             {
                 if (Exists(Name))
@@ -82,7 +90,7 @@ namespace SAPTeam.CommonTK
 
                 if (IsGlobal)
                 {
-                    foreach (string group in Groups.Concat(DefaultGroups))
+                    foreach (string group in ownedGroups)
                     {
                         RegisterAction(group, false);
                     }
@@ -121,7 +129,7 @@ namespace SAPTeam.CommonTK
         {
             if (!disposing)
             {
-                if (Groups.Concat(NeutralGroups).Contains(group))
+                if (allowedGroups.Contains(group))
                 {
                     RegisterAction(group, true);
                 }
@@ -148,7 +156,7 @@ namespace SAPTeam.CommonTK
         {
             if (!disposing)
             {
-                if (Groups.Concat(NeutralGroups).Contains(group))
+                if (allowedGroups.Contains(group))
                 {
                     lock (groupLockObj)
                     {
@@ -187,7 +195,7 @@ namespace SAPTeam.CommonTK
                 {
                     if (IsGlobal)
                     {
-                        foreach (string group in Groups.Concat(DefaultGroups).Concat(NeutralGroups))
+                        foreach (string group in contextGroups)
                         {
                             if (groups.ContainsKey(group) && groups[group].HasRegistered(this))
                             {

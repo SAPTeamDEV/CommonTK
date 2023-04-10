@@ -7,7 +7,7 @@ namespace SAPTeam.CommonTK
 {
     internal class ActionGroupContainer : IEnumerable<Context>
     {
-        public Context this[int index] { get => Contexts[index]; set => Contexts[index] = value; }
+        public Context this[int index] { get => Contexts[index]; }
 
         public string Name { get; }
 

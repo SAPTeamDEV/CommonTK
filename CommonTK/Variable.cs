@@ -22,6 +22,9 @@ namespace SAPTeam.CommonTK
 
         /// <summary>
         /// Gets the cached value or Sets the new value of the variable.
+        /// <para>
+        /// Property setter Action Group: global.variable.<see href="Target"/>.<see href="Name"/>
+        /// </para>
         /// </summary>
         public virtual string Value
         {

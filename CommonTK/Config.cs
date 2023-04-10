@@ -56,9 +56,13 @@ namespace SAPTeam.CommonTK
 
         /// <summary>
         /// Saves current values of <see cref="Prefs"/> properties to the configuration file.
+        /// <para>
+        /// Method Action Group: application.config.<see href="FileName"/>
+        /// </para>
         /// </summary>
         public void Write()
         {
+            Context.QueryGroup(Context.ActionGroup(ActionScope.Application, "config", FileName));
             StringWriter sw = new StringWriter();
             JsonTextWriter jw = new JsonTextWriter(sw);
             js.Serialize(jw, Prefs);

@@ -41,13 +41,13 @@ namespace SAPTeam.CommonTK
         /// Gets the action groups associated with this context.
         /// This action groups will be locked immediately after calling the <see cref="CreateContext()"/>.
         /// </summary>
-        public abstract string[] Groups { get; }
+        public virtual string[] Groups { get; } = new string[0];
 
         /// <summary>
         /// Gets the neutral action groups that this context need to access them.
         /// This action groups won't be automatically locked, but can be locked or temporarily unlocked by this context.
         /// </summary>
-        public virtual string[] NeutralGroups => new string[0];
+        public virtual string[] NeutralGroups { get; } = new string[0];
 
         /// <summary>
         /// Initializes a new context.

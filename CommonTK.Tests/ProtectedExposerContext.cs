@@ -8,16 +8,9 @@ namespace SAPTeam.CommonTK.Tests
 {
     internal class ProtectedExposerContext : Context
     {
-        public override string[] Groups => new string[]
-        {
-            "application.test4"
-        };
+        public override string[] Groups { get; } = new string[] { "application.test4" };
 
-        public override string[] NeutralGroups => new string[]
-        {
-            "application.test",
-            "application.test5"
-        };
+        public override string[] NeutralGroups { get; } = new string[] { "application.test", "application.test5" };
 
         public ProtectedExposerContext()
         {

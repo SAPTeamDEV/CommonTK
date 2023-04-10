@@ -8,7 +8,7 @@ namespace SAPTeam.CommonTK.Tests
 {
     internal class DummyContext3 : Context
     {
-        public override string[] Groups => new string[]
+        public override string[] Groups { get; } = new string[]
         {
             "application.test",
             "application.test5"

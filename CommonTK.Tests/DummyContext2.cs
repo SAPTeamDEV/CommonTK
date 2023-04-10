@@ -25,8 +25,8 @@ namespace SAPTeam.CommonTK.Tests
             Initialize(isGlobal);
         }
 
-        public override string[] Groups => new string[] { "global.interface", ActionGroup(ActionScope.Application, "test") };
-        public override string[] NeutralGroups => new string[]
+        public override string[] Groups { get; } = new string[] { "global.interface", ActionGroup(ActionScope.Application, "test") };
+        public override string[] NeutralGroups { get; } = new string[]
         {
             ActionGroup(ActionScope.Application, "test2")
         };

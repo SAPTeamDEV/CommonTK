@@ -128,25 +128,16 @@ namespace SAPTeam.CommonTK
         /// <exception cref="InvalidOperationException"></exception>
         protected void LockGroup(string group)
         {
-            if (!IsGlobal)
-            {
-                throw new InvalidOperationException("The action group feature only available in global contexts.");
-            }
+            if (!IsGlobal) throw new InvalidOperationException("The action group feature only available in global contexts.");
+            if (disposing) throw new ActionGroupException("A disposing context can't interact with action groups.");
 
-            if (!disposing)
+            if (allowedGroups.Contains(group))
             {
-                if (allowedGroups.Contains(group))
-                {
-                    RegisterAction(group, true);
-                }
-                else
-                {
-                    throw new ActionGroupException($"The action group operations for \"{group}\" is not permitted.");
-                }
+                RegisterAction(group, true);
             }
             else
             {
-                throw new ActionGroupException("A disposing context can't interact with action groups.");
+                throw new ActionGroupException($"The action group operations for \"{group}\" is not permitted.");
             }
         }
 
@@ -161,28 +152,19 @@ namespace SAPTeam.CommonTK
         /// <exception cref="InvalidOperationException"></exception>
         protected void SuppressLock(string group)
         {
-            if (!IsGlobal)
-            {
-                throw new InvalidOperationException("The action group feature only available in global contexts.");
-            }
+            if (!IsGlobal) throw new InvalidOperationException("The action group feature only available in global contexts.");
+            if (disposing) throw new ActionGroupException("A disposing context can't interact with action groups.");
 
-            if (!disposing)
+            if (allowedGroups.Contains(group))
             {
-                if (allowedGroups.Contains(group))
+                lock (groupLockObj)
                 {
-                    lock (groupLockObj)
-                    {
-                        groups[group].Suppress(this);
-                    }
-                }
-                else
-                {
-                    throw new ActionGroupException($"The action group operations for \"{group}\" is not permitted.");
+                    groups[group].Suppress(this);
                 }
             }
             else
             {
-                throw new ActionGroupException("A disposing context can't interact with action groups.");
+                throw new ActionGroupException($"The action group operations for \"{group}\" is not permitted.");
             }
         }
 

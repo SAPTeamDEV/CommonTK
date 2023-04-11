@@ -210,7 +210,7 @@ namespace SAPTeam.CommonTK.Tests
                     {
                         Assert.Equal(ActionGroupState.Locked, QueryGroupState(ActionGroup(ActionScope.Application, "test4")));
                         Assert.Throws<ActionGroupException>(() => exposer.Suppress("application.test"));
-                        Assert.Throws<ActionGroupException>(() => exposer.Suppress("application.test6"));
+                        Assert.Throws<ActionGroupException>(() => exposer.Suppress("application.test7"));
                         Assert.Throws<ActionGroupException>(() => exposer.Lock("application.test"));
                         Assert.Throws<ActionGroupException>(() => exposer.Lock("application.test3"));
                         Assert.Throws<ActionGroupException>(() => exposer.Lock("application.test4"));
@@ -220,6 +220,7 @@ namespace SAPTeam.CommonTK.Tests
                         Assert.Equal(ActionGroupState.Locked, QueryGroupState(ActionGroup(ActionScope.Application, "test4")));
                         exposer.Suppress("application.test4");
                         exposer.Suppress("application.test5");
+                        exposer.Suppress("application.test6");
                         exposer.Dispose();
                         Assert.Throws<InvalidOperationException>(() => exposer.Lock("application.test"));
                         Assert.Throws<InvalidOperationException>(() => exposer.Suppress("application.test"));

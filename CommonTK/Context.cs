@@ -93,27 +93,25 @@ namespace SAPTeam.CommonTK
             {
                 foreach (string group in ownedGroups)
                 {
-                    RegisterAction(group, false);
+                    RegisterAction(group, false, true);
                 }
             }
         }
 
-        void RegisterAction(string group, bool doRelock)
+        void RegisterAction(string group, bool doRelock, bool addContext)
         {
-            if (groups.ContainsKey(group))
+            if (!groups.ContainsKey(group))
             {
-                if (doRelock && groups[group].IsSuppressor(this))
-                {
-                    groups[group].Relock(this);
-                }
-                else
-                {
-                    groups[group].Add(this);
-                }
+                groups[group] = new ActionGroupContainer(group);
             }
-            else
+
+            if (doRelock && groups[group].IsSuppressor(this))
             {
-                groups[group] = new ActionGroupContainer(group) { this };
+                groups[group].Relock(this);
+            }
+            else if (addContext)
+            {
+                groups[group].Add(this);
             }
         }
 
@@ -133,7 +131,7 @@ namespace SAPTeam.CommonTK
 
             if (allowedGroups.Contains(group))
             {
-                RegisterAction(group, true);
+                RegisterAction(group, true, true);
             }
             else
             {
@@ -157,6 +155,8 @@ namespace SAPTeam.CommonTK
 
             if (allowedGroups.Contains(group))
             {
+                RegisterAction(group, false, false);
+
                 lock (groupLockObj)
                 {
                     groups[group].Suppress(this);

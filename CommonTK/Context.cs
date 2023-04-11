@@ -66,16 +66,16 @@ namespace SAPTeam.CommonTK
             disposing = false;
             disposed = false;
 
-            allowedGroups = Groups.Concat(NeutralGroups).ToArray();
-            ownedGroups = Groups.Concat(DefaultGroups).ToArray();
-            contextGroups = ownedGroups.Concat(NeutralGroups).ToArray();
-
             if (global && !IsGlobal)
             {
                 if (Exists(Name))
                 {
                     throw new InvalidOperationException("An instance of this context already exists");
                 }
+
+                allowedGroups = Groups.Concat(NeutralGroups).ToArray();
+                ownedGroups = Groups.Concat(DefaultGroups).ToArray();
+                contextGroups = ownedGroups.Concat(NeutralGroups).ToArray();
 
                 lock (contextLockObj)
                 {
@@ -87,13 +87,13 @@ namespace SAPTeam.CommonTK
             {
                 IsRunning = true;
                 CreateContext();
+            }
 
-                if (IsGlobal)
+            if (IsGlobal)
+            {
+                foreach (string group in ownedGroups)
                 {
-                    foreach (string group in ownedGroups)
-                    {
-                        RegisterAction(group, false);
-                    }
+                    RegisterAction(group, false);
                 }
             }
         }

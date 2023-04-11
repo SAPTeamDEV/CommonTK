@@ -69,13 +69,15 @@ namespace SAPTeam.CommonTK.Tests
         [Fact]
         public void RegisterTypeContextTest()
         {
-            using (var context = Register<DummyContext>())
+            using (var context2 = Register<DummyContext2>())
             {
-                Assert.True(Exists<DummyContext>());
-                Assert.Equal(context, GetContext<DummyContext>());
+                Assert.True(Exists<DummyContext2>());
+                Assert.Equal(context2, GetContext<DummyContext2>());
+                Assert.Throws<ActionGroupException>(() => QueryGroup("global.interface"));
             }
 
             Assert.False(Exists<DummyContext>());
+            QueryGroup("global.interface");
         }
 
         [Fact]

@@ -125,8 +125,14 @@ namespace SAPTeam.CommonTK
         /// The action group name.
         /// </param>
         /// <exception cref="ActionGroupException"></exception>
+        /// <exception cref="InvalidOperationException"></exception>
         protected void LockGroup(string group)
         {
+            if (!IsGlobal)
+            {
+                throw new InvalidOperationException("The action group feature only available in global contexts.");
+            }
+
             if (!disposing)
             {
                 if (allowedGroups.Contains(group))
@@ -152,8 +158,14 @@ namespace SAPTeam.CommonTK
         /// The action group name.
         /// </param>
         /// <exception cref="ActionGroupException"></exception>
+        /// <exception cref="InvalidOperationException"></exception>
         protected void SuppressLock(string group)
         {
+            if (!IsGlobal)
+            {
+                throw new InvalidOperationException("The action group feature only available in global contexts.");
+            }
+
             if (!disposing)
             {
                 if (allowedGroups.Contains(group))

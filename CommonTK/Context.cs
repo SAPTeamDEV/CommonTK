@@ -185,32 +185,37 @@ namespace SAPTeam.CommonTK
             {
                 disposing = true;
 
-                if (IsRunning)
+                if (IsGlobal)
+                {
+                    foreach (string group in contextGroups)
+                    {
+                        if (groups.ContainsKey(group) && groups[group].HasRegistered(this))
+                        {
+                            groups[group].Remove(this);
+                        }
+                    }
+                }
+
+                try
+                {
+                    if (IsRunning)
+                    {
+                        DisposeContext();
+                    }
+                }
+                finally
                 {
                     if (IsGlobal)
                     {
-                        foreach (string group in contextGroups)
+                        lock (contextLockObj)
                         {
-                            if (groups.ContainsKey(group) && groups[group].HasRegistered(this))
-                            {
-                                groups[group].Remove(this);
-                            }
+                            contexts.Remove(Name);
                         }
                     }
 
-                    DisposeContext();
                     IsRunning = false;
+                    disposed = true;
                 }
-
-                if (IsGlobal)
-                {
-                    lock (contextLockObj)
-                    {
-                        contexts.Remove(Name);
-                    }
-                }
-
-                disposed = true;
             }
         }
     }

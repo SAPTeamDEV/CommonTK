@@ -12,15 +12,17 @@ namespace SAPTeam.CommonTK.Tests
     {
         bool created;
         bool protectedTest;
+        bool throwOnFinalizer;
 
         public DummyContext2() : this(false)
         {
 
         }
 
-        public DummyContext2(bool isGlobal = true, bool protectedTest = false)
+        public DummyContext2(bool isGlobal = true, bool protectedTest = false, bool throwOnFinalizer = false)
         {
             this.protectedTest = protectedTest;
+            this.throwOnFinalizer = throwOnFinalizer;
 
             Initialize(isGlobal);
         }
@@ -50,7 +52,10 @@ namespace SAPTeam.CommonTK.Tests
 
         protected override void DisposeContext()
         {
-
+            if (throwOnFinalizer)
+            {
+                throw new Exception();
+            }
         }
     }
 }

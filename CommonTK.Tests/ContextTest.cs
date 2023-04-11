@@ -246,5 +246,18 @@ namespace SAPTeam.CommonTK.Tests
                 Assert.Throws<InvalidOperationException>(() => exposer.Suppress("application.test5"));
             }
         }
+
+        [Fact]
+        public void FinalizerCrashTest()
+        {
+            var context2 = new DummyContext2(throwOnFinalizer: true);
+            Assert.True(context2.IsGlobal);
+            Assert.True(context2.IsRunning);
+            Assert.ThrowsAny<Exception>(() => context2.Dispose());
+            context2.Dispose();
+            Assert.False(context2.IsGlobal);
+            Assert.False(context2.IsRunning);
+
+        }
     }
 }

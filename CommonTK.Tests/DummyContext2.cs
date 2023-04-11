@@ -12,6 +12,7 @@ namespace SAPTeam.CommonTK.Tests
     {
         bool created;
         bool protectedTest;
+        bool throwOnInitializer;
         bool throwOnFinalizer;
 
         public DummyContext2() : this(false)
@@ -19,9 +20,10 @@ namespace SAPTeam.CommonTK.Tests
 
         }
 
-        public DummyContext2(bool isGlobal = true, bool protectedTest = false, bool throwOnFinalizer = false)
+        public DummyContext2(bool isGlobal = true, bool protectedTest = false, bool throwOnInitializer = false, bool throwOnFinalizer = false)
         {
             this.protectedTest = protectedTest;
+            this.throwOnInitializer = throwOnInitializer;
             this.throwOnFinalizer = throwOnFinalizer;
 
             Initialize(isGlobal);
@@ -35,6 +37,11 @@ namespace SAPTeam.CommonTK.Tests
 
         protected override void CreateContext()
         {
+            if (throwOnInitializer)
+            {
+                throw new Exception();
+            }
+
             if (created)
             {
                 throw new InvalidDataException();
@@ -43,6 +50,7 @@ namespace SAPTeam.CommonTK.Tests
             {
                 created = true;
             }
+
             if (IsGlobal && protectedTest)
             {
                 SuppressLock("application.test");

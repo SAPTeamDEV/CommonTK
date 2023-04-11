@@ -249,16 +249,25 @@ namespace SAPTeam.CommonTK.Tests
         }
 
         [Fact]
+        public void InitializerCrashTest()
+        {
+            Assert.Throws<Exception>(() => new DummyContext2(throwOnInitializer: true));
+            Assert.False(Exists<DummyContext2>());
+            Assert.Throws<KeyNotFoundException>(() => GetContext<DummyContext2>());
+        }
+
+        [Fact]
         public void FinalizerCrashTest()
         {
             var context2 = new DummyContext2(throwOnFinalizer: true);
             Assert.True(context2.IsGlobal);
             Assert.True(context2.IsRunning);
-            Assert.ThrowsAny<Exception>(() => context2.Dispose());
+            Assert.Throws<Exception>(() => context2.Dispose());
             context2.Dispose();
             Assert.False(context2.IsGlobal);
             Assert.False(context2.IsRunning);
-
+            Assert.False(Exists<DummyContext2>());
+            Assert.Throws<KeyNotFoundException>(() => GetContext<DummyContext2>());
         }
     }
 }

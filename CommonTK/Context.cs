@@ -86,7 +86,16 @@ namespace SAPTeam.CommonTK
             if (!IsRunning)
             {
                 IsRunning = true;
-                CreateContext();
+
+                try
+                {
+                    CreateContext();
+                }
+                catch (Exception)
+                {
+                    KnockUp();
+                    throw;
+                }
             }
 
             if (IsGlobal)
@@ -205,18 +214,23 @@ namespace SAPTeam.CommonTK
                 }
                 finally
                 {
-                    if (IsGlobal)
-                    {
-                        lock (contextLockObj)
-                        {
-                            contexts.Remove(Name);
-                        }
-                    }
-
-                    IsRunning = false;
-                    disposed = true;
+                    KnockUp();
                 }
             }
+        }
+
+        void KnockUp()
+        {
+            if (IsGlobal)
+            {
+                lock (contextLockObj)
+                {
+                    contexts.Remove(Name);
+                }
+            }
+
+            IsRunning = false;
+            disposed = true;
         }
     }
 }

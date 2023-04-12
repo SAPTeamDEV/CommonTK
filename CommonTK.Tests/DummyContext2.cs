@@ -13,6 +13,7 @@ namespace SAPTeam.CommonTK.Tests
         bool created;
         bool protectedTest;
         bool throwOnInitializer;
+        bool throwOnRegisterAction;
         bool throwOnFinalizer;
 
         public DummyContext2() : this(false)
@@ -20,10 +21,15 @@ namespace SAPTeam.CommonTK.Tests
 
         }
 
-        public DummyContext2(bool isGlobal = true, bool protectedTest = false, bool throwOnInitializer = false, bool throwOnFinalizer = false)
+        public DummyContext2(bool isGlobal = true,
+                             bool protectedTest = false,
+                             bool throwOnInitializer = false,
+                             bool throwOnRegisterAction = false,
+                             bool throwOnFinalizer = false)
         {
             this.protectedTest = protectedTest;
             this.throwOnInitializer = throwOnInitializer;
+            this.throwOnRegisterAction = throwOnRegisterAction;
             this.throwOnFinalizer = throwOnFinalizer;
 
             Initialize(isGlobal);
@@ -40,6 +46,11 @@ namespace SAPTeam.CommonTK.Tests
             if (throwOnInitializer)
             {
                 throw new Exception();
+            }
+
+            if (throwOnRegisterAction)
+            {
+                SuppressLock("application.test");
             }
 
             if (created)

@@ -77,6 +77,14 @@ namespace SAPTeam.CommonTK
                 ownedGroups = Groups.Concat(DefaultGroups).ToArray();
                 contextGroups = ownedGroups.Concat(NeutralGroups).ToArray();
 
+                foreach (var group in ownedGroups)
+                {
+                    if (groups.ContainsKey(group) && groups[group].IsSuppressed)
+                    {
+                        throw new ActionGroupException($"The action group \"{group}\" is suppressed.");
+                    }
+                }
+
                 lock (contextLockObj)
                 {
                     contexts[Name] = this;

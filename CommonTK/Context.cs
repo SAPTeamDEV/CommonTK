@@ -81,7 +81,7 @@ namespace SAPTeam.CommonTK
                 {
                     if (groups.ContainsKey(group) && groups[group].IsSuppressed)
                     {
-                        throw new ActionGroupException($"The action group \"{group}\" is suppressed.");
+                        throw new ActionGroupException($"The action group \"{group}\" is suppressed.", ActionGroupError.Suppressed);
                     }
                 }
 
@@ -143,8 +143,8 @@ namespace SAPTeam.CommonTK
         /// <exception cref="InvalidOperationException"></exception>
         protected void LockGroup(string group)
         {
-            if (!IsGlobal) throw new InvalidOperationException("The action group feature only available in global contexts.");
-            if (disposing) throw new ActionGroupException("A disposing context can't interact with action groups.");
+            if (!IsGlobal) throw new ActionGroupException(ActionGroupError.NotGlobal);
+            if (disposing) throw new ActionGroupException(ActionGroupError.Disposing);
 
             if (allowedGroups.Contains(group))
             {
@@ -152,7 +152,7 @@ namespace SAPTeam.CommonTK
             }
             else
             {
-                throw new ActionGroupException($"The action group operations for \"{group}\" is not permitted.");
+                throw new ActionGroupException($"The action group operations for the \"{group}\" is not permitted.", ActionGroupError.AccessDenied);
             }
         }
 
@@ -167,8 +167,8 @@ namespace SAPTeam.CommonTK
         /// <exception cref="InvalidOperationException"></exception>
         protected void SuppressLock(string group)
         {
-            if (!IsGlobal) throw new InvalidOperationException("The action group feature only available in global contexts.");
-            if (disposing) throw new ActionGroupException("A disposing context can't interact with action groups.");
+            if (!IsGlobal) throw new ActionGroupException(ActionGroupError.NotGlobal);
+            if (disposing) throw new ActionGroupException(ActionGroupError.Disposing);
 
             if (allowedGroups.Contains(group))
             {
@@ -181,7 +181,7 @@ namespace SAPTeam.CommonTK
             }
             else
             {
-                throw new ActionGroupException($"The action group operations for \"{group}\" is not permitted.");
+                throw new ActionGroupException($"The action group operations for \"{group}\" is not permitted.", ActionGroupError.AccessDenied);
             }
         }
 

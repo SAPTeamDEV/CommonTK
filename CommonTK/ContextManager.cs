@@ -67,11 +67,11 @@ namespace SAPTeam.CommonTK
                 {
                     if (Context.groups[group].Count == 1)
                     {
-                        throw new ActionGroupException($"The action group \"{group}\" is locked by {Context.groups[group][0].Name} context.");
+                        throw new ActionGroupException($"The action group \"{group}\" is locked by {Context.groups[group][0].Name} context.", ActionGroupError.Locked);
                     }
                     else
                     {
-                        throw new ActionGroupException($"The action group \"{group}\" is locked by {Context.groups[group].Count} contexts.");
+                        throw new ActionGroupException($"The action group \"{group}\" is locked by {Context.groups[group].Count} contexts.", ActionGroupError.Locked);
                     }
                 }
             }

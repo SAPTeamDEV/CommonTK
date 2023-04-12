@@ -32,7 +32,7 @@ namespace SAPTeam.CommonTK
         {
             if (IsSuppressed)
             {
-                throw new ActionGroupException("The lock of action group already has suppressed.");
+                throw new ActionGroupException(ActionGroupError.AlreadySuppressed);
             }
 
             this.suppressor = suppressor;
@@ -43,11 +43,11 @@ namespace SAPTeam.CommonTK
         {
             if (!IsSuppressed)
             {
-                throw new ActionGroupException("The lock of action group does not suppressed.");
+                throw new ActionGroupException(ActionGroupError.NotSuppressed);
             }
             else if (!IsSuppressor(suppressor))
             {
-                throw new ActionGroupException("Only the suppressor context can relock the action group.");
+                throw new ActionGroupException(ActionGroupError.SuppressorRequired);
             }
             else
             {
@@ -70,11 +70,11 @@ namespace SAPTeam.CommonTK
         {
             if (IsSuppressed && !IsSuppressor(context))
             {
-                throw new ActionGroupException($"The action group \"{Name}\" is suppressed by {suppressor.Name}.");
+                throw new ActionGroupException($"The action group \"{Name}\" is suppressed by {suppressor.Name}.", ActionGroupError.Suppressed);
             }
             else if (Contexts.Contains(context))
             {
-                throw new ActionGroupException("The action group is already locked by this context.");
+                throw new ActionGroupException(ActionGroupError.AlreadyLocked);
             }
             else
             {

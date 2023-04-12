@@ -222,8 +222,8 @@ namespace SAPTeam.CommonTK.Tests
                         exposer.Suppress("application.test5");
                         exposer.Suppress("application.test6");
                         exposer.Dispose();
-                        Assert.Throws<InvalidOperationException>(() => exposer.Lock("application.test"));
-                        Assert.Throws<InvalidOperationException>(() => exposer.Suppress("application.test"));
+                        Assert.Throws<ActionGroupException>(() => exposer.Lock("application.test"));
+                        Assert.Throws<ActionGroupException>(() => exposer.Suppress("application.test"));
                     }
 
                     Assert.Equal(ActionGroupState.Free, QueryGroupState(ActionGroup(ActionScope.Application, "test4")));
@@ -243,8 +243,8 @@ namespace SAPTeam.CommonTK.Tests
         {
             using (var exposer = new ProtectedExposerContext(false))
             {
-                Assert.Throws<InvalidOperationException>(() => exposer.Lock("application.test5"));
-                Assert.Throws<InvalidOperationException>(() => exposer.Suppress("application.test5"));
+                Assert.Throws<ActionGroupException>(() => exposer.Lock("application.test5"));
+                Assert.Throws<ActionGroupException>(() => exposer.Suppress("application.test5"));
             }
         }
 

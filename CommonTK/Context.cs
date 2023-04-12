@@ -15,7 +15,8 @@ namespace SAPTeam.CommonTK
 
         string[] allowedGroups;
         string[] ownedGroups;
-        string[] contextGroups;
+
+        List<ActionGroupContainer> affectedGroups = new List<ActionGroupContainer>();
 
         /// <summary>
         /// Gets the context default action groups.
@@ -75,7 +76,6 @@ namespace SAPTeam.CommonTK
 
                 allowedGroups = Groups.Concat(NeutralGroups).ToArray();
                 ownedGroups = Groups.Concat(DefaultGroups).ToArray();
-                contextGroups = ownedGroups.Concat(NeutralGroups).ToArray();
 
                 foreach (var group in ownedGroups)
                 {
@@ -91,27 +91,34 @@ namespace SAPTeam.CommonTK
                 }
             }
 
-            if (!IsRunning)
+            try
             {
-                IsRunning = true;
-
-                try
+                if (!IsRunning)
                 {
+                    IsRunning = true;
                     CreateContext();
                 }
-                catch (Exception)
+
+                if (IsGlobal)
                 {
-                    KnockUp();
+                    foreach (string group in ownedGroups)
+                    {
+                        RegisterAction(group, false, true);
+                    }
+                }
+            }
+            catch (ActionGroupException age)
+            {
+                if (age.ErrorCode != (int)ActionGroupError.AlreadyLocked)
+                {
                     throw;
                 }
             }
-
-            if (IsGlobal)
+            catch (Exception)
             {
-                foreach (string group in ownedGroups)
-                {
-                    RegisterAction(group, false, true);
-                }
+                FreeGroups();
+                KnockUp();
+                throw;
             }
         }
 
@@ -125,10 +132,20 @@ namespace SAPTeam.CommonTK
             if (doRelock && groups[group].IsSuppressor(this))
             {
                 groups[group].Relock(this);
+
+                if (affectedGroups.Contains(groups[group]))
+                {
+                    affectedGroups.Remove(groups[group]);
+                }
             }
             else if (addContext)
             {
                 groups[group].Add(this);
+
+                if (!affectedGroups.Contains(groups[group]))
+                {
+                    affectedGroups.Add(groups[group]);
+                }
             }
         }
 
@@ -178,6 +195,11 @@ namespace SAPTeam.CommonTK
                 {
                     groups[group].Suppress(this);
                 }
+
+                if (!affectedGroups.Contains(groups[group]))
+                {
+                    affectedGroups.Add(groups[group]);
+                }
             }
             else
             {
@@ -202,16 +224,7 @@ namespace SAPTeam.CommonTK
             {
                 disposing = true;
 
-                if (IsGlobal)
-                {
-                    foreach (string group in contextGroups)
-                    {
-                        if (groups.ContainsKey(group) && groups[group].HasRegistered(this))
-                        {
-                            groups[group].Remove(this);
-                        }
-                    }
-                }
+                FreeGroups();
 
                 try
                 {
@@ -225,6 +238,16 @@ namespace SAPTeam.CommonTK
                     KnockUp();
                 }
             }
+        }
+
+        void FreeGroups()
+        {
+            foreach (var actionGroup in affectedGroups)
+            {
+                actionGroup.Remove(this);
+            }
+
+            affectedGroups.Clear();
         }
 
         void KnockUp()

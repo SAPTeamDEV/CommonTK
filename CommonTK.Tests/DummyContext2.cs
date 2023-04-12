@@ -14,6 +14,7 @@ namespace SAPTeam.CommonTK.Tests
         bool protectedTest;
         bool throwOnInitializer;
         bool throwOnRegisterAction;
+        bool earlyRegisterAction;
         bool throwOnFinalizer;
 
         public DummyContext2() : this(false)
@@ -25,11 +26,13 @@ namespace SAPTeam.CommonTK.Tests
                              bool protectedTest = false,
                              bool throwOnInitializer = false,
                              bool throwOnRegisterAction = false,
+                             bool earlyRegisterAction = false,
                              bool throwOnFinalizer = false)
         {
             this.protectedTest = protectedTest;
             this.throwOnInitializer = throwOnInitializer;
             this.throwOnRegisterAction = throwOnRegisterAction;
+            this.earlyRegisterAction = earlyRegisterAction;
             this.throwOnFinalizer = throwOnFinalizer;
 
             Initialize(isGlobal);
@@ -51,6 +54,11 @@ namespace SAPTeam.CommonTK.Tests
             if (throwOnRegisterAction)
             {
                 SuppressLock("application.test");
+            }
+
+            if (earlyRegisterAction)
+            {
+                LockGroup("application.test");
             }
 
             if (created)

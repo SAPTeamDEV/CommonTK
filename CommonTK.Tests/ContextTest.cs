@@ -255,6 +255,11 @@ namespace SAPTeam.CommonTK.Tests
             Assert.False(Exists<DummyContext2>());
             Assert.Throws<KeyNotFoundException>(() => GetContext<DummyContext2>());
 
+            using (var context2 = new DummyContext2(earlyRegisterAction: true))
+            {
+                Assert.True(Exists<DummyContext2>());
+            }
+
             using (var context2 = new DummyContext2(throwOnRegisterAction: true))
             {
                 Assert.Throws<ActionGroupException>(() => new DummyContext3());

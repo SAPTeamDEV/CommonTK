@@ -105,14 +105,9 @@ namespace SAPTeam.CommonTK
         /// </returns>
         public static string ActionGroup(ActionScope scope, string identifier, params string[] extras)
         {
-            var groupName = string.Join(".", scope, identifier, string.Join(".", extras))
+            var groupName = string.Join(".", new string[] { scope.ToString(), identifier }.Concat(extras))
                 .Replace(' ', '_')
                 .ToLower();
-
-            if (groupName.EndsWith("."))
-            {
-                return groupName.Substring(0, groupName.Length - 1);
-            }
 
             return groupName;
         }

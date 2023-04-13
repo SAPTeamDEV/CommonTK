@@ -7,27 +7,9 @@ namespace SAPTeam.CommonTK
 {
     public abstract partial class Context
     {
-        [DllImport("kernel32.dll")] private static extern IntPtr GetConsoleWindow();
-
         static readonly Dictionary<string, Context> contexts = new Dictionary<string, Context>();
         static readonly object contextLockObj = new object();
-        private static InteractInterface interactinterface = GetConsoleWindow() != IntPtr.Zero ? InteractInterface.Console : InteractInterface.UI;
 
-        /// <summary>
-        /// Gets or Sets the process interaction Interface.
-        /// <para>
-        /// Property setter Action Group: global.interface
-        /// </para>
-        /// </summary>
-        public static InteractInterface Interface
-        {
-            get => interactinterface;
-            set
-            {
-                QueryGroup(ActionGroup(ActionScope.Global, "interface"));
-                interactinterface = value;
-            }
-        }
         /// <summary>
         /// Creates a new Context and registers it globally.
         /// </summary>

@@ -283,5 +283,13 @@ namespace SAPTeam.CommonTK.Tests
             Assert.False(Exists<DummyContext2>());
             Assert.Throws<KeyNotFoundException>(() => GetContext<DummyContext2>());
         }
+
+        [Fact]
+        public void EnvironmentTest()
+        {
+            Assert.Null(ExecutablePath);
+            Assert.Equal("testhost", ApplicationTitle);
+            Assert.NotNull(ApplicationDirectory);
+        }
     }
 }

@@ -105,5 +105,22 @@ namespace SAPTeam.CommonTK.Tests
             StatusProvider.Provider = StatusProvider.Empty;
             Assert.Empty(status.Input);
         }
+
+        [Fact]
+        public void NullStatusProviderTest()
+        {
+            Assert.Equal(StatusProvider.Empty, StatusProvider.Provider);
+            StatusProvider.Provider = new NullStatusProvider();
+            Assert.NotEqual(StatusProvider.Empty, StatusProvider.Provider);
+            StatusProvider.Write("test");
+            StatusProvider.Write("test", ProgressBarType.Block);
+            StatusProvider.Increment();
+            StatusProvider.Increment(10);
+            StatusProvider.Write("test", ProgressBarType.Wait);
+            StatusProvider.Clear();
+            StatusProvider.Clear("test");
+            StatusProvider.Reset();
+            Assert.Equal(StatusProvider.Empty, StatusProvider.Provider);
+        }
     }
 }

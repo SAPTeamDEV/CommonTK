@@ -57,6 +57,9 @@ namespace SAPTeam.CommonTK
         /// <summary>
         /// Initializes a new context.
         /// This method must be called in the end of context constructor.
+        /// <para>
+        /// Method Action Groups are declared in the <see cref="DefaultGroups"/> property.
+        /// </para>
         /// </summary>
         /// <param name="global">
         /// Determines whether to register this context globally.
@@ -73,6 +76,8 @@ namespace SAPTeam.CommonTK
                 {
                     throw new InvalidOperationException("An instance of this context already exists");
                 }
+
+                QueryGroup(DefaultGroups);
 
                 allowedGroups = Groups.Concat(NeutralGroups).ToArray();
                 ownedGroups = Groups.Concat(DefaultGroups).ToArray();

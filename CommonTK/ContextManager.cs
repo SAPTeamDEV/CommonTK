@@ -63,7 +63,7 @@ namespace SAPTeam.CommonTK
         {
             foreach (var group in groups)
             {
-                if (Context.groups.ContainsKey(group) && Context.groups[group].State == ActionGroupState.Locked)
+                if (Context.groups.ContainsKey(group) && Context.groups[group].IsLocked)
                 {
                     if (Context.groups[group].Count == 1)
                     {

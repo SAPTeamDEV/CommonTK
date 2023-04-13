@@ -18,6 +18,7 @@ namespace SAPTeam.CommonTK
         Context suppressor;
 
         public bool IsSuppressed { get; private set; }
+        public bool IsLocked => State == ActionGroupState.Locked;
 
         public int Count => Contexts.Count;
 

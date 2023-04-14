@@ -5,10 +5,10 @@ using System.Text;
 
 namespace SAPTeam.CommonTK
 {
+    // Action Groups is an integrated feature in Context.
     public abstract partial class Context
     {
         static readonly Dictionary<string, ActionGroupContainer> groups = new Dictionary<string, ActionGroupContainer>();
-        static readonly object groupLockObj = new object();
 
         /// <summary>
         /// Queries all provided action groups and checks the locked state of each group.

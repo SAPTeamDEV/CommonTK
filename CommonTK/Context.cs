@@ -195,11 +195,7 @@ namespace SAPTeam.CommonTK
             if (allowedGroups.Contains(group))
             {
                 RegisterAction(group, false, false);
-
-                lock (groupLockObj)
-                {
-                    groups[group].Suppress(this);
-                }
+                groups[group].Suppress(this);
 
                 if (!affectedGroups.Contains(groups[group]))
                 {

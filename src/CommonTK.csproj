@@ -7,7 +7,6 @@
     <AssemblyName>SAPTeam.CommonTK</AssemblyName>
     <RootNamespace>$(AssemblyName)</RootNamespace>
     <PackageId>$(AssemblyName)</PackageId>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>CommonTK</Title>
     <AssemblyTitle>.NET Common Toolkit</AssemblyTitle>
     <Product>All in One and Multi Purpose .NET Library</Product>
@@ -29,12 +28,9 @@ For Getting started with this library you can visit our github page.</Descriptio
     <RepositoryUrl>https://github.com/SAPTeamDEV/CommonTK</RepositoryUrl>
   	<PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageTags>tools;toolkit;utility;json;settings;config;status;timer;context;status-provider;action-group;code-control;environment;variables</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
-	  <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
 	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
 	  <RepositoryType>git</RepositoryType>
 	  <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
@@ -42,26 +38,6 @@ For Getting started with this library you can visit our github page.</Descriptio
 	  <SignAssembly>True</SignAssembly>
 	  <AssemblyOriginatorKeyFile>CommonTK.snk</AssemblyOriginatorKeyFile>
 	  <PackageReleaseNotes></PackageReleaseNotes>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
-    <NoWarn>1701;1702</NoWarn>
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
-    <NoWarn>1701;1702</NoWarn>
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net461|AnyCPU'">
-    <NoWarn>1701;1702</NoWarn>
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net461|AnyCPU'">
-    <NoWarn>1701;1702</NoWarn>
-    <DebugType>portable</DebugType>
   </PropertyGroup>
 
   <ItemGroup>

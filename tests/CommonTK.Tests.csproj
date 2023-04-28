@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CommonTK\CommonTK.csproj" />
+    <ProjectReference Include="..\src\CommonTK.csproj" />
   </ItemGroup>
 
 </Project>

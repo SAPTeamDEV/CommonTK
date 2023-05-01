@@ -9,8 +9,36 @@ namespace SAPTeam.CommonTK
 {
     public abstract partial class Context
     {
-        [DllImport("kernel32.dll")] private static extern IntPtr GetConsoleWindow();
-        private static InteractInterface interactinterface = GetConsoleWindow() != IntPtr.Zero ? InteractInterface.Console : InteractInterface.UI;
+
+        private static InteractInterface interactinterface = CheckConsole();
+
+        private static InteractInterface CheckConsole()
+        {
+            if (Environment.OSVersion.Platform == PlatformID.Unix)
+            {
+                // Unix console behavior
+                if ((int)Console.BackgroundColor == -1)
+                {
+                    // There is no console
+                    return InteractInterface.UI;
+                }
+                else
+                {
+                    return InteractInterface.Console;
+                }
+            }
+
+            // Windows console behavior
+            try
+            {
+                int height = Console.WindowHeight;
+                return height > 0 ? InteractInterface.Console : InteractInterface.UI;
+            }
+            catch (Exception)
+            {
+                return InteractInterface.UI;
+            }
+        }
 
         /// <summary>
         /// Gets or Sets the process interaction Interface.

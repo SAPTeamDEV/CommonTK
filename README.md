@@ -1,8 +1,8 @@
 # CommonTK - All in One and Multi Purpose .NET Library
 
-[![Build status](https://ci.appveyor.com/api/projects/status/favd0t4w65nstkbk?svg=true)](https://ci.appveyor.com/project/SAPTeamDEV/commontk)
-[![Nuget](https://img.shields.io/nuget/v/SAPTeam.CommonTK)](https://www.nuget.org/packages/SAPTeam.CommonTK)
-[![Nuget](https://img.shields.io/nuget/dt/SAPTeam.CommonTK)](https://www.nuget.org/packages/SAPTeam.CommonTK)
+[![Gawe CI](https://github.com/SAPTeamDEV/CommonTK/actions/workflows/main.yml/badge.svg?event=push)](https://github.com/SAPTeamDEV/CommonTK/actions/workflows/main.yml)
+[![NuGet](https://img.shields.io/nuget/v/SAPTeam.CommonTK)](https://www.nuget.org/packages/SAPTeam.CommonTK)
+[![NuGet](https://img.shields.io/nuget/dt/SAPTeam.CommonTK)](https://www.nuget.org/packages/SAPTeam.CommonTK)
 
 This library has many Features and also provides Interfaces can be used in .NET Applications.
 This library has rich Interfaces that can be implemented and used by .NET libraries to create amazing features.

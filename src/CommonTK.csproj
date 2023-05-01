@@ -26,18 +26,14 @@ Represents a caching method for interacting with environment variable without lo
 
 For Getting started with this library you can visit our github page.</Description>
     <RepositoryUrl>https://github.com/SAPTeamDEV/CommonTK</RepositoryUrl>
-  	<PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <PackageTags>tools;toolkit;utility;json;settings;config;status;timer;context;status-provider;action-group;code-control;environment;variables</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
 	  <RepositoryType>git</RepositoryType>
-	  <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
 	  <Copyright>Copyright © SAP Team 2023</Copyright>
 	  <SignAssembly>True</SignAssembly>
 	  <AssemblyOriginatorKeyFile>CommonTK.snk</AssemblyOriginatorKeyFile>
-	  <PackageReleaseNotes></PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

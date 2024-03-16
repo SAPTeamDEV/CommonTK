@@ -46,7 +46,7 @@ namespace SAPTeam.CommonTK
         /// Otherwise it throws an <see cref="InvalidOperationException"/>.
         /// </param>
         /// <exception cref="InvalidOperationException"></exception>
-        public static void Write(string status, ProgressBarType progress = ProgressBarType.None)
+        public static object Write(string status, ProgressBarType progress = ProgressBarType.None)
         {
             if (progress == ProgressBarType.None)
             {
@@ -54,12 +54,14 @@ namespace SAPTeam.CommonTK
             }
             else if (Provider is IProgressStatusProvider ps)
             {
-                ps.Write(status, progress);
+                return ps.Write(status, progress);
             }
             else
             {
                 throw new InvalidOperationException("Operation is not supported in the current status provider.");
             }
+
+            return null;
         }
 
         /// <summary>

@@ -28,7 +28,7 @@ namespace SAPTeam.CommonTK
         /// <param name="type">
         /// The type of progress bar.
         /// </param>
-        void Write(string message, ProgressBarType type);
+        object Write(string message, ProgressBarType type);
 
         /// <summary>
         /// Increases the progress value of <see cref="ProgressBarType.Block"/> Progress bar by <paramref name="value"/>.

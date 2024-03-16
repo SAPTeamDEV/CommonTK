@@ -43,9 +43,10 @@ namespace SAPTeam.CommonTK
         }
 
         /// <inheritdoc/>
-        public void Write(string message, ProgressBarType type)
+        public object Write(string message, ProgressBarType type)
         {
             Type = type;
+            return null;
         }
     }
 }

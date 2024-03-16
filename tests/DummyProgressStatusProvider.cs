@@ -31,10 +31,11 @@ namespace SAPTeam.CommonTK.Tests
             Input.Append(message);
         }
 
-        public void Write(string message, ProgressBarType type)
+        public object Write(string message, ProgressBarType type)
         {
             Write(message + ": " + type);
             Type = type;
+            return null;
         }
 
         public void Increment(int value)

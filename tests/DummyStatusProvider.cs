@@ -28,7 +28,7 @@ namespace SAPTeam.CommonTK.Tests
         public StatusIdentifier Write(string message)
         {
             Input.Append(message);
-            return StatusIdentifier.Empty;
+            return new StatusIdentifier(this, 0);
         }
     }
 }

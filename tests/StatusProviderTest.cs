@@ -30,9 +30,12 @@ namespace SAPTeam.CommonTK.Tests
         {
             var status = new DummyStatusProvider();
             StatusProvider.Provider = status;
-            StatusProvider.Write("test");
+            var id = StatusProvider.Write("test");
             Assert.Equal("test", status.Input.ToString());
-            StatusProvider.Clear();
+            StatusProvider.Clear(id);
+            var id2 = StatusProvider.Write("test2");
+            Assert.Equal("test2", status.Input.ToString());
+            id.Dispose();
             Assert.Equal("", status.Input.ToString());
             StatusProvider.Write("test");
             StatusProvider.Provider = StatusProvider.Empty;
@@ -162,6 +165,7 @@ namespace SAPTeam.CommonTK.Tests
             Assert.Equal(StatusProvider.Empty, StatusProvider.Provider);
             StatusProvider.Provider = new NullStatusProvider();
             Assert.NotEqual(StatusProvider.Empty, StatusProvider.Provider);
+            StatusProvider.Provider.Write("test");
             StatusProvider.Write("test");
             StatusProvider.Write("test", ProgressBarType.Block);
             StatusProvider.Increment();
@@ -169,6 +173,7 @@ namespace SAPTeam.CommonTK.Tests
             var id = StatusProvider.Write("test", ProgressBarType.Wait);
             StatusProvider.Clear();
             StatusProvider.Clear(id);
+            ((IMultiStatusProvider)StatusProvider.Provider).Clear(id);
             StatusProvider.Reset();
             Assert.Equal(StatusProvider.Empty, StatusProvider.Provider);
         }

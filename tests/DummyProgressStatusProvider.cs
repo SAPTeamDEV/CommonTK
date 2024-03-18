@@ -26,21 +26,22 @@ namespace SAPTeam.CommonTK.Tests
             Clear();
         }
 
-        public void Write(string message)
+        public StatusIdentifier Write(string message)
         {
             Input.Append(message);
+            return StatusIdentifier.Empty;
         }
 
-        public object Write(string message, ProgressBarType type)
+        public StatusIdentifier Write(string message, ProgressBarType type)
         {
             if (type == ProgressBarType.None)
             {
                 Write(message);
-                return null;
+                return StatusIdentifier.Empty;
             }
             Write(message + ": " + type);
             Type = type;
-            return null;
+            return StatusIdentifier.Empty;
         }
 
         public void Increment(int value)

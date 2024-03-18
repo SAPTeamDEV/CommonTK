@@ -13,11 +13,11 @@ namespace SAPTeam.CommonTK
     public interface IMultiStatusProvider : IStatusProvider
     { 
         /// <summary>
-        /// Clears the <paramref name="message"/> from Status Provider.
+        /// Clears the status associated with <paramref name="identifier"/> from Status Provider.
         /// </summary>
-        /// <param name="message">
-        /// An existing status text.
+        /// <param name="identifier">
+        /// The identifier of the status.
         /// </param>
-        void Clear(string message);
+        void Clear(StatusIdentifier identifier);
     }
 }

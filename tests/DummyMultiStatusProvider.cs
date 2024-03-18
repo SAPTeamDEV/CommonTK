@@ -8,11 +8,11 @@ namespace SAPTeam.CommonTK.Tests
 {
     public class DummyMultiStatusProvider : IMultiStatusProvider
     {
-        public List<string> Input { get; }
+        public Dictionary<int, string> Input { get; }
 
         public DummyMultiStatusProvider()
         {
-            Input = new List<string>();
+            Input = new Dictionary<int, string>();
         }
 
         public void Clear()
@@ -25,14 +25,16 @@ namespace SAPTeam.CommonTK.Tests
             Clear();
         }
 
-        public void Write(string message)
+        public StatusIdentifier Write(string message)
         {
-            Input.Add(message);
+            var id = StatusIdentifier.Generate(this);
+            Input[id] = message;
+            return id;
         }
 
-        public void Clear(string message)
+        public void Clear(StatusIdentifier identifier)
         {
-            Input.Remove(message);
+            Input.Remove(identifier);
         }
     }
 }

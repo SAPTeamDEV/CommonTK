@@ -13,7 +13,7 @@ namespace SAPTeam.CommonTK
         public ProgressBarType Type { get; set; }
 
         /// <inheritdoc/>
-        public void Clear(string message)
+        public void Clear(StatusIdentifier identifier)
         {
             
         }
@@ -37,16 +37,16 @@ namespace SAPTeam.CommonTK
         }
 
         /// <inheritdoc/>
-        public void Write(string message)
+        public StatusIdentifier Write(string message)
         {
-            
+            return StatusIdentifier.Empty;
         }
 
         /// <inheritdoc/>
-        public object Write(string message, ProgressBarType type)
+        public StatusIdentifier Write(string message, ProgressBarType type)
         {
             Type = type;
-            return null;
+            return StatusIdentifier.Empty;
         }
     }
 }

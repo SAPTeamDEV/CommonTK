@@ -13,12 +13,12 @@ namespace SAPTeam.CommonTK
         public static IStatusProvider Empty { get; }
 
         /// <inheritdoc/>
-        public void Clear() { }
+        public abstract void Clear();
 
         /// <inheritdoc/>
-        public void Dispose() { }
+        public abstract void Dispose();
 
         /// <inheritdoc/>
-        public void Write(string message) { }
+        public abstract StatusIdentifier Write(string message);
     }
 }

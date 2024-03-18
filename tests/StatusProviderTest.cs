@@ -40,7 +40,7 @@ namespace SAPTeam.CommonTK.Tests
         }
 
         [Fact]
-        public void SwithcingStatusesTest()
+        public void SwitchingStatusesTest()
         {
             var status1 = new DummyStatusProvider();
             var status2 = new DummyProgressStatusProvider();
@@ -89,17 +89,69 @@ namespace SAPTeam.CommonTK.Tests
             var status = new DummyMultiStatusProvider();
             StatusProvider.Provider = status;
             StatusProvider.Write("test1");
-            Assert.Contains("test1", status.Input);
+            Assert.Contains("test1", status.Input.Values);
             StatusProvider.Clear();
             Assert.Empty(status.Input);
-            StatusProvider.Write("test2");
-            Assert.Contains("test2", status.Input);
-            StatusProvider.Write("test3");
-            Assert.Contains("test2", status.Input);
-            Assert.Contains("test3", status.Input);
-            StatusProvider.Clear("test2");
-            Assert.DoesNotContain("test2", status.Input);
-            Assert.Contains("test3", status.Input);
+            var id2 = StatusProvider.Write("test2");
+            Assert.Contains("test2", status.Input.Values);
+            var id3 = StatusProvider.Write("test3");
+            StatusProvider.Write("test4");
+            Assert.Contains("test2", status.Input.Values);
+            Assert.Contains("test3", status.Input.Values);
+            Assert.Contains("test4", status.Input.Values);
+            StatusProvider.Clear(id2);
+            Assert.DoesNotContain("test2", status.Input.Values);
+            Assert.Contains("test3", status.Input.Values);
+            Assert.Contains("test4", status.Input.Values);
+            StatusProvider.Clear(id3);
+            Assert.DoesNotContain("test3", status.Input.Values);
+            Assert.Contains("test4", status.Input.Values);
+            StatusProvider.Provider = StatusProvider.Empty;
+            Assert.Empty(status.Input);
+        }
+
+        [Fact]
+        public void StatusIdentifierTest()
+        {
+            var status = new DummyMultiStatusProvider();
+            StatusProvider.Provider = status;
+            var id1 = StatusProvider.Write("test1");
+            var id2 = StatusProvider.Write("test2");
+            Assert.Contains("test1", status.Input.Values);
+            Assert.Contains("test2", status.Input.Values);
+            StatusProvider.Clear(id1);
+            Assert.DoesNotContain("test1", status.Input.Values);
+            using (var id3 = StatusProvider.Write("test3"))
+            {
+                Assert.Contains("test2", status.Input.Values);
+                Assert.Contains("test3", status.Input.Values);
+
+                using (var id4 = StatusProvider.Write("test4"))
+                {
+                    Assert.Contains("test2", status.Input.Values);
+                    Assert.Contains("test3", status.Input.Values);
+                    Assert.Contains("test4", status.Input.Values);
+
+                    Assert.Throws<InvalidOperationException>(() =>
+                    {
+                        using (var id5 = StatusProvider.Write("test5"))
+                        {
+                            Assert.Contains("test2", status.Input.Values);
+                            Assert.Contains("test3", status.Input.Values);
+                            Assert.Contains("test4", status.Input.Values);
+                            Assert.Contains("test5", status.Input.Values);
+                            id5.Dispose();
+                            Assert.Contains("test2", status.Input.Values);
+                            Assert.Contains("test3", status.Input.Values);
+                            Assert.Contains("test4", status.Input.Values);
+                            Assert.DoesNotContain("test5", status.Input.Values);
+                        }
+                    });
+                }
+                Assert.DoesNotContain("test4", status.Input.Values);
+            }
+            Assert.DoesNotContain("test3", status.Input.Values);
+            Assert.Contains("test2", status.Input.Values);
             StatusProvider.Provider = StatusProvider.Empty;
             Assert.Empty(status.Input);
         }
@@ -114,9 +166,9 @@ namespace SAPTeam.CommonTK.Tests
             StatusProvider.Write("test", ProgressBarType.Block);
             StatusProvider.Increment();
             StatusProvider.Increment(10);
-            StatusProvider.Write("test", ProgressBarType.Wait);
+            var id = StatusProvider.Write("test", ProgressBarType.Wait);
             StatusProvider.Clear();
-            StatusProvider.Clear("test");
+            StatusProvider.Clear(id);
             StatusProvider.Reset();
             Assert.Equal(StatusProvider.Empty, StatusProvider.Provider);
         }

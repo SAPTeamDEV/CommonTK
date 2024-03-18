@@ -46,7 +46,7 @@ namespace SAPTeam.CommonTK
         /// Otherwise it will be ignored.
         /// </param>
         /// <exception cref="InvalidOperationException"></exception>
-        public static object Write(string status, ProgressBarType progress = ProgressBarType.None)
+        public static StatusIdentifier Write(string status, ProgressBarType progress = ProgressBarType.None)
         {
             if (Provider is IProgressStatusProvider ps)
             {
@@ -54,10 +54,8 @@ namespace SAPTeam.CommonTK
             }
             else
             {
-                Provider.Write(status);
+                return Provider.Write(status);
             }
-
-            return null;
         }
 
         /// <summary>
@@ -91,16 +89,16 @@ namespace SAPTeam.CommonTK
 
         /// <summary>
         /// Clears the text of the global status provider.
-        /// if class implements <see cref="IMultiStatusProvider"/> you can provide <paramref name="message"/>, otherwise it will ignored.
+        /// if class implements <see cref="IMultiStatusProvider"/> you can provide <paramref name="identifier"/>, otherwise it will be ignored.
         /// </summary>
-        /// <param name="message">
-        /// A specific message that will be removed.
+        /// <param name="identifier">
+        /// The identifier of the status that will be removed.
         /// </param>
-        public static void Clear(string message = null)
+        public static void Clear(StatusIdentifier identifier = default)
         {
-            if (Provider is IMultiStatusProvider msp && message != null)
+            if (Provider is IMultiStatusProvider msp && identifier.IsValid())
             {
-                msp.Clear(message);
+                msp.Clear(identifier);
             }
             else
             {

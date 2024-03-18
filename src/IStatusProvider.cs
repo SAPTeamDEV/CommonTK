@@ -13,11 +13,11 @@ namespace SAPTeam.CommonTK
         void Clear();
 
         /// <summary>
-        /// Writes the new status to the Status Provider.
+        /// Writes new status to the Status Provider.
         /// </summary>
         /// <param name="message">
         /// New status of Status Provider.
         /// </param>
-        void Write(string message);
+        StatusIdentifier Write(string message);
     }
 }

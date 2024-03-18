@@ -43,22 +43,18 @@ namespace SAPTeam.CommonTK
         /// <param name="progress">
         /// The type of progress bar.
         /// This argument applied only when the global status provider is an instance of the <see cref="IProgressStatusProvider"/> interface.
-        /// Otherwise it throws an <see cref="InvalidOperationException"/>.
+        /// Otherwise it will be ignored.
         /// </param>
         /// <exception cref="InvalidOperationException"></exception>
         public static object Write(string status, ProgressBarType progress = ProgressBarType.None)
         {
-            if (progress == ProgressBarType.None)
-            {
-                Provider.Write(status);
-            }
-            else if (Provider is IProgressStatusProvider ps)
+            if (Provider is IProgressStatusProvider ps)
             {
                 return ps.Write(status, progress);
             }
             else
             {
-                throw new InvalidOperationException("Operation is not supported in the current status provider.");
+                Provider.Write(status);
             }
 
             return null;

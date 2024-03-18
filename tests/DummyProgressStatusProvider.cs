@@ -33,6 +33,11 @@ namespace SAPTeam.CommonTK.Tests
 
         public object Write(string message, ProgressBarType type)
         {
+            if (type == ProgressBarType.None)
+            {
+                Write(message);
+                return null;
+            }
             Write(message + ": " + type);
             Type = type;
             return null;

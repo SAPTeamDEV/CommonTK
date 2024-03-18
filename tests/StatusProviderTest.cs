@@ -30,7 +30,6 @@ namespace SAPTeam.CommonTK.Tests
         {
             var status = new DummyStatusProvider();
             StatusProvider.Provider = status;
-            Assert.Throws<InvalidOperationException>(() => StatusProvider.Write("test", ProgressBarType.Block));
             StatusProvider.Write("test");
             Assert.Equal("test", status.Input.ToString());
             StatusProvider.Clear();
@@ -89,7 +88,6 @@ namespace SAPTeam.CommonTK.Tests
         {
             var status = new DummyMultiStatusProvider();
             StatusProvider.Provider = status;
-            Assert.Throws<InvalidOperationException>(() => StatusProvider.Write("test", ProgressBarType.Block));
             StatusProvider.Write("test1");
             Assert.Contains("test1", status.Input);
             StatusProvider.Clear();

@@ -42,7 +42,7 @@ For Getting started with this library you can visit our github page.</Descriptio
       <PrivateAssets>all</PrivateAssets>
       <Version>3.6.133</Version>
     </PackageReference>
-    <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.1.1" PrivateAssets="All"/>
+    <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.2.4" PrivateAssets="All"/>
   </ItemGroup>
 
   <ItemGroup>

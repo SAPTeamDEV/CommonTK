@@ -25,6 +25,8 @@ permissions:
     write
   pull-requests:
     write
+  checks:
+    write
 
 jobs:
   build:

@@ -14,7 +14,9 @@ namespace SAPTeam.CommonTK
     public sealed class Config<T>
         where T : new()
     {
-        JsonSerializer js = new JsonSerializer()
+        JsonSerializer js;
+
+        static JsonSerializerSettings defaultSettings = new JsonSerializerSettings()
         {
             Formatting = Formatting.Indented,
             NullValueHandling = NullValueHandling.Ignore
@@ -36,7 +38,21 @@ namespace SAPTeam.CommonTK
         /// <param name="configPath">
         /// Path of configuration file, if the file does not exists, it automatically created.
         /// </param>
-        public Config(string configPath)
+        public Config(string configPath) : this(configPath, defaultSettings)
+        {
+
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Config{T}"/> class.
+        /// </summary>
+        /// <param name="configPath">
+        /// Path of configuration file, if the file does not exists, it automatically created.
+        /// </param>
+        /// <param name="serializerSettings">
+        /// The settings to be applied to the <see cref="JsonSerializer"/>.
+        /// </param>
+        public Config(string configPath, JsonSerializerSettings serializerSettings)
         {
             FileName = configPath;
 
@@ -51,6 +67,7 @@ namespace SAPTeam.CommonTK
 
             JObject data = JObject.Parse(File.ReadAllText(configPath));
 
+            js = JsonSerializer.Create(serializerSettings);
             Prefs = js.Deserialize<T>(data.CreateReader());
         }
 

@@ -41,7 +41,7 @@ For Getting started with this library you can visit our github page.</Descriptio
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   	<PackageReference Include="Nerdbank.GitVersioning" Condition="!Exists('packages.config')">
       <PrivateAssets>all</PrivateAssets>
-      <Version>3.6.133</Version>
+      <Version>3.6.141</Version>
     </PackageReference>
     <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.1.1" PrivateAssets="All"/>
   </ItemGroup>

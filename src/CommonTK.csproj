@@ -32,6 +32,7 @@ For Getting started with this library you can visit our github page.</Descriptio
 	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
 	  <RepositoryType>git</RepositoryType>
 	  <Copyright>Copyright © SAP Team 2023</Copyright>
+    <RestorePackagesWithLockFile>True</RestorePackagesWithLockFile>
 	  <SignAssembly>True</SignAssembly>
 	  <AssemblyOriginatorKeyFile>CommonTK.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>

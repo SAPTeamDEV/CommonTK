@@ -9,6 +9,7 @@
     <IsTestProject>true</IsTestProject>
     <AssemblyName>SAPTeam.$(MSBuildProjectName)</AssemblyName>
     <RootNamespace>SAPTeam.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+    <RestorePackagesWithLockFile>True</RestorePackagesWithLockFile>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>CommonTK.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>

@@ -59,7 +59,7 @@ namespace SAPTeam.CommonTK
 
         public bool HasRegistered(Context context)
         {
-            return Contexts.Contains(context) ? true : IsSuppressor(context);
+            return Contexts.Contains(context) || IsSuppressor(context);
         }
 
         public bool IsSuppressor(Context context)

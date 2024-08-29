@@ -109,16 +109,6 @@ namespace SAPTeam.CommonTK
         /// <summary>
         /// Initializes a new instance of the <see cref="ActionGroupException"/> class.
         /// </summary>
-        /// <param name="serializationInfo">The serialization info.</param>
-        /// <param name="context">The context.</param>
-        public ActionGroupException(SerializationInfo serializationInfo, StreamingContext context)
-            : base(serializationInfo, context)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ActionGroupException"/> class.
-        /// </summary>
         /// <param name="message">The error message.</param>
         /// <param name="innerException">The inner exception.</param>
         public ActionGroupException(string message, Exception innerException)

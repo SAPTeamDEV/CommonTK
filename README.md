@@ -102,32 +102,6 @@ void Main()
 }
 ```
 
-### `Config`
-`JsonWorker` was a base class for doing Json-related actions. in version 2.0 the functionalities of this class integrated into `Config` class.
-
-A best place to use Json files, is implementing it for Application config. `Config` class do it simply Just by getting a file name and a `Serializer` class.
-
-This class gives you config data as `Config.Prefs` property that you can make changes on it and save changes using `Config.Write()` method.
-This is the Simplest way to save your Application settings or other types of data!
-
-```
-public class Entries
-{
-    public string UserName { get; set; }
-    public string Password { get; set; }
-}
-
-// Loads config.json, if it is not existing create it.
-var config = new Config<Entries>("config.json");
-
-// Set the new values.
-config.Prefs.UserName = "admin";
-config.Prefs.Password = "12345";
-
-// Save config.json.
-config.Write();
-```
-
 ### Variable
 With this class you can change the environment variable vlaues easily.
 Also because the instances of this class caches the environment values the overall performance of your applications will be increased.

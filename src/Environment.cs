@@ -14,8 +14,16 @@ namespace SAPTeam.CommonTK
 
         private static InteractInterface CheckConsole()
         {
-            if (Environment.OSVersion.Platform == PlatformID.Unix)
+#if NET6_0_OR_GREATER
+            var isAndroid = OperatingSystem.IsAndroid();
+#else
+            var isAndroid = false;
+#endif
+
+            if (Environment.OSVersion.Platform == PlatformID.Unix || isAndroid)
             {
+                if (isAndroid) return InteractInterface.UI;
+
                 // Unix console behavior
                 if ((int)Console.BackgroundColor == -1)
                 {

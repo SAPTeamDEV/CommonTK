@@ -48,7 +48,7 @@ For Getting started with this library you can visit our github page.</Descriptio
       <PrivateAssets>all</PrivateAssets>
       <Version>3.6.143</Version>
     </PackageReference>
-    <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.1.1" PrivateAssets="All" />
+    <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.2.25" PrivateAssets="All" />
     <PackageReference Include="System.Text.Json" Version="8.0.4" Condition=" '$(TargetFramework)' == 'netstandard2.0'" />
     <PackageReference Include="System.Text.Json" Version="6.0.9" Condition=" '$(TargetFramework)' == 'net461'" />
   </ItemGroup>

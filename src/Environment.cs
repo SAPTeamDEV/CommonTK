@@ -100,7 +100,7 @@ namespace SAPTeam.CommonTK
         /// <returns>
         /// The path to the application data directory based on the operating system.
         /// </returns>
-        public static string ApplicationDataDirectory(string appName = null)
+        public static string GetApplicationDataDirectory(string appName = null)
         {
             if (string.IsNullOrEmpty(appName))
             {

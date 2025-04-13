@@ -18,7 +18,7 @@ namespace SAPTeam.CommonTK
         /// Initializes a new instance of the <see cref="JsonWorker"/> class.
         /// </summary>
         /// <param name="options">
-        /// The serializer options. (used in netstandard2.0 or net461 targets)
+        /// The serializer options. (used in netstandard2.0 targets)
         /// </param>
         /// <param name="context">
         /// The source-generated serializer context. (used in net6.0+ targets)

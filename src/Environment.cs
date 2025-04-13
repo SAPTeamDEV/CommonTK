@@ -90,5 +90,35 @@ namespace SAPTeam.CommonTK
         /// Gets the root application directory.
         /// </summary>
         public static string ApplicationDirectory => AppDomain.CurrentDomain.BaseDirectory;
+
+        /// <summary>
+        /// Gets the path to the application data directory based on the operating system.
+        /// </summary>
+        /// <param name="appName">
+        /// The name of the application. If not provided, the default application name will be used.
+        /// </param>
+        /// <returns>
+        /// The path to the application data directory based on the operating system.
+        /// </returns>
+        public static string ApplicationDataDirectory(string appName = null)
+        {
+            if (string.IsNullOrEmpty(appName))
+            {
+                appName = ApplicationTitle;
+            }
+
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                appName = appName.ToLowerInvariant();
+            }
+
+            string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            string unixHome = Environment.GetEnvironmentVariable("HOME") ?? Path.GetFullPath(".");
+            string altAppData = Path.Combine(unixHome, ".config");
+
+            var path = Path.Combine(string.IsNullOrEmpty(localAppData) ? altAppData : localAppData, appName);
+
+            return path;
+        }
     }
 }

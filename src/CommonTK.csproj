@@ -2,8 +2,12 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net6.0;net8.0</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+    
     <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
     <Deterministic>True</Deterministic>
+    <Nullable>enable</Nullable>
+    
     <AssemblyName>SAPTeam.CommonTK</AssemblyName>
     <RootNamespace>$(AssemblyName)</RootNamespace>
     <PackageId>$(AssemblyName)</PackageId>
@@ -33,6 +37,7 @@ For Getting started with this library you can visit our github page.</Descriptio
 	  <RepositoryType>git</RepositoryType>
 	  <Copyright>Copyright © SAP Team 2023</Copyright>
     <RestorePackagesWithLockFile>True</RestorePackagesWithLockFile>
+    
     <IsTrimmable>true</IsTrimmable>
 	  <SignAssembly>True</SignAssembly>
 	  <AssemblyOriginatorKeyFile>CommonTK.snk</AssemblyOriginatorKeyFile>

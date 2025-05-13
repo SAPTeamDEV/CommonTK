@@ -1,268 +1,266 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
+using System.Linq;
 
-namespace SAPTeam.CommonTK
+namespace SAPTeam.CommonTK;
+
+/// <summary>
+/// Defines a disposable Context that can be used to set some properties or do particular actions in a specified <see cref="Context"/>.
+/// </summary>
+public abstract partial class Context : IDisposable
 {
+    private bool disposing;
+    private bool disposed;
+
+    private string[] allowedGroups;
+    private string[] ownedGroups;
+
+    private readonly List<ActionGroupContainer> affectedGroups = [];
+
     /// <summary>
-    /// Defines a disposable Context that can be used to set some properties or do particular actions in a specified <see cref="Context"/>.
+    /// Gets the context default action groups.
+    /// This action groups applied and locked automatically.
     /// </summary>
-    public abstract partial class Context : IDisposable
+    public string[] DefaultGroups => new string[]
     {
-        bool disposing;
-        bool disposed;
+        ActionGroup(ActionScope.Application, "context", Name)
+    };
 
-        string[] allowedGroups;
-        string[] ownedGroups;
+    /// <summary>
+    /// Gets the name identifier of this context.
+    /// </summary>
+    public string Name => GetType().Name;
 
-        List<ActionGroupContainer> affectedGroups = new List<ActionGroupContainer>();
+    /// <summary>
+    /// Gets a value indicating whether this context is globally registered.
+    /// </summary>
+    public bool IsGlobal => contexts.ContainsValue(this);
 
-        /// <summary>
-        /// Gets the context default action groups.
-        /// This action groups applied and locked automatically.
-        /// </summary>
-        public string[] DefaultGroups => new string[]
+    /// <summary>
+    /// Gets a value indicating whether this context is running.
+    /// </summary>
+    public bool IsRunning { get; private set; }
+
+    /// <summary>
+    /// Gets the action groups associated with this context.
+    /// This action groups will be locked immediately after calling the <see cref="CreateContext()"/>.
+    /// </summary>
+    public virtual string[] Groups { get; } = new string[0];
+
+    /// <summary>
+    /// Gets the neutral action groups that this context need to access them.
+    /// This action groups won't be automatically locked, but can be locked or temporarily unlocked by this context.
+    /// </summary>
+    public virtual string[] NeutralGroups { get; } = new string[0];
+
+    /// <summary>
+    /// Initializes a new context.
+    /// This method must be called in the end of context constructor.
+    /// <para>
+    /// Method Action Groups are declared in the <see cref="DefaultGroups"/> property.
+    /// </para>
+    /// </summary>
+    /// <param name="global">
+    /// Determines whether to register this context globally.
+    /// </param>
+    /// <exception cref="InvalidOperationException"></exception>
+    protected void Initialize(bool global)
+    {
+        disposing = false;
+        disposed = false;
+
+        if (global && !IsGlobal)
         {
-            ActionGroup(ActionScope.Application, "context", Name)
-        };
+            if (Exists(Name))
+            {
+                throw new InvalidOperationException("An instance of this context already exists");
+            }
 
-        /// <summary>
-        /// Gets the name identifier of this context.
-        /// </summary>
-        public string Name => GetType().Name;
+            QueryGroup(DefaultGroups);
 
-        /// <summary>
-        /// Gets a value indicating whether this context is globally registered.
-        /// </summary>
-        public bool IsGlobal => contexts.ContainsValue(this);
+            allowedGroups = Groups.Concat(NeutralGroups).ToArray();
+            ownedGroups = Groups.Concat(DefaultGroups).ToArray();
 
-        /// <summary>
-        /// Gets a value indicating whether this context is running.
-        /// </summary>
-        public bool IsRunning { get; private set; }
+            foreach (string group in ownedGroups)
+            {
+                if (groups.ContainsKey(group) && groups[group].IsSuppressed)
+                {
+                    throw new ActionGroupException($"The action group \"{group}\" is suppressed.", ActionGroupError.Suppressed);
+                }
+            }
 
-        /// <summary>
-        /// Gets the action groups associated with this context.
-        /// This action groups will be locked immediately after calling the <see cref="CreateContext()"/>.
-        /// </summary>
-        public virtual string[] Groups { get; } = new string[0];
+            lock (contextLockObj)
+            {
+                contexts[Name] = this;
+            }
+        }
 
-        /// <summary>
-        /// Gets the neutral action groups that this context need to access them.
-        /// This action groups won't be automatically locked, but can be locked or temporarily unlocked by this context.
-        /// </summary>
-        public virtual string[] NeutralGroups { get; } = new string[0];
-
-        /// <summary>
-        /// Initializes a new context.
-        /// This method must be called in the end of context constructor.
-        /// <para>
-        /// Method Action Groups are declared in the <see cref="DefaultGroups"/> property.
-        /// </para>
-        /// </summary>
-        /// <param name="global">
-        /// Determines whether to register this context globally.
-        /// </param>
-        /// <exception cref="InvalidOperationException"></exception>
-        protected void Initialize(bool global)
+        try
         {
-            disposing = false;
-            disposed = false;
-
-            if (global && !IsGlobal)
+            if (!IsRunning)
             {
-                if (Exists(Name))
-                {
-                    throw new InvalidOperationException("An instance of this context already exists");
-                }
-
-                QueryGroup(DefaultGroups);
-
-                allowedGroups = Groups.Concat(NeutralGroups).ToArray();
-                ownedGroups = Groups.Concat(DefaultGroups).ToArray();
-
-                foreach (var group in ownedGroups)
-                {
-                    if (groups.ContainsKey(group) && groups[group].IsSuppressed)
-                    {
-                        throw new ActionGroupException($"The action group \"{group}\" is suppressed.", ActionGroupError.Suppressed);
-                    }
-                }
-
-                lock (contextLockObj)
-                {
-                    contexts[Name] = this;
-                }
+                IsRunning = true;
+                CreateContext();
             }
 
-            try
+            if (IsGlobal)
             {
-                if (!IsRunning)
+                foreach (string group in ownedGroups)
                 {
-                    IsRunning = true;
-                    CreateContext();
-                }
-
-                if (IsGlobal)
-                {
-                    foreach (string group in ownedGroups)
-                    {
-                        RegisterAction(group, false, true);
-                    }
+                    RegisterAction(group, false, true);
                 }
             }
-            catch (ActionGroupException age)
+        }
+        catch (ActionGroupException age)
+        {
+            if (age.ErrorCode != (int)ActionGroupError.AlreadyLocked)
             {
-                if (age.ErrorCode != (int)ActionGroupError.AlreadyLocked)
-                {
-                    throw;
-                }
-            }
-            catch (Exception)
-            {
-                FreeGroups();
-                KnockUp();
                 throw;
             }
         }
-
-        void RegisterAction(string group, bool doRelock, bool addContext)
+        catch (Exception)
         {
-            if (!groups.ContainsKey(group))
+            FreeGroups();
+            KnockUp();
+            throw;
+        }
+    }
+
+    private void RegisterAction(string group, bool doRelock, bool addContext)
+    {
+        if (!groups.ContainsKey(group))
+        {
+            groups[group] = new ActionGroupContainer(group);
+        }
+
+        if (doRelock && groups[group].IsSuppressor(this))
+        {
+            groups[group].Relock(this);
+
+            if (affectedGroups.Contains(groups[group]))
             {
-                groups[group] = new ActionGroupContainer(group);
+                affectedGroups.Remove(groups[group]);
             }
+        }
+        else if (addContext)
+        {
+            groups[group].Add(this);
 
-            if (doRelock && groups[group].IsSuppressor(this))
+            if (!affectedGroups.Contains(groups[group]))
             {
-                groups[group].Relock(this);
+                affectedGroups.Add(groups[group]);
+            }
+        }
+    }
 
-                if (affectedGroups.Contains(groups[group]))
+    /// <summary>
+    /// Locks an action group. if the <paramref name="group"/> has already suppressed by this context, it will be relocked.
+    /// The action group must be already declared in <see cref="Groups"/> or <see cref="NeutralGroups"/> properties.
+    /// </summary>
+    /// <param name="group">
+    /// The action group name.
+    /// </param>
+    /// <exception cref="ActionGroupException"></exception>
+    /// <exception cref="InvalidOperationException"></exception>
+    protected void LockGroup(string group)
+    {
+        if (!IsGlobal) throw new ActionGroupException(ActionGroupError.NotGlobal);
+        if (disposing) throw new ActionGroupException(ActionGroupError.Disposing);
+
+        if (allowedGroups.Contains(group))
+        {
+            RegisterAction(group, true, true);
+        }
+        else
+        {
+            throw new ActionGroupException($"The action group operations for the \"{group}\" is not permitted.", ActionGroupError.AccessDenied);
+        }
+    }
+
+    /// <summary>
+    /// Suppresses the lock state of an action group. The suppression state automatically removed in the finalizer.
+    /// The action group must be already declared in <see cref="Groups"/> or <see cref="NeutralGroups"/> properties.
+    /// </summary>
+    /// <param name="group">
+    /// The action group name.
+    /// </param>
+    /// <exception cref="ActionGroupException"></exception>
+    /// <exception cref="InvalidOperationException"></exception>
+    protected void SuppressLock(string group)
+    {
+        if (!IsGlobal) throw new ActionGroupException(ActionGroupError.NotGlobal);
+        if (disposing) throw new ActionGroupException(ActionGroupError.Disposing);
+
+        if (allowedGroups.Contains(group))
+        {
+            RegisterAction(group, false, false);
+            groups[group].Suppress(this);
+
+            if (!affectedGroups.Contains(groups[group]))
+            {
+                affectedGroups.Add(groups[group]);
+            }
+        }
+        else
+        {
+            throw new ActionGroupException($"The action group operations for \"{group}\" is not permitted.", ActionGroupError.AccessDenied);
+        }
+    }
+
+    /// <summary>
+    /// This method called after the constructor has successfully registers the Context.
+    /// </summary>
+    protected abstract void CreateContext();
+
+    /// <summary>
+    /// This method called when the context is disposing.
+    /// </summary>
+    protected abstract void DisposeContext();
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        if (!disposed)
+        {
+            disposing = true;
+
+            FreeGroups();
+
+            try
+            {
+                if (IsRunning)
                 {
-                    affectedGroups.Remove(groups[group]);
+                    DisposeContext();
                 }
             }
-            else if (addContext)
+            finally
             {
-                groups[group].Add(this);
+                KnockUp();
+            }
+        }
+    }
 
-                if (!affectedGroups.Contains(groups[group]))
-                {
-                    affectedGroups.Add(groups[group]);
-                }
+    private void FreeGroups()
+    {
+        foreach (ActionGroupContainer actionGroup in affectedGroups)
+        {
+            actionGroup.Remove(this);
+        }
+
+        affectedGroups.Clear();
+    }
+
+    private void KnockUp()
+    {
+        if (IsGlobal)
+        {
+            lock (contextLockObj)
+            {
+                contexts.Remove(Name);
             }
         }
 
-        /// <summary>
-        /// Locks an action group. if the <paramref name="group"/> has already suppressed by this context, it will be relocked.
-        /// The action group must be already declared in <see cref="Groups"/> or <see cref="NeutralGroups"/> properties.
-        /// </summary>
-        /// <param name="group">
-        /// The action group name.
-        /// </param>
-        /// <exception cref="ActionGroupException"></exception>
-        /// <exception cref="InvalidOperationException"></exception>
-        protected void LockGroup(string group)
-        {
-            if (!IsGlobal) throw new ActionGroupException(ActionGroupError.NotGlobal);
-            if (disposing) throw new ActionGroupException(ActionGroupError.Disposing);
-
-            if (allowedGroups.Contains(group))
-            {
-                RegisterAction(group, true, true);
-            }
-            else
-            {
-                throw new ActionGroupException($"The action group operations for the \"{group}\" is not permitted.", ActionGroupError.AccessDenied);
-            }
-        }
-
-        /// <summary>
-        /// Suppresses the lock state of an action group. The suppression state automatically removed in the finalizer.
-        /// The action group must be already declared in <see cref="Groups"/> or <see cref="NeutralGroups"/> properties.
-        /// </summary>
-        /// <param name="group">
-        /// The action group name.
-        /// </param>
-        /// <exception cref="ActionGroupException"></exception>
-        /// <exception cref="InvalidOperationException"></exception>
-        protected void SuppressLock(string group)
-        {
-            if (!IsGlobal) throw new ActionGroupException(ActionGroupError.NotGlobal);
-            if (disposing) throw new ActionGroupException(ActionGroupError.Disposing);
-
-            if (allowedGroups.Contains(group))
-            {
-                RegisterAction(group, false, false);
-                groups[group].Suppress(this);
-
-                if (!affectedGroups.Contains(groups[group]))
-                {
-                    affectedGroups.Add(groups[group]);
-                }
-            }
-            else
-            {
-                throw new ActionGroupException($"The action group operations for \"{group}\" is not permitted.", ActionGroupError.AccessDenied);
-            }
-        }
-
-        /// <summary>
-        /// This method called after the constructor has successfully registers the Context.
-        /// </summary>
-        protected abstract void CreateContext();
-
-        /// <summary>
-        /// This method called when the context is disposing.
-        /// </summary>
-        protected abstract void DisposeContext();
-
-        /// <inheritdoc/>
-        public void Dispose()
-        {
-            if (!disposed)
-            {
-                disposing = true;
-
-                FreeGroups();
-
-                try
-                {
-                    if (IsRunning)
-                    {
-                        DisposeContext();
-                    }
-                }
-                finally
-                {
-                    KnockUp();
-                }
-            }
-        }
-
-        void FreeGroups()
-        {
-            foreach (var actionGroup in affectedGroups)
-            {
-                actionGroup.Remove(this);
-            }
-
-            affectedGroups.Clear();
-        }
-
-        void KnockUp()
-        {
-            if (IsGlobal)
-            {
-                lock (contextLockObj)
-                {
-                    contexts.Remove(Name);
-                }
-            }
-
-            IsRunning = false;
-            disposed = true;
-        }
+        IsRunning = false;
+        disposed = true;
     }
 }

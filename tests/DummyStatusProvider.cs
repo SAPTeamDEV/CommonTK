@@ -1,34 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
-namespace SAPTeam.CommonTK.Tests
+namespace SAPTeam.CommonTK.Tests;
+
+public class DummyStatusProvider : IStatusProvider
 {
-    public class DummyStatusProvider : IStatusProvider
+    public StringBuilder Input { get; }
+
+    public DummyStatusProvider() => Input = new StringBuilder();
+
+    public void Clear() => Input.Clear();
+
+    public void Dispose() => Clear();
+
+    public StatusIdentifier Write(string message)
     {
-        public StringBuilder Input { get; }
-
-        public DummyStatusProvider()
-        {
-            Input = new StringBuilder();
-        }
-
-        public void Clear()
-        {
-            Input.Clear();
-        }
-
-        public void Dispose()
-        {
-            Clear();
-        }
-
-        public StatusIdentifier Write(string message)
-        {
-            Input.Append(message);
-            return new StatusIdentifier(this, 0);
-        }
+        Input.Append(message);
+        return new StatusIdentifier(this, 0);
     }
 }

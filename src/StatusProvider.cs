@@ -1,24 +1,21 @@
-﻿using System;
+﻿namespace SAPTeam.CommonTK;
 
-namespace SAPTeam.CommonTK
+/// <summary>
+/// Provides mechanisms for interacting with users and notifying them.
+/// </summary>
+public abstract partial class StatusProvider : IStatusProvider
 {
     /// <summary>
-    /// Provides mechanisms for interacting with users and notifying them.
+    /// Represents the empty <see cref="StatusProvider"/>.
     /// </summary>
-    public abstract partial class StatusProvider : IStatusProvider
-    {
-        /// <summary>
-        /// Represents the empty <see cref="StatusProvider"/>.
-        /// </summary>
-        public static IStatusProvider Empty { get; }
+    public static IStatusProvider Empty { get; }
 
-        /// <inheritdoc/>
-        public abstract void Clear();
+    /// <inheritdoc/>
+    public abstract void Clear();
 
-        /// <inheritdoc/>
-        public abstract void Dispose();
+    /// <inheritdoc/>
+    public abstract void Dispose();
 
-        /// <inheritdoc/>
-        public abstract StatusIdentifier Write(string message);
-    }
+    /// <inheritdoc/>
+    public abstract StatusIdentifier Write(string message);
 }

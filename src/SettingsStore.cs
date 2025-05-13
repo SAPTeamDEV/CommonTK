@@ -34,10 +34,7 @@ namespace SAPTeam.CommonTK
         {
             foreach (var kvp in settings)
             {
-                if (TryGetSetting(kvp.Key, out var setting))
-                {
-                    setting.RawValue = kvp.Value;
-                }
+                UpdateSetting(kvp.Key, kvp.Value, true);
             }
         }
 

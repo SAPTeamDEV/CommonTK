@@ -7,7 +7,10 @@ namespace SAPTeam.CommonTK
 {
     public class SettingNode : Node
     {
-        private readonly List<Func<string, string, string>> _interceptors = new();
+        public delegate string Interceptor(string path, string currentValue);
+
+        private readonly List<Interceptor> _interceptors = [];
+        private readonly Dictionary<string, string> _pendingSettings = new(StringComparer.OrdinalIgnoreCase);
 
         public SettingNode(SettingNode? parent, string name) : base(parent, name)
         {
@@ -24,6 +27,22 @@ namespace SAPTeam.CommonTK
             if (parts.Length > 1)
             {
                 var child = (SettingNode)CreateNode([parts[0]]);
+
+                var pending = _pendingSettings
+                    .Where(kvp => ParsePath(kvp.Key).Length > 1 && ParsePath(kvp.Key)[0] == parts[0]);
+
+                foreach (var kvp in pending)
+                {
+                    _pendingSettings.Remove(kvp.Key);
+                }
+
+                var formattedPending = pending.ToDictionary(kvp => ParsePath(kvp.Key).Skip(1).ToArray(), kvp => kvp.Value);
+
+                foreach (var kvp in formattedPending)
+                {
+                    child.UpdateSetting(kvp.Key, kvp.Value, true);
+                }
+
                 return child.CreateSetting(parts.Skip(1).ToArray(), defaultValue, description);
             }
 
@@ -33,10 +52,16 @@ namespace SAPTeam.CommonTK
                 AddMember(setting);
             }
 
+            if (_pendingSettings.TryGetValue(parts[0], out var pendingValue))
+            {
+                UpdateSetting([parts[0]], pendingValue, false);
+                _pendingSettings.Remove(parts[0]);
+            }
+
             return setting;
         }
 
-        public void AddInterceptor(Func<string, string, string> interceptor)
+        public void AddInterceptor(Interceptor interceptor)
         {
             _interceptors.Add(interceptor);
         }
@@ -119,24 +144,43 @@ namespace SAPTeam.CommonTK
             }
         }
 
-        protected void UpdateSetting(string[] parts, string value)
+        public void UpdateSetting(string path, string value, bool queueIfNotFound = false)
         {
-            if (parts.Length > 1)
-            {
-                var child = (SettingNode)GetNode([parts[0]]);
-                child.UpdateSetting(parts.Skip(1).ToArray(), value);
-                return;
-            }
+            UpdateSetting(ParsePath(path), value, queueIfNotFound);
+        }
 
-            var member = GetMember([parts[0]]);
+        protected void UpdateSetting(string[] parts, string value, bool queueIfNotFound)
+        {
+            try
+            {
+                if (parts.Length > 1)
+                {
+                    var child = (SettingNode)GetNode([parts[0]]);
+                    child.UpdateSetting(parts.Skip(1).ToArray(), value, queueIfNotFound);
+                    return;
+                }
 
-            if (member is Setting setting)
-            {
-                setting.RawValue = value;
+                var member = GetMember([parts[0]]);
+
+                if (member is Setting setting)
+                {
+                    setting.RawValue = value;
+                }
+                else
+                {
+                    throw new InvalidCastException($"Member '{parts[0]}' under '{FullPath}' is not a setting");
+                }
             }
-            else
+            catch
             {
-                throw new InvalidCastException($"Member '{parts[0]}' under '{FullPath}' is not a setting");
+                if (queueIfNotFound)
+                {
+                    _pendingSettings[string.Join(".", parts)] = value;
+                }
+                else
+                {
+                    throw;
+                }
             }
         }
 

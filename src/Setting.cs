@@ -31,6 +31,8 @@ namespace SAPTeam.CommonTK
             }
         }
 
+        public override object? ValueObject => Value;
+
         public T Value
         {
             get
@@ -71,6 +73,8 @@ namespace SAPTeam.CommonTK
     public abstract class Setting : Member
     {
         public virtual string RawValue { get; set; }
+
+        public abstract object? ValueObject { get; }
 
         public string DefaultValue { get; }
 

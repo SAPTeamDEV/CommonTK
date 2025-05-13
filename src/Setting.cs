@@ -33,6 +33,8 @@ namespace SAPTeam.CommonTK
 
         public override object? ValueObject => Value;
 
+        public override Type ValueType => typeof(T);
+
         public T Value
         {
             get
@@ -75,6 +77,8 @@ namespace SAPTeam.CommonTK
         public virtual string RawValue { get; set; }
 
         public abstract object? ValueObject { get; }
+
+        public abstract Type ValueType { get; }
 
         public string DefaultValue { get; }
 

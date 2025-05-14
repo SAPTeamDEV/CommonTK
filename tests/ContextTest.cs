@@ -100,7 +100,7 @@ public class ContextTest
     }
 
     [Fact]
-    public void GlobalCotextTest()
+    public void GlobalContextTest()
     {
         DummyContext context = Register<DummyContext>();
         Assert.True(context.IsGlobal);
@@ -145,7 +145,7 @@ public class ContextTest
     }
 
     [Fact]
-    public void IsGlobalReliablityTest()
+    public void IsGlobalReliabilityTest()
     {
         using (DummyContext2 context2 = new DummyContext2())
         {

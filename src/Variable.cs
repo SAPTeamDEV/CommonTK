@@ -10,7 +10,7 @@ namespace SAPTeam.CommonTK;
 /// </summary>
 public class Variable
 {
-    private string cachedValue;
+    private string? cachedValue;
 
     /// <summary>
     /// Gets the name of the variable.
@@ -23,7 +23,7 @@ public class Variable
     /// Property setter Action Group: global.variable.<see href="Target"/>.<see href="Name"/>
     /// </para>
     /// </summary>
-    public virtual string Value
+    public virtual string? Value
     {
         get => cachedValue;
         set
@@ -76,7 +76,7 @@ public class Variable
     public Variable(string name, EnvironmentVariableTarget target, bool acceptNonExistVariables = true) : this(name, acceptNonExistVariables) => Target = target;
 
     /// <inheritdoc/>
-    public override string ToString() => Value;
+    public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
     /// Generates a variable action group name.
@@ -101,7 +101,7 @@ public class Variable
     /// <returns>
     /// The value of the <paramref name="name"/>.
     /// </returns>
-    public static string GetVariable(string name) => Environment.GetEnvironmentVariable(name);
+    public static string? GetVariable(string name) => Environment.GetEnvironmentVariable(name);
 
     /// <summary>
     /// Sets the value of the given <paramref name="name"/>.
@@ -118,7 +118,7 @@ public class Variable
     /// <param name="target">
     /// Determines the target location of the variable.
     /// </param>
-    public static void SetVariable(string name, string value, EnvironmentVariableTarget target = EnvironmentVariableTarget.Process)
+    public static void SetVariable(string name, string? value, EnvironmentVariableTarget target = EnvironmentVariableTarget.Process)
     {
         QueryGroup(VariableActionGroup(name, target));
         Environment.SetEnvironmentVariable(name, value, target);
@@ -167,7 +167,7 @@ public class Variable
     /// <exception cref="KeyNotFoundException"></exception>
     public static bool Exists(string name, bool throwException = false)
     {
-        string value = GetVariable(name);
+        string? value = GetVariable(name);
 
         return value == null && throwException ? throw new KeyNotFoundException($"The variable {name} is not found.") : value != null;
     }

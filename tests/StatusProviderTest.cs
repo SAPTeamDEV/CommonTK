@@ -13,7 +13,7 @@ public class StatusProviderTest
     }
 
     [Fact]
-    public void NullRefrenceTest()
+    public void NullReferenceTest()
     {
         Assert.ThrowsAny<NullReferenceException>(() => StatusProvider.Write("new"));
         Assert.ThrowsAny<NullReferenceException>(() => StatusProvider.Clear());

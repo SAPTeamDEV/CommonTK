@@ -8,7 +8,7 @@ public abstract partial class StatusProvider : IStatusProvider
     /// <summary>
     /// Represents the empty <see cref="StatusProvider"/>.
     /// </summary>
-    public static IStatusProvider Empty { get; }
+    public static IStatusProvider Empty { get; } = new EmptyStatusProvider();
 
     /// <inheritdoc/>
     public abstract void Clear();

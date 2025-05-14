@@ -43,10 +43,12 @@ public class Timer
             repeat = repeat,
             IsRunning = true
         };
+
         timer.thread = new Thread(timer.Run)
         {
             Name = $"Timer {timer.GetHashCode()} Thread"
         };
+
         timer.thread.Start();
         return timer;
     }

@@ -58,7 +58,7 @@ public struct StatusIdentifier : IDisposable
             parent.Clear();
         }
 
-        parent = null;
+        parent = null!;
     }
 
     /// <summary>

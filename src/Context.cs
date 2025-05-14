@@ -12,8 +12,8 @@ public abstract partial class Context : IDisposable
     private bool disposing;
     private bool disposed;
 
-    private string[] allowedGroups;
-    private string[] ownedGroups;
+    private string[] allowedGroups = [];
+    private string[] ownedGroups = [];
 
     private readonly List<ActionGroupContainer> affectedGroups = [];
 

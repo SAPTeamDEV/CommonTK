@@ -64,7 +64,7 @@ public abstract partial class Context
     /// <summary>
     /// Gets the full path of the executable application.
     /// </summary>
-    public static string ExecutablePath
+    public static string? ExecutablePath
     {
         get
         {
@@ -92,7 +92,7 @@ public abstract partial class Context
     /// <returns>
     /// The path to the application data directory based on the operating system.
     /// </returns>
-    public static string GetApplicationDataDirectory(string appName = null)
+    public static string GetApplicationDataDirectory(string? appName = null)
     {
         if (string.IsNullOrEmpty(appName))
         {
@@ -101,7 +101,7 @@ public abstract partial class Context
 
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            appName = appName.ToLowerInvariant();
+            appName = appName!.ToLowerInvariant();
         }
 
         string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);

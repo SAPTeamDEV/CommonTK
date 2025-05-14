@@ -13,9 +13,10 @@ internal class ActionGroupContainer : IEnumerable<Context>
 
     private List<Context> Contexts { get; }
 
-    private Context suppressor;
+    private Context? suppressor;
 
-    public bool IsSuppressed { get; private set; }
+    public bool IsSuppressed => suppressor != null;
+
     public bool IsLocked => State == ActionGroupState.Locked;
 
     public int Count => Contexts.Count;
@@ -24,7 +25,7 @@ internal class ActionGroupContainer : IEnumerable<Context>
     {
         Name = name;
         Contexts = [];
-        suppressor = default;
+        suppressor = null;
     }
 
     public void Suppress(Context suppressor)
@@ -35,7 +36,6 @@ internal class ActionGroupContainer : IEnumerable<Context>
         }
 
         this.suppressor = suppressor;
-        IsSuppressed = true;
     }
 
     public void Relock(Context suppressor)
@@ -50,8 +50,7 @@ internal class ActionGroupContainer : IEnumerable<Context>
         }
         else
         {
-            this.suppressor = default;
-            IsSuppressed = false;
+            this.suppressor = null;
         }
     }
 
@@ -63,7 +62,7 @@ internal class ActionGroupContainer : IEnumerable<Context>
     {
         if (IsSuppressed && !IsSuppressor(context))
         {
-            throw new ActionGroupException($"The action group \"{Name}\" is suppressed by {suppressor.Name}.", ActionGroupError.Suppressed);
+            throw new ActionGroupException($"The action group \"{Name}\" is suppressed by {suppressor!.Name}.", ActionGroupError.Suppressed);
         }
         else if (Contexts.Contains(context))
         {

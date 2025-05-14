@@ -6,9 +6,9 @@
 public abstract partial class StatusProvider : IStatusProvider
 {
     /// <summary>
-    /// Represents the empty <see cref="StatusProvider"/>.
+    /// Represents the empty <see cref="IStatusProvider"/>.
     /// </summary>
-    public static IStatusProvider Empty { get; } = new EmptyStatusProvider();
+    public static IStatusProvider Empty => EmptyStatusProvider.Instance;
 
     /// <inheritdoc/>
     public abstract void Clear();

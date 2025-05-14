@@ -4,7 +4,7 @@ namespace SAPTeam.CommonTK;
 
 public abstract partial class StatusProvider
 {
-    private static IStatusProvider provider = Empty!;
+    private static IStatusProvider provider = EmptyStatusProvider.Instance;
     private static readonly object lockObj = new object();
 
     /// <summary>

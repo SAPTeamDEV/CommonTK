@@ -8,15 +8,17 @@ public class StatusProviderTest
         DummyStatusProvider status = new DummyStatusProvider();
         StatusProvider.Provider = status;
         Assert.Equal(status, StatusProvider.Provider);
-        StatusProvider.Provider = StatusProvider.Empty;
+        StatusProvider.Reset();
         Assert.NotEqual(status, StatusProvider.Provider);
     }
 
     [Fact]
-    public void NullReferenceTest()
+    public void EnsureNotNullTest()
     {
-        Assert.ThrowsAny<NullReferenceException>(() => StatusProvider.Write("new"));
-        Assert.ThrowsAny<NullReferenceException>(() => StatusProvider.Clear());
+        Assert.NotNull(StatusProvider.Provider);
+        var id = StatusProvider.Write("new");
+        Assert.Equal(id, StatusIdentifier.Empty);
+        StatusProvider.Clear();
     }
 
     [Fact]
@@ -32,7 +34,7 @@ public class StatusProviderTest
         id.Dispose();
         Assert.Equal("", status.Input.ToString());
         StatusProvider.Write("test");
-        StatusProvider.Provider = StatusProvider.Empty;
+        StatusProvider.Reset();
         Assert.Equal("", status.Input.ToString());
     }
 
@@ -45,7 +47,7 @@ public class StatusProviderTest
         Assert.Equal(status1, StatusProvider.Provider);
         StatusProvider.Provider = status2;
         Assert.Equal(status2, StatusProvider.Provider);
-        StatusProvider.Provider = StatusProvider.Empty;
+        StatusProvider.Reset();
     }
 
     [Fact]
@@ -103,7 +105,7 @@ public class StatusProviderTest
         StatusProvider.Clear(id3);
         Assert.DoesNotContain("test3", status.Input.Values);
         Assert.Contains("test4", status.Input.Values);
-        StatusProvider.Provider = StatusProvider.Empty;
+        StatusProvider.Reset();
         Assert.Empty(status.Input);
     }
 
@@ -151,7 +153,7 @@ public class StatusProviderTest
 
         Assert.DoesNotContain("test3", status.Input.Values);
         Assert.Contains("test2", status.Input.Values);
-        StatusProvider.Provider = StatusProvider.Empty;
+        StatusProvider.Reset();
         Assert.Empty(status.Input);
     }
 

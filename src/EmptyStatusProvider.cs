@@ -6,6 +6,8 @@ namespace SAPTeam.CommonTK
 {
     internal class EmptyStatusProvider : IStatusProvider
     {
+        public static EmptyStatusProvider Instance = new EmptyStatusProvider();
+
         public void Clear()
         {
 

@@ -1,4 +1,4 @@
-﻿namespace SAPTeam.CommonTK;
+﻿namespace SAPTeam.CommonTK.ExecutionPolicy;
 
 /// <summary>
 /// Represents the current status of a specific action group.

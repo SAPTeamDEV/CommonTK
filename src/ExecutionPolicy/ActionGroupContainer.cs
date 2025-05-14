@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-namespace SAPTeam.CommonTK;
+namespace SAPTeam.CommonTK.ExecutionPolicy;
 
 internal class ActionGroupContainer : IEnumerable<Context>
 {
@@ -31,9 +31,7 @@ internal class ActionGroupContainer : IEnumerable<Context>
     public void Suppress(Context suppressor)
     {
         if (IsSuppressed)
-        {
             throw new ActionGroupException(ActionGroupError.AlreadySuppressed);
-        }
 
         this.suppressor = suppressor;
     }
@@ -41,9 +39,7 @@ internal class ActionGroupContainer : IEnumerable<Context>
     public void Relock(Context suppressor)
     {
         if (!IsSuppressed)
-        {
             throw new ActionGroupException(ActionGroupError.NotSuppressed);
-        }
         else if (!IsSuppressor(suppressor))
         {
             throw new ActionGroupException(ActionGroupError.SuppressorRequired);
@@ -61,9 +57,7 @@ internal class ActionGroupContainer : IEnumerable<Context>
     public void Add(Context context)
     {
         if (IsSuppressed && !IsSuppressor(context))
-        {
             throw new ActionGroupException($"The action group \"{Name}\" is suppressed by {suppressor!.Name}.", ActionGroupError.Suppressed);
-        }
         else if (Contexts.Contains(context))
         {
             throw new ActionGroupException(ActionGroupError.AlreadyLocked);
@@ -77,9 +71,7 @@ internal class ActionGroupContainer : IEnumerable<Context>
     public void Remove(Context context)
     {
         if (IsSuppressor(context))
-        {
             Relock(context);
-        }
 
         Contexts.Remove(context);
     }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SAPTeam.CommonTK;
+namespace SAPTeam.CommonTK.ExecutionPolicy;
 
 /// <summary>
 /// The exception that is thrown when there is an attempt to access a locked action group.

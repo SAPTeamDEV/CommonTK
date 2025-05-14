@@ -1,4 +1,4 @@
-﻿namespace SAPTeam.CommonTK;
+﻿namespace SAPTeam.CommonTK.ExecutionPolicy;
 
 /// <summary>
 /// Defines error codes for the action group feature.

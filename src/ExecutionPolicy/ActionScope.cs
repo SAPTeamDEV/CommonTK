@@ -1,4 +1,4 @@
-﻿namespace SAPTeam.CommonTK;
+﻿namespace SAPTeam.CommonTK.ExecutionPolicy;
 
 /// <summary>
 /// Represents predefined scopes for action groups.

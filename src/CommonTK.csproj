@@ -35,7 +35,7 @@ For Getting started with this library you can visit our github page.</Descriptio
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
 	  <RepositoryType>git</RepositoryType>
-	  <Copyright>Copyright © SAP Team 2023</Copyright>
+	  <Copyright>Copyright © SAP Team 2025</Copyright>
     <RestorePackagesWithLockFile>True</RestorePackagesWithLockFile>
     
     <IsTrimmable>true</IsTrimmable>

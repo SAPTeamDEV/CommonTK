@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SAPTeam.CommonTK;
+namespace SAPTeam.CommonTK.Hierarchy;
 
 /// <summary>
 /// Represents a node in a hierarchical structure.
@@ -49,24 +49,16 @@ public class Node : Member
     public bool AddMember(Member member)
     {
         if (member == null)
-        {
             throw new ArgumentNullException(nameof(member));
-        }
 
         if (member.PathSeparator != PathSeparator)
-        {
             throw new ArgumentException("Invalid path separator", nameof(member));
-        }
 
         if (member.Name.Contains(PathSeparator))
-        {
             throw new ArgumentException("Member name cannot contain '.'", nameof(member));
-        }
 
         if (_members.ContainsKey(member.Name))
-        {
             return false;
-        }
 
         _members[member.Name] = member;
         return true;

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+using SAPTeam.CommonTK.Hierarchy;
+
 namespace SAPTeam.CommonTK;
 
 /// <summary>

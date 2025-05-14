@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace SAPTeam.CommonTK;
+namespace SAPTeam.CommonTK.Hierarchy;
 
 /// <summary>
 /// Represents a node in a hierarchical structure that can contain settings.
@@ -322,9 +322,7 @@ public class SettingNode : Node
             Member member = GetMember([parts[0]]);
 
             if (member is Setting setting)
-            {
                 setting.RawValue = value;
-            }
             else
             {
                 throw new InvalidCastException($"Member '{parts[0]}' under '{FullPath}' is not a setting");
@@ -333,9 +331,7 @@ public class SettingNode : Node
         catch
         {
             if (queueIfNotFound)
-            {
                 _pendingSettings[string.Join(".", parts)] = value;
-            }
             else
             {
                 throw;
@@ -353,9 +349,7 @@ public class SettingNode : Node
         }
 
         if (Parent is not null and SettingNode settingNode)
-        {
             current = settingNode.ApplyInterceptors(JoinPath(Name, path), current);
-        }
 
         return current;
     }

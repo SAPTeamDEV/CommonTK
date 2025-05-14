@@ -2,7 +2,7 @@
 using System.IO;
 using System.Linq;
 
-namespace SAPTeam.CommonTK;
+namespace SAPTeam.CommonTK.Hierarchy;
 
 /// <summary>
 /// Represents a member in a hierarchical structure.
@@ -44,20 +44,14 @@ public class Member
         Name = string.IsNullOrEmpty(name) ? string.Empty : name!.Trim();
 
         if (Name.Contains(PathSeparator))
-        {
             throw new ArgumentException($"Member name cannot contain '{PathSeparator}'", nameof(name));
-        }
 
         if (Parent is null)
-        {
             FullPath = Name;
-        }
         else
         {
             if (string.IsNullOrEmpty(Name))
-            {
                 throw new ArgumentException("Non-root members must have a name", nameof(name));
-            }
 
             string parentPath = Parent.FullPath;
             FullPath = string.IsNullOrEmpty(parentPath) ? Name : JoinPath(parentPath, Name);
@@ -77,9 +71,7 @@ public class Member
     protected string[] ParsePath(string path)
     {
         if (string.IsNullOrEmpty(path) || string.IsNullOrWhiteSpace(path))
-        {
             throw new ArgumentException("Path cannot be null or empty", nameof(path));
-        }
 
         string[] parts = path.Split(PathSeparator);
 
@@ -114,9 +106,7 @@ public class Member
     protected string JoinPath(params string[] paths)
     {
         if (paths.Length == 0)
-        {
             throw new ArgumentException("Path cannot be null or empty", nameof(paths));
-        }
 
         return string.Join(PathSeparator.ToString(), paths);
     }
@@ -152,19 +142,13 @@ public class Member
     protected string ToAbsolutePath(string path, string basePath)
     {
         if (string.IsNullOrEmpty(path) || string.IsNullOrWhiteSpace(path))
-        {
             throw new ArgumentException("Path cannot be null or empty", nameof(path));
-        }
 
         if (string.IsNullOrEmpty(basePath) || string.IsNullOrWhiteSpace(basePath))
-        {
             throw new ArgumentException("Base path cannot be null or empty", nameof(basePath));
-        }
 
         if (path.StartsWith(basePath, StringComparison.OrdinalIgnoreCase))
-        {
             return path;
-        }
 
         return JoinPath(basePath, path);
     }

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SAPTeam.CommonTK;
+namespace SAPTeam.CommonTK.Hierarchy;
 
 /// <summary>
 /// Represents a setting in a hierarchical structure.
@@ -22,11 +22,9 @@ public class Setting<T> : Setting
         set
         {
             if (Parent is not null and SettingNode settingNode)
-            {
                 value = settingNode.ApplyInterceptors(Name, value);
-            }
 
-            if (TryParse<T>(value, out T? result))
+            if (TryParse(value, out T? result))
             {
                 _rawValue = value;
                 UpdateCache(result);
@@ -50,11 +48,9 @@ public class Setting<T> : Setting
         get
         {
             if (RawValue == _cachedRaw)
-            {
                 return _cachedValue;
-            }
 
-            if (TryParse<T>(RawValue, out T? result))
+            if (TryParse(RawValue, out T? result))
             {
                 UpdateCache(result);
                 return result;
@@ -164,7 +160,7 @@ public abstract class Setting : Member
     /// <exception cref="InvalidCastException"></exception>
     public T As<T>()
     {
-        return TryParse<T>(RawValue, out T? result)
+        return TryParse(RawValue, out T? result)
             ? result
             : throw new InvalidCastException($"Cannot parse setting '{FullPath}' value '{RawValue}' as {typeof(T).Name}.");
     }

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SAPTeam.CommonTK;
+namespace SAPTeam.CommonTK.Status;
 
 /// <summary>
 /// Stores an integer value as identifier for an status message.
@@ -44,14 +44,10 @@ public struct StatusIdentifier : IDisposable
     public void Dispose()
     {
         if (parent == null)
-        {
             return;
-        }
 
         if (parent is IMultiStatusProvider msp)
-        {
             msp.Clear(this);
-        }
         else
         {
             parent.Clear();

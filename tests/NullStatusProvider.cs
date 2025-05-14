@@ -1,4 +1,6 @@
-﻿namespace SAPTeam.CommonTK;
+﻿using SAPTeam.CommonTK.Status;
+
+namespace SAPTeam.CommonTK.Tests;
 
 /// <summary>
 /// Represents a null status provider that accepts any requests.

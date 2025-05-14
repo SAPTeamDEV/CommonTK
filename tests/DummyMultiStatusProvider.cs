@@ -1,4 +1,6 @@
-﻿namespace SAPTeam.CommonTK.Tests;
+﻿using SAPTeam.CommonTK.Status;
+
+namespace SAPTeam.CommonTK.Tests;
 
 public class DummyMultiStatusProvider : IMultiStatusProvider
 {

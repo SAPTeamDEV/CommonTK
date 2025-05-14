@@ -1,4 +1,4 @@
-﻿namespace SAPTeam.CommonTK;
+﻿namespace SAPTeam.CommonTK.Status;
 
 /// <summary>
 /// Provides mechanisms for interacting with users and notifying them.

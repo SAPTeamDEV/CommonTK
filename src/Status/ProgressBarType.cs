@@ -1,4 +1,4 @@
-﻿namespace SAPTeam.CommonTK;
+﻿namespace SAPTeam.CommonTK.Status;
 
 /// <summary>
 /// Represents type of progress bar.

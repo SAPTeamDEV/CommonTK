@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SAPTeam.CommonTK
+namespace SAPTeam.CommonTK.Status
 {
     internal class EmptyStatusProvider : IStatusProvider
     {

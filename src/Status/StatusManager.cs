@@ -2,7 +2,7 @@
 
 using SAPTeam.CommonTK.ExecutionPolicy;
 
-namespace SAPTeam.CommonTK;
+namespace SAPTeam.CommonTK.Status;
 
 public abstract partial class StatusProvider
 {

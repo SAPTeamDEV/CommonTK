@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SAPTeam.CommonTK;
+namespace SAPTeam.CommonTK.Status;
 
 /// <summary>
 /// Implements an <see cref="IStatusProvider"/> with progress bar support.

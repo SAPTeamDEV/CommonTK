@@ -131,21 +131,18 @@ public class StatusProviderTest
                 Assert.Contains("test3", status.Input.Values);
                 Assert.Contains("test4", status.Input.Values);
 
-                Assert.Throws<InvalidOperationException>(() =>
+                using (StatusIdentifier id5 = StatusProvider.Write("test5"))
                 {
-                    using (StatusIdentifier id5 = StatusProvider.Write("test5"))
-                    {
-                        Assert.Contains("test2", status.Input.Values);
-                        Assert.Contains("test3", status.Input.Values);
-                        Assert.Contains("test4", status.Input.Values);
-                        Assert.Contains("test5", status.Input.Values);
-                        id5.Dispose();
-                        Assert.Contains("test2", status.Input.Values);
-                        Assert.Contains("test3", status.Input.Values);
-                        Assert.Contains("test4", status.Input.Values);
-                        Assert.DoesNotContain("test5", status.Input.Values);
-                    }
-                });
+                    Assert.Contains("test2", status.Input.Values);
+                    Assert.Contains("test3", status.Input.Values);
+                    Assert.Contains("test4", status.Input.Values);
+                    Assert.Contains("test5", status.Input.Values);
+                    id5.Dispose();
+                    Assert.Contains("test2", status.Input.Values);
+                    Assert.Contains("test3", status.Input.Values);
+                    Assert.Contains("test4", status.Input.Values);
+                    Assert.DoesNotContain("test5", status.Input.Values);
+                }
             }
 
             Assert.DoesNotContain("test4", status.Input.Values);

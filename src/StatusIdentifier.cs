@@ -10,7 +10,7 @@ public struct StatusIdentifier : IDisposable
     /// <summary>
     /// Returns an invalid empty identifier
     /// </summary>
-    public static StatusIdentifier Empty = default;
+    public readonly static StatusIdentifier Empty = default;
 
     /// <summary>
     /// Gets the numerical identifier of this instance.
@@ -41,12 +41,11 @@ public struct StatusIdentifier : IDisposable
     /// <summary>
     /// Asks the parent status provider to remove the status message.
     /// </summary>
-    /// <exception cref="InvalidOperationException"></exception>
     public void Dispose()
     {
         if (parent == null)
         {
-            throw new InvalidOperationException("This identifier does not associated with any status providers");
+            return;
         }
 
         if (parent is IMultiStatusProvider msp)

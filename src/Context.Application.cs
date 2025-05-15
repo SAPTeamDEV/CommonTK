@@ -123,7 +123,9 @@ public abstract partial class Context
             var entryAsm = Assembly.GetEntryAssembly();
             if (entryAsm != null)
             {
+#pragma warning disable IL3000
                 path = entryAsm.Location;
+#pragma warning disable IL3000
                 if (IsValidExe(path))
                     return path;
 

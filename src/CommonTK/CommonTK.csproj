@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net6.0;net8.0</TargetFrameworks>
+
+    <AssemblyName>SAPTeam.CommonTK</AssemblyName>
+    <RootNamespace>$(AssemblyName)</RootNamespace>
+    <PackageId>$(AssemblyName)</PackageId>
+    
+    <Title>CommonTK</Title>
+    <AssemblyTitle>.NET Common Toolkit</AssemblyTitle>
+    <Product>All in One and Multi Purpose .NET Library</Product>
+    <Description>All in One and Multi Purpose .NET Library.</Description>
+    <PackageTags>tools;toolkit;utility;json;settings;config;status;timer;context;status-provider;action-group;code-control;environment;variables</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Update="**\Context.*.cs">
+      <DependentUpon>Context.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="9.0.4" Condition=" '$(TargetFramework)' == 'netstandard2.0'" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="$(RepoRootPath)\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <Import Project="$(RepoRootPath)\build\Library.props" />
+
+</Project>

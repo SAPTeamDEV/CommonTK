@@ -1,17 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-
+    <TargetFramework>net9.0</TargetFramework>
+    
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <AssemblyName>SAPTeam.$(MSBuildProjectName)</AssemblyName>
     <RootNamespace>SAPTeam.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
-    <RestorePackagesWithLockFile>True</RestorePackagesWithLockFile>
-    <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>CommonTK.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\CommonTK.csproj" />
+    <ProjectReference Include="$(RepoRootPath)\src\CommonTK\CommonTK.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,124 +1,151 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace SAPTeam.CommonTK;
 
 /// <summary>
-/// A Timer that runs a parameterless method after specified time in another thread.
+/// Represents a timer that executes a callback after a specified delay.
 /// </summary>
-public class Timer
+public sealed class Timer
 {
-    private int delay;
-    private Action callback;
-    private Thread thread;
-    private bool repeat;
-    private bool paused;
+    private readonly Action _callback;
+    private readonly Thread _thread;
+    
+    private bool _alive;
+    private bool _paused;
 
     /// <summary>
-    /// Gets running state of this timer.
+    /// Gets the delay in milliseconds.
     /// </summary>
-    public bool IsRunning { get; private set; }
+    public int Delay { get; }
 
     /// <summary>
-    /// Creates new <see cref="Timer"/> and starts it.
+    /// Gets a value indicating whether the callback is executed indefinitely or just once.
+    /// </summary>
+    public bool Repeat { get; }
+
+    /// <summary>
+    /// Gets a value indicating whether the timer thread is running.
+    /// </summary>
+    public bool Alive => _alive;
+
+    /// <summary>
+    /// Gets a value indicating whether the timer is running.
+    /// </summary>
+    public bool Paused => _paused;
+
+    /// <summary>
+    /// Gets the exceptions that occurred during the execution of the callback.
+    /// </summary>
+    public List<Exception> Exceptions { get; } = [];
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Timer"/> class and starts the timer.
     /// </summary>
     /// <param name="milliseconds">
-    /// Timer delay in Milliseconds.
+    /// The delay in milliseconds.
     /// </param>
     /// <param name="callback">
-    /// A parameterless method or lambda expression that runs after passing <paramref name="milliseconds"/>.
+    /// The callback to be executed after the delay.
     /// </param>
     /// <param name="repeat">
-    /// Determines that <see cref="Timer"/> will be stopped after passing <paramref name="milliseconds"/> or running until it stopped.
+    /// A value indicating whether the callback should be executed indefinitely or just once.
     /// </param>
-    /// <returns>
-    /// An instance of <see cref="Timer"/> class.
-    /// </returns>
-    public static Timer Set(int milliseconds, Action callback, bool repeat = false)
+    public Timer(int milliseconds, Action callback, bool repeat = false)
     {
-        Timer timer = new Timer()
+        Delay = milliseconds;
+        _callback = callback;
+        Repeat = repeat;
+
+        _thread = new Thread(Run)
         {
-            delay = milliseconds,
-            callback = callback,
-            repeat = repeat,
-            IsRunning = true
+            Name = $"Timer {GetHashCode()} Thread"
         };
 
-        timer.thread = new Thread(timer.Run)
-        {
-            Name = $"Timer {timer.GetHashCode()} Thread"
-        };
-
-        timer.thread.Start();
-        return timer;
+        _thread.Start();
     }
 
+    /// <summary>
+    /// Runs the timer logic.
+    /// </summary>
     private void Run()
     {
+        _alive = true;
+
         while (true)
         {
-            Thread.Sleep(delay);
+            Thread.Sleep(Delay);
 
-            if (!IsRunning)
+            if (!_alive)
             {
                 break;
             }
 
-            if (!paused)
+            if (!_paused)
             {
-                callback();
+                try
+                {
+                    _callback();
+                }
+                catch (Exception ex)
+                {
+                    lock (Exceptions)
+                    {
+                        Exceptions.Add(ex);
+                    }
+                }
             }
 
-            if (!repeat)
+            if (!Repeat)
             {
                 break;
             }
         }
+
+        _alive = false;
     }
 
     /// <summary>
-    /// Resumes timer if it already paused.
+    /// Pauses the timer if it is running.
     /// </summary>
+    /// <remarks>
+    /// Dead timers cannot be paused.
+    /// </remarks>
+    /// <exception cref="InvalidOperationException"></exception>
+    public void Pause()
+    {
+        if (!Alive)
+        {
+            throw new InvalidOperationException("The timer thread is dead.");
+        }
+
+        _paused = true;
+    }
+
+    /// <summary>
+    /// Resumes the timer if it is paused.
+    /// </summary>
+    /// <remarks>
+    /// Dead timers cannot be resumed.
+    /// </remarks>
+    /// <exception cref="InvalidOperationException"></exception>
     public void Resume()
     {
-        if (!IsRunning)
+        if (!Alive)
         {
-            throw new InvalidOperationException("Timer is not running.");
+            throw new InvalidOperationException("The timer thread is dead.");
         }
 
-        if (!paused)
-        {
-            throw new InvalidOperationException("Timer is not paused.");
-        }
-
-        paused = false;
+        _paused = false;
     }
 
     /// <summary>
-    /// Stops or Pauses the timer. Once a Timer has stopped, it can''t be restarted because the underlying <see cref="Thread"/> is died.
+    /// Stops the timer.
     /// </summary>
-    /// <param name="pause">
-    /// Determines that this timer will be temporary paused or stopped.
-    /// </param>
-    public void Stop(bool pause = false)
+    public void Stop()
     {
-        if (!IsRunning)
-        {
-            throw new InvalidOperationException("Timer is not running.");
-        }
-
-        if (pause)
-        {
-            if (!paused)
-            {
-                throw new InvalidOperationException("Timer is already paused.");
-            }
-
-            paused = true;
-        }
-        else
-        {
-            IsRunning = false;
-        }
+        _alive = false;
     }
 }

@@ -111,12 +111,31 @@ public class SettingsStore : SettingNode
         internal SettingAccessor(Setting setting) => _setting = setting;
 
         /// <summary>
+        /// Updates the setting value with the specified raw value.
+        /// </summary>
+        /// <param name="value">
+        /// The raw value to set.
+        /// </param>
+        public void Update(string value)
+        {
+            _setting.RawValue = value;
+        }
+
+        /// <summary>
+        /// Resets the setting to its default value.
+        /// </summary>
+        public void Reset()
+        {
+            _setting.Reset();
+        }
+
+        /// <summary>
         /// Implicitly converts the setting value to a boolean value.
         /// </summary>
         /// <param name="accessor">
         /// The setting accessor.
         /// </param>
-        public static implicit operator bool(SettingAccessor accessor) => accessor.As<bool>();
+        public static implicit operator bool(SettingAccessor accessor) => accessor.To<bool>();
 
         /// <summary>
         /// Implicitly converts the setting value to an integer value.
@@ -124,7 +143,7 @@ public class SettingsStore : SettingNode
         /// <param name="accessor">
         /// The setting accessor.
         /// </param>
-        public static implicit operator int(SettingAccessor accessor) => accessor.As<int>();
+        public static implicit operator int(SettingAccessor accessor) => accessor.To<int>();
 
         /// <summary>
         /// Implicitly converts the setting value to a double value.
@@ -132,7 +151,7 @@ public class SettingsStore : SettingNode
         /// <param name="accessor">
         /// The setting accessor.
         /// </param>
-        public static implicit operator string(SettingAccessor accessor) => accessor.As<string>();
+        public static implicit operator string(SettingAccessor accessor) => accessor.To<string>();
 
         /// <summary>
         /// Converts the setting value to the specified type.
@@ -143,7 +162,7 @@ public class SettingsStore : SettingNode
         /// <returns>
         /// The converted value of the setting.
         /// </returns>
-        public T As<T>() => _setting.As<T>();
+        public T To<T>() => _setting.To<T>();
     }
 }
 

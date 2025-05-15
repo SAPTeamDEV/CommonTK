@@ -24,7 +24,7 @@ public class Setting<T> : Setting
             if (Parent is not null and SettingNode settingNode)
                 value = settingNode.ApplyInterceptors(Name, value);
 
-            if (TryParse(value, out T? result))
+            if (TryParse(value, out T result))
             {
                 _rawValue = value;
                 UpdateCache(result);
@@ -50,7 +50,7 @@ public class Setting<T> : Setting
             if (RawValue == _cachedRaw)
                 return _cachedValue;
 
-            if (TryParse(RawValue, out T? result))
+            if (TryParse(RawValue, out T result))
             {
                 UpdateCache(result);
                 return result;
@@ -158,9 +158,9 @@ public abstract class Setting : Member
     /// The converted value of the setting.
     /// </returns>
     /// <exception cref="InvalidCastException"></exception>
-    public T As<T>()
+    public T To<T>()
     {
-        return TryParse(RawValue, out T? result)
+        return TryParse(RawValue, out T result)
             ? result
             : throw new InvalidCastException($"Cannot parse setting '{FullPath}' value '{RawValue}' as {typeof(T).Name}.");
     }

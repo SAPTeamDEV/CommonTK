@@ -15,7 +15,7 @@ namespace SAPTeam.CommonTK;
 /// <typeparam name="TResource">
 /// The type of the resources stored in the registry.
 /// </typeparam>
-public abstract class Registry<TResource> : IReadOnlyDictionary<ResourceLocation, TResource>, IDisposable
+public class Registry<TResource> : IReadOnlyDictionary<ResourceLocation, TResource>, IDisposable
     where TResource : notnull
 {
 

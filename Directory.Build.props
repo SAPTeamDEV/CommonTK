@@ -2,19 +2,26 @@
 <Project>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    
     <RepoRootPath>$(MSBuildThisFileDirectory)</RepoRootPath>
-    <BaseIntermediateOutputPath>$(RepoRootPath)artifacts\obj\$([MSBuild]::MakeRelative($(RepoRootPath), $(MSBuildProjectDirectory)))\</BaseIntermediateOutputPath>
-    <BaseOutputPath Condition=" '$(BaseOutputPath)' == '' ">$(RepoRootPath)artifacts\bin\$(MSBuildProjectName)\</BaseOutputPath>
-    <PublishDir>$(RepoRootPath)artifacts\publish\$(MSBuildProjectName)\$(Configuration)\$(TargetFramework)\$(RuntimeIdentifier)\</PublishDir>
-    <PackageOutputPath>$(RepoRootPath)artifacts\packages\$(Configuration)\</PackageOutputPath>
+    <RepoArtifactsPath>$(MSBuildThisFileDirectory)artifacts\</RepoArtifactsPath>
+    
+    <BaseIntermediateOutputPath>$(RepoArtifactsPath)obj\$([MSBuild]::MakeRelative($(RepoRootPath), $(MSBuildProjectDirectory)))\</BaseIntermediateOutputPath>
+    <BaseOutputPath Condition=" '$(BaseOutputPath)' == '' ">$(RepoArtifactsPath)bin\$(MSBuildProjectName)\</BaseOutputPath>
+    <PublishDir>$(RepoArtifactsPath)publish\$(MSBuildProjectName)\$(Configuration)\$(TargetFramework)\$(RuntimeIdentifier)\</PublishDir>
+    <PackageOutputPath>$(RepoArtifactsPath)packages\$(Configuration)\</PackageOutputPath>
+    <LogPath>$(RepoArtifactsPath)logs\</LogPath>
 
+    <!-- Customize as needed -->
     <RepositoryUrl>https://github.com/SAPTeamDEV/CommonTK</RepositoryUrl>
-	<PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Authors>Alireza Poodineh</Authors>
     <Company>SAP Team</Company>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Copyright>Copyright (c) SAP Team</Copyright>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)CommonTK.snk</AssemblyOriginatorKeyFile>
 
     <LangVersion>latest</LangVersion>
     <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
@@ -23,18 +30,19 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)CommonTK.snk</AssemblyOriginatorKeyFile>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
 	
-	<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-	
-	<EnableNETAnalyzers>true</EnableNETAnalyzers>
-	<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+    <EnableBuildServer>true</EnableBuildServer>
+    <UseSharedCompilation>true</UseSharedCompilation>
+    <UseMSBuildFileSystem>true</UseMSBuildFileSystem>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-	<RestoreLockedMode>true</RestoreLockedMode>
+	  <RestoreLockedMode>true</RestoreLockedMode>
   </PropertyGroup>
 
 </Project>

@@ -27,6 +27,9 @@
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)CommonTK.snk</AssemblyOriginatorKeyFile>
 	
 	<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+	
+	<EnableNETAnalyzers>true</EnableNETAnalyzers>
+	<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">

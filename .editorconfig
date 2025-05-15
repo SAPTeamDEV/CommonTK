@@ -1,0 +1,75 @@
+# ┌───────────────────────────────────────────────────────────
+# │ 1) Global config
+# └───────────────────────────────────────────────────────────
+root = true
+
+[*]
+# line endings & encoding
+end_of_line = lf
+charset = utf-8
+
+# whitespace & newlines
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# ┌───────────────────────────────────────────────────────────
+# │ 2) Formatting rules
+# └───────────────────────────────────────────────────────────
+[*.{cs,vb}]
+file_header_template = //-----------------------------------------------------------------------\n// <copyright file="{fileName}" company="SAP Team" author="Alireza Poodineh">\n//     Copyright © SAP Team\n//     Released under the MIT License. See LICENSE.md.\n// </copyright>\n//-----------------------------------------------------------------------
+
+# indent
+indent_style = space
+indent_size = 4
+
+# use expression-bodied members whenever possible
+csharp_style_expression_bodied_methods                        = when_on_single_line:error
+csharp_style_expression_bodied_properties                     = when_on_single_line:error
+csharp_style_expression_bodied_ctors                          = when_on_single_line:error
+csharp_style_expression_bodied_operators                       = when_on_single_line:error
+
+# prefer `var` for built‐in types, require explicit for others
+csharp_style_var_for_built_in_types                           = true:error
+csharp_style_var_elsewhere                                    = false:error
+
+# spacing
+csharp_space_before_semicolon                                 = false:error
+csharp_space_after_cast                                       = false:error
+
+# file‐scoped namespaces (C# 10+)
+csharp_style_namespace_declarations                            = file_scoped:error
+
+# ┌───────────────────────────────────────────────────────────
+# │ 3) Naming conventions
+# └───────────────────────────────────────────────────────────
+dotnet_naming_rule.private_members_should_be_camel_case.severity      = error
+dotnet_naming_rule.private_members_should_be_camel_case.symbols       = private_fields
+dotnet_naming_rule.private_members_should_be_camel_case.style         = camel_case_style
+
+dotnet_naming_symbols.private_fields.applicable_kinds                = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities      = private
+dotnet_naming_symbols.private_fields.required_modifiers              = readonly  
+
+dotnet_naming_style.camel_case_style.capitalization                  = camel_case
+
+# ┌───────────────────────────────────────────────────────────
+# │ 4) Analyzer rule severities
+# └───────────────────────────────────────────────────────────
+# treat dead‐code warnings as errors
+dotnet_diagnostic.CS0169.severity = error   # unused private field
+dotnet_diagnostic.CS0649.severity = error   # unassigned field
+
+# IDE0051: remove unused private members
+dotnet_diagnostic.IDE0051.severity = error
+
+# IDE0060: remove unused parameters
+dotnet_diagnostic.IDE0060.severity = error
+
+# require XML doc on public APIs
+dotnet_diagnostic.CS1591.severity = error
+
+# ┌───────────────────────────────────────────────────────────
+# │ 5) Directive ordering & usings
+# └───────────────────────────────────────────────────────────
+dotnet_sort_system_directives_first = true:error
+dotnet_separate_import_directive_groups = true:error

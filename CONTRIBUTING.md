@@ -76,6 +76,8 @@ You could find output files in artifacts folder.
 
 Please follow these guidelines to ensure consistency in the codebase:
 - Use [C# coding conventions](https://docs.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions).
+- Pay attention to Visual Studio warnings and errors, some important coding conventions are enforced by Roslyn analyzers.
+- Use `dotnet format` and Visual Studio code cleanup feature to format your code.
 - Write clear and descriptive commit messages.
 - Ensure your code is well-documented with XML comments where appropriate.
 - Run tests before submitting your pull request to ensure your changes do not break existing functionality.

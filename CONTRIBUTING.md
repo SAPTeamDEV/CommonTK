@@ -10,7 +10,6 @@ Thank you for considering contributing to CommonTK! We welcome contributions fro
   - [Suggesting Features](#suggesting-features)
   - [Submitting Pull Requests](#submitting-pull-requests)
 - [Development Setup](#development-setup)
-- [Native AOT Compilation](#native-aot-compilation)
 - [Style Guide](#style-guide)
 - [License](#license)
 

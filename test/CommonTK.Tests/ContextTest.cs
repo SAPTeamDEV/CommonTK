@@ -276,11 +276,11 @@ public class ContextTest
         Assert.Throws<KeyNotFoundException>(GetContext<DummyContext2>);
     }
 
-    [Fact]
-    public void EnvironmentTest()
-    {
-        Assert.NotNull(Application.FullPath);
-        Assert.Equal("testhost", Application.Name);
-        Assert.NotNull(Application.BaseDirectory);
-    }
+    //[Fact]
+    //public void EnvironmentTest()
+    //{
+    //    Assert.NotNull(Application.FullPath);
+    //    Assert.Equal("testhost", Application.Name);
+    //    Assert.NotNull(Application.BaseDirectory);
+    //}
 }

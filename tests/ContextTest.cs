@@ -288,8 +288,8 @@ public class ContextTest
     [Fact]
     public void EnvironmentTest()
     {
-        Assert.Null(ExecutablePath);
-        Assert.Equal("testhost", ApplicationTitle);
+        Assert.NotNull(ApplicationFullPath);
+        Assert.Equal("testhost", ApplicationName);
         Assert.NotNull(ApplicationDirectory);
     }
 }

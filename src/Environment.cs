@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 using SAPTeam.CommonTK.ExecutionPolicy;
@@ -8,21 +10,29 @@ namespace SAPTeam.CommonTK;
 
 public abstract partial class Context
 {
+    private static InteractInterface interactinterface = DetectInteractionInterface();
 
-    private static InteractInterface interactinterface = CheckConsole();
-
-    private static InteractInterface CheckConsole()
+    /// <summary>
+    /// Detects the interaction interface of the current process.
+    /// </summary>
+    /// <returns></returns>
+    public static InteractInterface DetectInteractionInterface()
     {
 #if NET6_0_OR_GREATER
-        bool isAndroid = OperatingSystem.IsAndroid();
+        // These OSs does not have a console support.
+        bool spcOS = OperatingSystem.IsAndroid()
+                     || OperatingSystem.IsIOS();
 #else
-        bool isAndroid = false;
+        bool spcOS = false;
 #endif
 
-        if (Environment.OSVersion.Platform == PlatformID.Unix || isAndroid)
+        if (spcOS)
         {
-            if (isAndroid) return InteractInterface.UI;
+            return InteractInterface.UI;
+        }
 
+        if (Environment.OSVersion.Platform == PlatformID.Unix)
+        {
             // Unix console behavior
             if ((int)Console.BackgroundColor == -1)
             {
@@ -48,7 +58,7 @@ public abstract partial class Context
     }
 
     /// <summary>
-    /// Gets or Sets the process interaction Interface.
+    /// Gets or Sets the preferred interaction interface.
     /// <para>
     /// Property setter Action Group: global.interface
     /// </para>
@@ -64,46 +74,147 @@ public abstract partial class Context
     }
 
     /// <summary>
-    /// Gets the full path of the executable application.
+    /// Gets the full path of the application's executable file.
     /// </summary>
-    public static string? ExecutablePath
+    public static string? ApplicationFullPath
     {
         get
         {
-            string file = AppDomain.CurrentDomain.FriendlyName;
-            return File.Exists(file) ? file : null;
+            try
+            {
+                return DetectExecutable();
+            }
+            catch
+            {
+                return null;
+            }
+        }
+    }
+
+    private static string? DetectExecutable()
+    {
+        string? path;
+
+#if NET6_0_OR_GREATER
+        // 1. .NET 6+: Environment.ProcessPath
+        path = Environment.ProcessPath;
+        if (IsValidExe(path))
+            return path;
+#endif
+
+        // 2. Process.MainModule.FileName
+        try
+        {
+            path = Process.GetCurrentProcess().MainModule?.FileName;
+            if (IsValidExe(path))
+                return path;
+        }
+        catch
+        {
+            // ignore platform/permission issues
+        }
+
+        // 3. Entry assembly’s own Location
+        var entryAsm = Assembly.GetEntryAssembly();
+        if (entryAsm != null)
+        {
+            path = entryAsm.Location;
+            if (IsValidExe(path))
+                return path;
+
+            // 4. Combine BaseDirectory + assembly name + ".exe"
+            string exeName = entryAsm.GetName().Name + ".exe";
+            path = Path.Combine(AppContext.BaseDirectory, exeName);
+            if (IsValidExe(path))
+                return path;
+        }
+
+        // 5. CommandLineArgs[0]
+        var args = Environment.GetCommandLineArgs();
+        if (args.Length > 0)
+        {
+            path = Path.GetFullPath(args[0]);
+            if (IsValidExe(path))
+                return path;
+        }
+
+        return null;
+    }
+
+    private static bool IsValidExe(string? candidate)
+        => !string.IsNullOrWhiteSpace(candidate)
+           && File.Exists(candidate)
+           && string.Equals(Path.GetExtension(candidate), ".exe", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Gets the application name.
+    /// </summary>
+    public static string? ApplicationName
+    {
+        get
+        {
+            string? path = ApplicationFullPath;
+
+            if (string.IsNullOrEmpty(path))
+            {
+                return null;
+            }
+
+            return Path.GetFileNameWithoutExtension(path);
         }
     }
 
     /// <summary>
-    /// Gets the name of the application.
+    /// Gets the application base directory.
     /// </summary>
-    public static string ApplicationTitle => Path.GetFileName(AppDomain.CurrentDomain.FriendlyName);
+    public static string? ApplicationDirectory
+    {
+        get
+        {
+            try
+            {
+                string? path = Path.GetDirectoryName(ApplicationFullPath);
 
-    /// <summary>
-    /// Gets the root application directory.
-    /// </summary>
-    public static string ApplicationDirectory => AppDomain.CurrentDomain.BaseDirectory;
+                if (string.IsNullOrEmpty(path))
+                {
+                    path = AppContext.BaseDirectory;
+                }
+
+                return path;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+    }
 
     /// <summary>
     /// Gets the path to the application data directory based on the operating system.
     /// </summary>
     /// <param name="appName">
-    /// The name of the application. If not provided, the default application name will be used.
+    /// The name of the application.
     /// </param>
     /// <returns>
     /// The path to the application data directory based on the operating system.
     /// </returns>
-    public static string GetApplicationDataDirectory(string? appName = null)
+    public static string GetApplicationDataDirectory(string appName)
     {
         if (string.IsNullOrEmpty(appName))
         {
-            appName = ApplicationTitle;
+            string? name = ApplicationName;
+
+            if (string.IsNullOrEmpty(name) || string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentNullException(nameof(appName), "Application name cannot be null or empty.");
+            }
+
+            appName = name!;
         }
 
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            appName = appName!.ToLowerInvariant();
+            appName = appName.ToLowerInvariant();
         }
 
         string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);

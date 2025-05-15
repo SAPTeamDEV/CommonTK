@@ -107,7 +107,7 @@ public sealed class Timer
     }
 
     /// <summary>
-    /// Pauses the timer if it is running.
+    /// Pauses the repeating timer if it is running.
     /// </summary>
     /// <remarks>
     /// Dead timers cannot be paused.
@@ -118,6 +118,11 @@ public sealed class Timer
         if (!Alive)
         {
             throw new InvalidOperationException("The timer thread is dead.");
+        }
+
+        if (!Repeat)
+        {
+            throw new InvalidOperationException("Non-repeating timers cannot be paused.");
         }
 
         Paused = true;

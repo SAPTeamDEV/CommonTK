@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SAPTeam.CommonTK.Hierarchy;
 
@@ -98,6 +99,16 @@ public class Setting<T> : Setting
 /// </summary>
 public abstract class Setting : Member
 {
+    private static readonly HashSet<string> _trueValues = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "1", "true", "t", "yes", "y", "on", "enable", "enabled"
+    };
+
+    private static readonly HashSet<string> _falseValues = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "0", "false", "f", "no", "n", "off", "disable", "disabled"
+    };
+
     /// <summary>
     /// Gets or sets the string value of the setting.
     /// </summary>
@@ -190,35 +201,99 @@ public abstract class Setting : Member
     /// </returns>
     public static bool TryParse<T>(string rawValue, out T result)
     {
-        Type type = typeof(T);
+        Type targetType = typeof(T);
+        object obj = null!;
+
+        if (TryParse(rawValue, targetType, out obj))
+        {
+            result = ChangeType<T>(obj);
+            return true;
+        }
+
+        result = default!;
+        return false;
+    }
+
+    /// <summary>
+    /// Tries to parse the raw value into the specified type.
+    /// </summary>
+    /// <param name="rawValue">
+    /// The raw value to parse.
+    /// </param>
+    /// <param name="targetType">
+    /// The type to parse the raw value.
+    /// </param>
+    /// <param name="result">
+    /// The parsed result.
+    /// </param>
+    /// <returns>
+    /// <see langword="true"/> if the parsing was successful; otherwise, <see langword="false"/>.
+    /// </returns>
+    public static bool TryParse(string rawValue, Type targetType, out object result)
+    {
         result = default!;
 
-        if (type == typeof(string))
+        if (targetType == typeof(string))
         {
-            result = ChangeType<T>(rawValue);
+            result = rawValue;
             return true;
         }
 
-        if (type == typeof(bool) && bool.TryParse(rawValue, out bool b))
+        if (targetType == typeof(bool) && TryParseBoolean(rawValue, out bool b))
         {
-            result = ChangeType<T>(b);
+            result = b;
             return true;
         }
 
-        if (type == typeof(int) && int.TryParse(rawValue, out int i))
+        if (targetType == typeof(int) && int.TryParse(rawValue, out int i))
         {
-            result = ChangeType<T>(i);
+            result = i;
             return true;
         }
 
-        if (type.IsEnum)
+        if (targetType.IsEnum)
         {
             try
             {
-                result = (T)Enum.Parse(type, rawValue, ignoreCase: true);
+                result = Enum.Parse(targetType, rawValue, ignoreCase: true);
                 return true;
             }
             catch { }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Tries to parse a string into a boolean value.
+    /// </summary>
+    /// <param name="input">
+    /// The string to parse.
+    /// </param>
+    /// <param name="result">
+    /// The parsed boolean value.
+    /// </param>
+    /// <returns>
+    /// <see langword="true"/> if the parsing was successful; otherwise, <see langword="false"/>.
+    /// </returns>
+    private static bool TryParseBoolean(string? input, out bool result)
+    {
+        result = false;
+
+        if (string.IsNullOrEmpty(input) || string.IsNullOrWhiteSpace(input))
+            return false;
+
+        var s = input!.Trim();
+        if (_trueValues.Contains(s))
+        {
+            result = true;
+            return true;
+        }
+
+        if (_falseValues.Contains(s))
+        {
+            result = false;
+            return true;
         }
 
         return false;

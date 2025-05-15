@@ -21,8 +21,9 @@
     </Compile>
   </ItemGroup>
   
-  <ItemGroup>
-    <PackageReference Include="System.Text.Json" Version="9.0.4" Condition=" '$(TargetFramework)' == 'netstandard2.0'" />
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0"/>
+    <PackageReference Include="System.Text.Json" Version="9.0.4"/>
   </ItemGroup>
 
   <ItemGroup>

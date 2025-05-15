@@ -18,6 +18,83 @@ public abstract partial class Context
         private static InteractInterface interactinterface = DetectInteractionInterface();
 
         /// <summary>
+        /// Gets or Sets the preferred interaction interface.
+        /// <para>
+        /// Property setter Action Group: global.interface
+        /// </para>
+        /// </summary>
+        public static InteractInterface Interface
+        {
+            get => interactinterface;
+            set
+            {
+                QueryGroup(ActionGroup(ActionScope.Global, "interface"));
+                interactinterface = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets the full path of the application's executable file.
+        /// </summary>
+        public static string? FullPath
+        {
+            get
+            {
+                try
+                {
+                    return DetectExecutable();
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the application name.
+        /// </summary>
+        public static string? Name
+        {
+            get
+            {
+                string? path = FullPath;
+
+                if (string.IsNullOrEmpty(path))
+                {
+                    return null;
+                }
+
+                return Path.GetFileNameWithoutExtension(path);
+            }
+        }
+
+        /// <summary>
+        /// Gets the application base directory.
+        /// </summary>
+        public static string? BaseDirectory
+        {
+            get
+            {
+                try
+                {
+                    string? path = Path.GetDirectoryName(FullPath);
+
+                    if (string.IsNullOrEmpty(path))
+                    {
+                        path = AppContext.BaseDirectory;
+                    }
+
+                    return path;
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+        }
+
+        /// <summary>
         /// Detects the interaction interface of the current process.
         /// </summary>
         /// <returns></returns>
@@ -28,7 +105,7 @@ public abstract partial class Context
             bool spcOS = OperatingSystem.IsAndroid()
                          || OperatingSystem.IsIOS();
 #else
-        bool spcOS = false;
+            bool spcOS = false;
 #endif
 
             if (spcOS)
@@ -63,37 +140,40 @@ public abstract partial class Context
         }
 
         /// <summary>
-        /// Gets or Sets the preferred interaction interface.
-        /// <para>
-        /// Property setter Action Group: global.interface
-        /// </para>
+        /// Gets the path to the application data directory based on the operating system.
         /// </summary>
-        public static InteractInterface Interface
+        /// <param name="appName">
+        /// The name of the application.
+        /// </param>
+        /// <returns>
+        /// The path to the application data directory based on the operating system.
+        /// </returns>
+        public static string GetAppDataDirectory(string appName)
         {
-            get => interactinterface;
-            set
+            if (string.IsNullOrEmpty(appName))
             {
-                QueryGroup(ActionGroup(ActionScope.Global, "interface"));
-                interactinterface = value;
-            }
-        }
+                string? name = Name;
 
-        /// <summary>
-        /// Gets the full path of the application's executable file.
-        /// </summary>
-        public static string? ApplicationFullPath
-        {
-            get
-            {
-                try
+                if (string.IsNullOrEmpty(name) || string.IsNullOrWhiteSpace(name))
                 {
-                    return DetectExecutable();
+                    throw new ArgumentNullException(nameof(appName), "Application name cannot be null or empty.");
                 }
-                catch
-                {
-                    return null;
-                }
+
+                appName = name!;
             }
+
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                appName = appName.ToLowerInvariant();
+            }
+
+            string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            string unixHome = Environment.GetEnvironmentVariable("HOME") ?? Path.GetFullPath(".");
+            string altAppData = Path.Combine(unixHome, ".config");
+
+            string path = Path.Combine(string.IsNullOrEmpty(localAppData) ? altAppData : localAppData, appName);
+
+            return path;
         }
 
         private static string? DetectExecutable()
@@ -153,84 +233,5 @@ public abstract partial class Context
                && File.Exists(candidate)
                && string.Equals(Path.GetExtension(candidate), ".exe", StringComparison.OrdinalIgnoreCase);
 
-        /// <summary>
-        /// Gets the application name.
-        /// </summary>
-        public static string? ApplicationName
-        {
-            get
-            {
-                string? path = ApplicationFullPath;
-
-                if (string.IsNullOrEmpty(path))
-                {
-                    return null;
-                }
-
-                return Path.GetFileNameWithoutExtension(path);
-            }
-        }
-
-        /// <summary>
-        /// Gets the application base directory.
-        /// </summary>
-        public static string? ApplicationDirectory
-        {
-            get
-            {
-                try
-                {
-                    string? path = Path.GetDirectoryName(ApplicationFullPath);
-
-                    if (string.IsNullOrEmpty(path))
-                    {
-                        path = AppContext.BaseDirectory;
-                    }
-
-                    return path;
-                }
-                catch
-                {
-                    return null;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets the path to the application data directory based on the operating system.
-        /// </summary>
-        /// <param name="appName">
-        /// The name of the application.
-        /// </param>
-        /// <returns>
-        /// The path to the application data directory based on the operating system.
-        /// </returns>
-        public static string GetApplicationDataDirectory(string appName)
-        {
-            if (string.IsNullOrEmpty(appName))
-            {
-                string? name = ApplicationName;
-
-                if (string.IsNullOrEmpty(name) || string.IsNullOrWhiteSpace(name))
-                {
-                    throw new ArgumentNullException(nameof(appName), "Application name cannot be null or empty.");
-                }
-
-                appName = name!;
-            }
-
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                appName = appName.ToLowerInvariant();
-            }
-
-            string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            string unixHome = Environment.GetEnvironmentVariable("HOME") ?? Path.GetFullPath(".");
-            string altAppData = Path.Combine(unixHome, ".config");
-
-            string path = Path.Combine(string.IsNullOrEmpty(localAppData) ? altAppData : localAppData, appName);
-
-            return path;
-        }
     }
 }

@@ -4,8 +4,7 @@
 root = true
 
 [*]
-# line endings & encoding
-end_of_line = crlf
+# encoding
 charset = utf-8
 
 # whitespace & newlines

@@ -137,7 +137,7 @@ public abstract partial class Context : IDisposable
 
         if (doRelock && groups[group].IsSuppressor(this))
         {
-            groups[group].Relock(this);
+            groups[group].ReLock(this);
 
             if (affectedGroups.Contains(groups[group]))
             {

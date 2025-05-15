@@ -18,6 +18,6 @@ internal class ProtectedExposerContext : Context
 
     }
 
-    public void Suppress(string hroup) => SuppressLock(hroup);
+    public void Suppress(string group) => SuppressLock(group);
     public void Lock(string group) => LockGroup(group);
 }

@@ -22,23 +22,23 @@ public class Timer
     /// <summary>
     /// Creates new <see cref="Timer"/> and starts it.
     /// </summary>
-    /// <param name="msec">
+    /// <param name="milliseconds">
     /// Timer delay in Milliseconds.
     /// </param>
     /// <param name="callback">
-    /// A parameterless method or lambda expression that runs after passing <paramref name="msec"/>.
+    /// A parameterless method or lambda expression that runs after passing <paramref name="milliseconds"/>.
     /// </param>
     /// <param name="repeat">
-    /// Determines that <see cref="Timer"/> will be stopped after passing <paramref name="msec"/> or running until it stopped.
+    /// Determines that <see cref="Timer"/> will be stopped after passing <paramref name="milliseconds"/> or running until it stopped.
     /// </param>
     /// <returns>
     /// An instance of <see cref="Timer"/> class.
     /// </returns>
-    public static Timer Set(int msec, Action callback, bool repeat = false)
+    public static Timer Set(int milliseconds, Action callback, bool repeat = false)
     {
         Timer timer = new Timer()
         {
-            delay = msec,
+            delay = milliseconds,
             callback = callback,
             repeat = repeat,
             IsRunning = true

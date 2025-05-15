@@ -36,7 +36,7 @@ internal class ActionGroupContainer : IEnumerable<Context>
         this.suppressor = suppressor;
     }
 
-    public void Relock(Context suppressor)
+    public void ReLock(Context suppressor)
     {
         if (!IsSuppressed)
             throw new ActionGroupException(ActionGroupError.NotSuppressed);
@@ -71,7 +71,7 @@ internal class ActionGroupContainer : IEnumerable<Context>
     public void Remove(Context context)
     {
         if (IsSuppressor(context))
-            Relock(context);
+            ReLock(context);
 
         Contexts.Remove(context);
     }

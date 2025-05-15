@@ -47,6 +47,12 @@ For Getting started with this library you can visit our github page.</Descriptio
     <IsAotCompatible>true</IsAotCompatible>
     <PublishTrimmed>true</PublishTrimmed>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Update="**\Context.*.cs">
+      <DependentUpon>Context.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
   
   <ItemGroup>
   	<PackageReference Include="Nerdbank.GitVersioning" Condition="!Exists('packages.config')">

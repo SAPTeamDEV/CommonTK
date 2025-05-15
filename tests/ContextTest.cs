@@ -46,15 +46,15 @@ public class ContextTest
     [Fact]
     public void ContextFunctionalityTest()
     {
-        Assert.Equal(InteractInterface.UI, Interface);
+        Assert.Equal(InteractInterface.UI, Application.Interface);
 
         using (DummyContext context = new DummyContext(true))
         {
             Assert.Equal(InteractInterface.UI, context.PreStat);
-            Assert.Equal(InteractInterface.None, Interface);
+            Assert.Equal(InteractInterface.None, Application.Interface);
         }
 
-        Assert.Equal(InteractInterface.UI, Interface);
+        Assert.Equal(InteractInterface.UI, Application.Interface);
     }
 
     [Fact]
@@ -172,13 +172,13 @@ public class ContextTest
     {
         using (DummyContext context = new DummyContext())
         {
-            Assert.Throws<ActionGroupException>(() => Interface = InteractInterface.None);
+            Assert.Throws<ActionGroupException>(() => Application.Interface = InteractInterface.None);
             using (DummyContext2 context2 = new DummyContext2(true))
             {
-                Assert.Throws<ActionGroupException>(() => Interface = InteractInterface.None);
+                Assert.Throws<ActionGroupException>(() => Application.Interface = InteractInterface.None);
             }
 
-            Assert.Throws<ActionGroupException>(() => Interface = InteractInterface.None);
+            Assert.Throws<ActionGroupException>(() => Application.Interface = InteractInterface.None);
         }
     }
 
@@ -288,8 +288,8 @@ public class ContextTest
     [Fact]
     public void EnvironmentTest()
     {
-        Assert.NotNull(ApplicationFullPath);
-        Assert.Equal("testhost", ApplicationName);
-        Assert.NotNull(ApplicationDirectory);
+        Assert.NotNull(Application.ApplicationFullPath);
+        Assert.Equal("testhost", Application.ApplicationName);
+        Assert.NotNull(Application.ApplicationDirectory);
     }
 }

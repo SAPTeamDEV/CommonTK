@@ -19,9 +19,9 @@ internal class DummyContext : Context
 
     protected override void CreateContext()
     {
-        PreStat = Interface;
-        Interface = InteractInterface.None;
+        PreStat = Application.Interface;
+        Application.Interface = InteractInterface.None;
     }
 
-    protected override void DisposeContext() => Interface = PreStat;
+    protected override void DisposeContext() => Application.Interface = PreStat;
 }

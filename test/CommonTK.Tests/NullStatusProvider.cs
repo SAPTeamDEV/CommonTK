@@ -12,7 +12,7 @@ namespace SAPTeam.CommonTK.Tests;
 /// <summary>
 /// Represents a null status provider that accepts any requests.
 /// </summary>
-public class NullStatusProvider : IProgressStatusProvider, IMultiStatusProvider
+public sealed class NullStatusProvider : IProgressStatusProvider, IMultiStatusProvider
 {
     /// <inheritdoc/>
     public ProgressBarType Type { get; set; }

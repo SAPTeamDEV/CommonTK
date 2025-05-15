@@ -26,7 +26,7 @@ public abstract partial class Context
     {
         foreach (var group in groups)
         {
-            if (Context.groups.ContainsKey(group) && Context.groups[group].IsLocked)
+            if (Context.groups.TryGetValue(group, out ActionGroupContainer? value) && value.IsLocked)
             {
                 if (Context.groups[group].Count == 1)
                 {
@@ -49,7 +49,7 @@ public abstract partial class Context
     /// <returns>
     /// A <see cref="ActionGroupState"/> represents the current state of the <paramref name="group"/>.
     /// </returns>
-    public static ActionGroupState QueryGroupState(string group) => groups.ContainsKey(group) ? groups[group].State : ActionGroupState.Free;
+    public static ActionGroupState QueryGroupState(string group) => groups.TryGetValue(group, out ActionGroupContainer? value) ? value.State : ActionGroupState.Free;
 
     /// <summary>
     /// Generates a new action group.

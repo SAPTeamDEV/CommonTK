@@ -39,11 +39,11 @@ internal class DummyContext2 : Context
         Initialize(isGlobal);
     }
 
-    public override string[] Groups { get; } = new string[] { "global.interface", ActionGroup(ActionScope.Application, "test") };
-    public override string[] NeutralGroups { get; } = new string[]
-    {
+    public override string[] Groups { get; } = ["global.interface", ActionGroup(ActionScope.Application, "test")];
+    public override string[] NeutralGroups { get; } =
+    [
         ActionGroup(ActionScope.Application, "test2")
-    };
+    ];
 
     protected override void CreateContext()
     {

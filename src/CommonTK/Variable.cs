@@ -79,10 +79,7 @@ public class Variable
     /// Determines whether this instance should accept a non-existence variable.
     /// </param>
     /// <exception cref="KeyNotFoundException"></exception>
-    public Variable(string name, EnvironmentVariableTarget target, bool acceptNonExistVariables = true) : this(name, acceptNonExistVariables)
-    {
-        Target = target;
-    }
+    public Variable(string name, EnvironmentVariableTarget target, bool acceptNonExistVariables = true) : this(name, acceptNonExistVariables) => Target = target;
 
     /// <inheritdoc/>
     public override string ToString() => Value ?? string.Empty;

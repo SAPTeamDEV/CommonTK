@@ -113,10 +113,7 @@ public class SettingsStore : SettingNode
     {
         private readonly Setting setting;
 
-        internal SettingAccessor(Setting setting)
-        {
-            this.setting = setting;
-        }
+        internal SettingAccessor(Setting setting) => this.setting = setting;
 
         /// <summary>
         /// Updates the setting value with the specified raw value.

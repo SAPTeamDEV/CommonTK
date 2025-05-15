@@ -12,7 +12,7 @@ internal class DummyContext : Context
     public bool IsTest { get; set; }
     public InteractInterface PreStat { get; set; }
 
-    public override string[] Groups { get; } = new string[] { "global.interface" };
+    public override string[] Groups { get; } = ["global.interface"];
 
     public DummyContext() : this(false)
     {

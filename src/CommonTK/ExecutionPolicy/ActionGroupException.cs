@@ -50,10 +50,7 @@ public class ActionGroupException : Exception
     /// The error code that describes the problem.
     /// </param>
     public ActionGroupException(int errorCode)
-        : base(Messages[errorCode])
-    {
-        ErrorCode = errorCode;
-    }
+        : base(Messages[errorCode]) => ErrorCode = errorCode;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ActionGroupException"/> class.
@@ -77,10 +74,7 @@ public class ActionGroupException : Exception
     /// The error code that describes the problem.
     /// </param>
     public ActionGroupException(string message, int errorCode)
-        : base(message)
-    {
-        ErrorCode = errorCode;
-    }
+        : base(message) => ErrorCode = errorCode;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ActionGroupException"/> class.
@@ -92,10 +86,7 @@ public class ActionGroupException : Exception
     /// The error code that describes the problem.
     /// </param>
     public ActionGroupException(string message, ActionGroupError errorCode)
-        : base(message)
-    {
-        ErrorCode = (int)errorCode;
-    }
+        : base(message) => ErrorCode = (int)errorCode;
 
     /*
     /// <summary>

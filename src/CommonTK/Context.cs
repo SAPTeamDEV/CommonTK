@@ -26,10 +26,10 @@ public abstract partial class Context : IDisposable
     /// Gets the context default action groups.
     /// This action groups applied and locked automatically.
     /// </summary>
-    public string[] DefaultGroups => new string[]
-    {
+    public string[] DefaultGroups =>
+    [
         ActionGroup(ActionScope.Application, "context", Name)
-    };
+    ];
 
     /// <summary>
     /// Gets the name identifier of this context.
@@ -56,7 +56,7 @@ public abstract partial class Context : IDisposable
     /// Gets the neutral action groups that this context need to access them.
     /// This action groups won't be automatically locked, but can be locked or temporarily unlocked by this context.
     /// </summary>
-    public virtual string[] NeutralGroups { get; } = new string[0];
+    public virtual string[] NeutralGroups { get; } = [];
 
     /// <summary>
     /// Initializes a new context.
@@ -88,7 +88,7 @@ public abstract partial class Context : IDisposable
 
             foreach (var group in ownedGroups)
             {
-                if (groups.ContainsKey(group) && groups[group].IsSuppressed)
+                if (groups.TryGetValue(group, out ActionGroupContainer? value) && value.IsSuppressed)
                 {
                     throw new ActionGroupException($"The action group \"{group}\" is suppressed.", ActionGroupError.Suppressed);
                 }
@@ -133,14 +133,15 @@ public abstract partial class Context : IDisposable
 
     private void RegisterAction(string group, bool doRelock, bool addContext)
     {
-        if (!groups.ContainsKey(group))
+        if (!groups.TryGetValue(group, out ActionGroupContainer? value))
         {
-            groups[group] = new ActionGroupContainer(group);
+            value = new ActionGroupContainer(group);
+            groups[group] = value;
         }
 
-        if (doRelock && groups[group].IsSuppressor(this))
+        if (doRelock && value.IsSuppressor(this))
         {
-            groups[group].ReLock(this);
+            value.ReLock(this);
 
             if (affectedGroups.Contains(groups[group]))
             {

@@ -9,14 +9,11 @@ using SAPTeam.CommonTK.Status;
 
 namespace SAPTeam.CommonTK.Tests;
 
-public class DummyMultiStatusProvider : IMultiStatusProvider
+public sealed class DummyMultiStatusProvider : IMultiStatusProvider
 {
     public Dictionary<int, string> Input { get; }
 
-    public DummyMultiStatusProvider()
-    {
-        Input = [];
-    }
+    public DummyMultiStatusProvider() => Input = [];
 
     public void Clear() => Input.Clear();
 

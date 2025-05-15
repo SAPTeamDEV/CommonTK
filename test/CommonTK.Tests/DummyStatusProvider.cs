@@ -11,14 +11,11 @@ using SAPTeam.CommonTK.Status;
 
 namespace SAPTeam.CommonTK.Tests;
 
-public class DummyStatusProvider : IStatusProvider
+public sealed class DummyStatusProvider : IStatusProvider
 {
     public StringBuilder Input { get; }
 
-    public DummyStatusProvider()
-    {
-        Input = new StringBuilder();
-    }
+    public DummyStatusProvider() => Input = new StringBuilder();
 
     public void Clear() => Input.Clear();
 

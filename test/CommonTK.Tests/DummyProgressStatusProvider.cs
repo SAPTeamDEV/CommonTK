@@ -11,15 +11,12 @@ using SAPTeam.CommonTK.Status;
 
 namespace SAPTeam.CommonTK.Tests;
 
-public class DummyProgressStatusProvider : IProgressStatusProvider
+public sealed class DummyProgressStatusProvider : IProgressStatusProvider
 {
     public StringBuilder Input { get; }
     public ProgressBarType Type { get; set; }
 
-    public DummyProgressStatusProvider()
-    {
-        Input = new StringBuilder();
-    }
+    public DummyProgressStatusProvider() => Input = new StringBuilder();
 
     public void Clear() => Input.Clear();
 

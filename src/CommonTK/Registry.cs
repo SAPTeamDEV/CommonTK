@@ -86,7 +86,12 @@ public abstract class Registry<TResource> : IReadOnlyDictionary<ResourceLocation
     /// <returns>
     /// <see langword="true"/> if the resource was found; otherwise, <see langword="false"/>.
     /// </returns>
-    public bool TryGetValue(ResourceLocation key, out TResource value) => Resources.TryGetValue(key, out value);
+#if NET6_0_OR_GREATER
+    public bool TryGetValue(ResourceLocation key, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out TResource value)
+#else
+    public bool TryGetValue(ResourceLocation key, out TResource value)
+#endif
+        => Resources.TryGetValue(key, out value);
 
     /// <summary>
     /// Gets the enumerator that iterates through the registered resources.

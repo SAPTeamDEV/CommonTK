@@ -1,26 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// ----------------------------------------------------------------------------
+//  <copyright file="EmptyStatusProvider.cs" company="SAP Team" author="Alireza Poodineh">
+//      Copyright © SAP Team
+//      Released under the MIT License. See LICENSE.md.
+//  </copyright>
+// ----------------------------------------------------------------------------
 
-namespace SAPTeam.CommonTK.Status
+namespace SAPTeam.CommonTK.Status;
+
+internal class EmptyStatusProvider : IStatusProvider
 {
-    internal class EmptyStatusProvider : IStatusProvider
+    public static EmptyStatusProvider Instance = new();
+
+    public void Clear()
     {
-        public static EmptyStatusProvider Instance = new EmptyStatusProvider();
 
-        public void Clear()
-        {
-
-        }
-
-        public void Dispose()
-        {
-
-        }
-
-        public StatusIdentifier Write(string message)
-        {
-            return StatusIdentifier.Empty;
-        }
     }
+
+    public void Dispose()
+    {
+
+    }
+
+    public StatusIdentifier Write(string message) => StatusIdentifier.Empty;
 }

@@ -1,4 +1,11 @@
-﻿using System.Text;
+// ----------------------------------------------------------------------------
+//  <copyright file="DummyProgressStatusProvider.cs" company="SAP Team" author="Alireza Poodineh">
+//      Copyright © SAP Team
+//      Released under the MIT License. See LICENSE.md.
+//  </copyright>
+// ----------------------------------------------------------------------------
+
+using System.Text;
 
 using SAPTeam.CommonTK.Status;
 
@@ -9,7 +16,10 @@ public class DummyProgressStatusProvider : IProgressStatusProvider
     public StringBuilder Input { get; }
     public ProgressBarType Type { get; set; }
 
-    public DummyProgressStatusProvider() => Input = new StringBuilder();
+    public DummyProgressStatusProvider()
+    {
+        Input = new StringBuilder();
+    }
 
     public void Clear() => Input.Clear();
 

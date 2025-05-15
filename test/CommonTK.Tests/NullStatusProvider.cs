@@ -1,4 +1,11 @@
-﻿using SAPTeam.CommonTK.Status;
+// ----------------------------------------------------------------------------
+//  <copyright file="NullStatusProvider.cs" company="SAP Team" author="Alireza Poodineh">
+//      Copyright © SAP Team
+//      Released under the MIT License. See LICENSE.md.
+//  </copyright>
+// ----------------------------------------------------------------------------
+
+using SAPTeam.CommonTK.Status;
 
 namespace SAPTeam.CommonTK.Tests;
 

@@ -1,7 +1,9 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Threading;
+﻿// ----------------------------------------------------------------------------
+//  <copyright file="Timer.cs" company="SAP Team" author="Alireza Poodineh">
+//      Copyright © SAP Team
+//      Released under the MIT License. See LICENSE.md.
+//  </copyright>
+// ----------------------------------------------------------------------------
 
 namespace SAPTeam.CommonTK;
 
@@ -10,11 +12,8 @@ namespace SAPTeam.CommonTK;
 /// </summary>
 public sealed class Timer
 {
-    private readonly Action _callback;
-    private readonly Thread _thread;
-    
-    private bool _alive;
-    private bool _paused;
+    private readonly Action callback;
+    private readonly Thread thread;
 
     /// <summary>
     /// Gets the delay in milliseconds.
@@ -29,12 +28,12 @@ public sealed class Timer
     /// <summary>
     /// Gets a value indicating whether the timer thread is running.
     /// </summary>
-    public bool Alive => _alive;
+    public bool Alive { get; private set; }
 
     /// <summary>
     /// Gets a value indicating whether the timer is running.
     /// </summary>
-    public bool Paused => _paused;
+    public bool Paused { get; private set; }
 
     /// <summary>
     /// Gets the exceptions that occurred during the execution of the callback.
@@ -56,15 +55,15 @@ public sealed class Timer
     public Timer(int milliseconds, Action callback, bool repeat = false)
     {
         Delay = milliseconds;
-        _callback = callback;
+        this.callback = callback;
         Repeat = repeat;
 
-        _thread = new Thread(Run)
+        thread = new Thread(Run)
         {
             Name = $"Timer {GetHashCode()} Thread"
         };
 
-        _thread.Start();
+        thread.Start();
     }
 
     /// <summary>
@@ -72,22 +71,22 @@ public sealed class Timer
     /// </summary>
     private void Run()
     {
-        _alive = true;
+        Alive = true;
 
         while (true)
         {
             Thread.Sleep(Delay);
 
-            if (!_alive)
+            if (!Alive)
             {
                 break;
             }
 
-            if (!_paused)
+            if (!Paused)
             {
                 try
                 {
-                    _callback();
+                    callback();
                 }
                 catch (Exception ex)
                 {
@@ -104,7 +103,7 @@ public sealed class Timer
             }
         }
 
-        _alive = false;
+        Alive = false;
     }
 
     /// <summary>
@@ -121,7 +120,7 @@ public sealed class Timer
             throw new InvalidOperationException("The timer thread is dead.");
         }
 
-        _paused = true;
+        Paused = true;
     }
 
     /// <summary>
@@ -138,14 +137,11 @@ public sealed class Timer
             throw new InvalidOperationException("The timer thread is dead.");
         }
 
-        _paused = false;
+        Paused = false;
     }
 
     /// <summary>
     /// Stops the timer.
     /// </summary>
-    public void Stop()
-    {
-        _alive = false;
-    }
+    public void Stop() => Alive = false;
 }

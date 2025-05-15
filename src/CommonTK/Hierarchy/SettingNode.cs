@@ -1,7 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Linq;
+﻿// ----------------------------------------------------------------------------
+//  <copyright file="SettingNode.cs" company="SAP Team" author="Alireza Poodineh">
+//      Copyright © SAP Team
+//      Released under the MIT License. See LICENSE.md.
+//  </copyright>
+// ----------------------------------------------------------------------------
 
 namespace SAPTeam.CommonTK.Hierarchy;
 
@@ -24,8 +26,7 @@ public class SettingNode : Node
     /// </returns>
     public delegate string Interceptor(string path, string value);
 
-    private readonly List<Interceptor> _interceptors = [];
-    private readonly Dictionary<string, string> _pendingSettings = new(StringComparer.OrdinalIgnoreCase);
+    private readonly List<Interceptor> interceptors = [];
 
     /// <summary>
     /// Gets the pending settings that are queued for later update.
@@ -34,7 +35,7 @@ public class SettingNode : Node
     /// All settings that imported, but not yet created are stored here for automatic update right after setting creation.
     /// These settings are not yet part of the node and after creation, they will be removed from this list.
     /// </remarks>
-    public Dictionary<string, string> PendingSettings => _pendingSettings;
+    public Dictionary<string, string> PendingSettings { get; } = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// Gets the settings of this node.
@@ -102,12 +103,12 @@ public class SettingNode : Node
         {
             SettingNode child = (SettingNode)CreateNode([parts[0]]);
 
-            IEnumerable<KeyValuePair<string, string>> pending = _pendingSettings
+            IEnumerable<KeyValuePair<string, string>> pending = PendingSettings
                 .Where(kvp => ParsePath(kvp.Key).Length > 1 && ParsePath(kvp.Key)[0] == parts[0]);
 
             foreach (KeyValuePair<string, string> kvp in pending)
             {
-                _pendingSettings.Remove(kvp.Key);
+                PendingSettings.Remove(kvp.Key);
             }
 
             Dictionary<string[], string> formattedPending = pending.ToDictionary(kvp => ParsePath(kvp.Key).Skip(1).ToArray(), kvp => kvp.Value);
@@ -126,10 +127,10 @@ public class SettingNode : Node
             AddMember(setting);
         }
 
-        if (_pendingSettings.TryGetValue(parts[0], out string? pendingValue))
+        if (PendingSettings.TryGetValue(parts[0], out var pendingValue))
         {
             UpdateSetting([parts[0]], pendingValue, false);
-            _pendingSettings.Remove(parts[0]);
+            PendingSettings.Remove(parts[0]);
         }
 
         return setting;
@@ -145,7 +146,7 @@ public class SettingNode : Node
     /// <param name="interceptor">
     /// The interceptor method.
     /// </param>
-    public void AddInterceptor(Interceptor interceptor) => _interceptors.Add(interceptor);
+    public void AddInterceptor(Interceptor interceptor) => interceptors.Add(interceptor);
 
     /// <summary>
     /// Gets a setting at the specified path.
@@ -322,7 +323,9 @@ public class SettingNode : Node
             Member member = GetMember([parts[0]]);
 
             if (member is Setting setting)
+            {
                 setting.RawValue = value;
+            }
             else
             {
                 throw new InvalidCastException($"Member '{parts[0]}' under '{FullPath}' is not a setting");
@@ -331,7 +334,9 @@ public class SettingNode : Node
         catch
         {
             if (queueIfNotFound)
-                _pendingSettings[string.Join(".", parts)] = value;
+            {
+                PendingSettings[string.Join(".", parts)] = value;
+            }
             else
             {
                 throw;
@@ -341,15 +346,17 @@ public class SettingNode : Node
 
     internal string ApplyInterceptors(string path, string value)
     {
-        string current = value;
+        var current = value;
 
-        foreach (Interceptor interceptor in _interceptors)
+        foreach (Interceptor interceptor in interceptors)
         {
             current = interceptor(path, current);
         }
 
         if (Parent is not null and SettingNode settingNode)
+        {
             current = settingNode.ApplyInterceptors(JoinPath(Name, path), current);
+        }
 
         return current;
     }
@@ -364,14 +371,14 @@ public class SettingNode : Node
     {
         Dictionary<string, string> dict = [];
 
-        foreach (var pending in _pendingSettings)
+        foreach (KeyValuePair<string, string> pending in PendingSettings)
         {
             dict[ToAbsolutePath(pending.Key)] = pending.Value;
         }
 
-        foreach (var node in Nodes.OfType<SettingNode>())
+        foreach (SettingNode node in Nodes.OfType<SettingNode>())
         {
-            foreach (var pending in node.GetAllPendingSettings())
+            foreach (KeyValuePair<string, string> pending in node.GetAllPendingSettings())
             {
                 dict[pending.Key] = pending.Value;
             }

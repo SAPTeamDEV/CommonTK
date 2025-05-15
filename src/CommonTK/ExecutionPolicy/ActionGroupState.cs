@@ -1,4 +1,11 @@
-﻿namespace SAPTeam.CommonTK.ExecutionPolicy;
+﻿// ----------------------------------------------------------------------------
+//  <copyright file="ActionGroupState.cs" company="SAP Team" author="Alireza Poodineh">
+//      Copyright © SAP Team
+//      Released under the MIT License. See LICENSE.md.
+//  </copyright>
+// ----------------------------------------------------------------------------
+
+namespace SAPTeam.CommonTK.ExecutionPolicy;
 
 /// <summary>
 /// Represents the current status of a specific action group.

@@ -1,5 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿// ----------------------------------------------------------------------------
+//  <copyright file="Context.ActionGroup.cs" company="SAP Team" author="Alireza Poodineh">
+//      Copyright © SAP Team
+//      Released under the MIT License. See LICENSE.md.
+//  </copyright>
+// ----------------------------------------------------------------------------
 
 using SAPTeam.CommonTK.ExecutionPolicy;
 
@@ -20,7 +24,7 @@ public abstract partial class Context
     /// <exception cref="ActionGroupException"></exception>
     public static void QueryGroup(params string[] groups)
     {
-        foreach (string group in groups)
+        foreach (var group in groups)
         {
             if (Context.groups.ContainsKey(group) && Context.groups[group].IsLocked)
             {
@@ -64,7 +68,7 @@ public abstract partial class Context
     /// </returns>
     public static string ActionGroup(ActionScope scope, string identifier, params string[] extras)
     {
-        string groupName = string.Join(".", new string[] { scope.ToString(), identifier }.Concat(extras))
+        var groupName = string.Join(".", new string[] { scope.ToString(), identifier }.Concat(extras))
             .Replace(' ', '_')
             .ToLower();
 

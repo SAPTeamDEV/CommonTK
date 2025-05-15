@@ -1,6 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿// ----------------------------------------------------------------------------
+//  <copyright file="Context.cs" company="SAP Team" author="Alireza Poodineh">
+//      Copyright © SAP Team
+//      Released under the MIT License. See LICENSE.md.
+//  </copyright>
+// ----------------------------------------------------------------------------
 
 using SAPTeam.CommonTK.ExecutionPolicy;
 
@@ -47,7 +50,7 @@ public abstract partial class Context : IDisposable
     /// Gets the action groups associated with this context.
     /// This action groups will be locked immediately after calling the <see cref="CreateContext()"/>.
     /// </summary>
-    public virtual string[] Groups { get; } = new string[0];
+    public virtual string[] Groups { get; } = Array.Empty<string>();
 
     /// <summary>
     /// Gets the neutral action groups that this context need to access them.
@@ -83,7 +86,7 @@ public abstract partial class Context : IDisposable
             allowedGroups = Groups.Concat(NeutralGroups).ToArray();
             ownedGroups = Groups.Concat(DefaultGroups).ToArray();
 
-            foreach (string group in ownedGroups)
+            foreach (var group in ownedGroups)
             {
                 if (groups.ContainsKey(group) && groups[group].IsSuppressed)
                 {
@@ -107,7 +110,7 @@ public abstract partial class Context : IDisposable
 
             if (IsGlobal)
             {
-                foreach (string group in ownedGroups)
+                foreach (var group in ownedGroups)
                 {
                     RegisterAction(group, false, true);
                 }
@@ -166,8 +169,15 @@ public abstract partial class Context : IDisposable
     /// <exception cref="InvalidOperationException"></exception>
     protected void LockGroup(string group)
     {
-        if (!IsGlobal) throw new ActionGroupException(ActionGroupError.NotGlobal);
-        if (disposing) throw new ActionGroupException(ActionGroupError.Disposing);
+        if (!IsGlobal)
+        {
+            throw new ActionGroupException(ActionGroupError.NotGlobal);
+        }
+
+        if (disposing)
+        {
+            throw new ActionGroupException(ActionGroupError.Disposing);
+        }
 
         if (allowedGroups.Contains(group))
         {
@@ -190,8 +200,15 @@ public abstract partial class Context : IDisposable
     /// <exception cref="InvalidOperationException"></exception>
     protected void SuppressLock(string group)
     {
-        if (!IsGlobal) throw new ActionGroupException(ActionGroupError.NotGlobal);
-        if (disposing) throw new ActionGroupException(ActionGroupError.Disposing);
+        if (!IsGlobal)
+        {
+            throw new ActionGroupException(ActionGroupError.NotGlobal);
+        }
+
+        if (disposing)
+        {
+            throw new ActionGroupException(ActionGroupError.Disposing);
+        }
 
         if (allowedGroups.Contains(group))
         {

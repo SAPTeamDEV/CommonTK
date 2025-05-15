@@ -1,4 +1,9 @@
-﻿using System;
+﻿// ----------------------------------------------------------------------------
+//  <copyright file="StatusManager.cs" company="SAP Team" author="Alireza Poodineh">
+//      Copyright © SAP Team
+//      Released under the MIT License. See LICENSE.md.
+//  </copyright>
+// ----------------------------------------------------------------------------
 
 using SAPTeam.CommonTK.ExecutionPolicy;
 
@@ -7,7 +12,7 @@ namespace SAPTeam.CommonTK.Status;
 public abstract partial class StatusProvider
 {
     private static IStatusProvider provider = EmptyStatusProvider.Instance;
-    private static readonly object lockObj = new object();
+    private static readonly object lockObj = new();
 
     /// <summary>
     /// Gets or Sets the Global Status Provider.

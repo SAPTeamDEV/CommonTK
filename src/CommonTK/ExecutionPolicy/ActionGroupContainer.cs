@@ -1,5 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿// ----------------------------------------------------------------------------
+//  <copyright file="ActionGroupContainer.cs" company="SAP Team" author="Alireza Poodineh">
+//      Copyright © SAP Team
+//      Released under the MIT License. See LICENSE.md.
+//  </copyright>
+// ----------------------------------------------------------------------------
+
+using System.Collections;
 
 namespace SAPTeam.CommonTK.ExecutionPolicy;
 
@@ -31,23 +37,18 @@ internal class ActionGroupContainer : IEnumerable<Context>
     public void Suppress(Context suppressor)
     {
         if (IsSuppressed)
+        {
             throw new ActionGroupException(ActionGroupError.AlreadySuppressed);
+        }
 
         this.suppressor = suppressor;
     }
 
     public void ReLock(Context suppressor)
     {
-        if (!IsSuppressed)
-            throw new ActionGroupException(ActionGroupError.NotSuppressed);
-        else if (!IsSuppressor(suppressor))
-        {
-            throw new ActionGroupException(ActionGroupError.SuppressorRequired);
-        }
-        else
-        {
-            this.suppressor = null;
-        }
+        this.suppressor = !IsSuppressed
+            ? throw new ActionGroupException(ActionGroupError.NotSuppressed)
+            : !IsSuppressor(suppressor) ? throw new ActionGroupException(ActionGroupError.SuppressorRequired) : null;
     }
 
     public bool HasRegistered(Context context) => Contexts.Contains(context) || IsSuppressor(context);
@@ -57,7 +58,9 @@ internal class ActionGroupContainer : IEnumerable<Context>
     public void Add(Context context)
     {
         if (IsSuppressed && !IsSuppressor(context))
+        {
             throw new ActionGroupException($"The action group \"{Name}\" is suppressed by {suppressor!.Name}.", ActionGroupError.Suppressed);
+        }
         else if (Contexts.Contains(context))
         {
             throw new ActionGroupException(ActionGroupError.AlreadyLocked);
@@ -71,7 +74,9 @@ internal class ActionGroupContainer : IEnumerable<Context>
     public void Remove(Context context)
     {
         if (IsSuppressor(context))
+        {
             ReLock(context);
+        }
 
         Contexts.Remove(context);
     }

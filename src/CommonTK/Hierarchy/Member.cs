@@ -1,6 +1,9 @@
-﻿using System;
-using System.IO;
-using System.Linq;
+﻿// ----------------------------------------------------------------------------
+//  <copyright file="Member.cs" company="SAP Team" author="Alireza Poodineh">
+//      Copyright © SAP Team
+//      Released under the MIT License. See LICENSE.md.
+//  </copyright>
+// ----------------------------------------------------------------------------
 
 namespace SAPTeam.CommonTK.Hierarchy;
 
@@ -44,16 +47,22 @@ public class Member
         Name = string.IsNullOrEmpty(name) ? string.Empty : name!.Trim();
 
         if (Name.Contains(PathSeparator))
+        {
             throw new ArgumentException($"Member name cannot contain '{PathSeparator}'", nameof(name));
+        }
 
         if (Parent is null)
+        {
             FullPath = Name;
+        }
         else
         {
             if (string.IsNullOrEmpty(Name))
+            {
                 throw new ArgumentException("Non-root members must have a name", nameof(name));
+            }
 
-            string parentPath = Parent.FullPath;
+            var parentPath = Parent.FullPath;
             FullPath = string.IsNullOrEmpty(parentPath) ? Name : JoinPath(parentPath, Name);
         }
     }
@@ -71,9 +80,11 @@ public class Member
     protected string[] ParsePath(string path)
     {
         if (string.IsNullOrEmpty(path) || string.IsNullOrWhiteSpace(path))
+        {
             throw new ArgumentException("Path cannot be null or empty", nameof(path));
+        }
 
-        string[] parts = path.Split(PathSeparator);
+        var parts = path.Split(PathSeparator);
 
         return parts.Length == 0 ? throw new ArgumentException("Invalid path", nameof(path)) : parts;
     }
@@ -88,10 +99,7 @@ public class Member
     /// A string representing the path.
     /// </returns>
     /// <exception cref="ArgumentException"></exception>
-    protected string CreatePath(string[] parts)
-    {
-        return parts.Length == 0 ? throw new ArgumentException("Invalid path", nameof(parts)) : JoinPath(parts);
-    }
+    protected string CreatePath(string[] parts) => parts.Length == 0 ? throw new ArgumentException("Invalid path", nameof(parts)) : JoinPath(parts);
 
     /// <summary>
     /// Concatenates the given paths into a single path.
@@ -105,10 +113,9 @@ public class Member
     /// <exception cref="ArgumentException"></exception>
     protected string JoinPath(params string[] paths)
     {
-        if (paths.Length == 0)
-            throw new ArgumentException("Path cannot be null or empty", nameof(paths));
-
-        return string.Join(PathSeparator.ToString(), paths);
+        return paths.Length == 0
+            ? throw new ArgumentException("Path cannot be null or empty", nameof(paths))
+            : string.Join(PathSeparator.ToString(), paths);
     }
 
     /// <summary>
@@ -121,10 +128,7 @@ public class Member
     /// A string representing the absolute path.
     /// </returns>
     /// <exception cref="ArgumentException"></exception>
-    protected string ToAbsolutePath(string path)
-    {
-        return ToAbsolutePath(path, FullPath);
-    }
+    protected string ToAbsolutePath(string path) => ToAbsolutePath(path, FullPath);
 
     /// <summary>
     /// Converts the given path to an absolute path based on the specified base path.
@@ -141,15 +145,10 @@ public class Member
     /// <exception cref="ArgumentException"></exception>
     protected string ToAbsolutePath(string path, string basePath)
     {
-        if (string.IsNullOrEmpty(path) || string.IsNullOrWhiteSpace(path))
-            throw new ArgumentException("Path cannot be null or empty", nameof(path));
-
-        if (string.IsNullOrEmpty(basePath) || string.IsNullOrWhiteSpace(basePath))
-            throw new ArgumentException("Base path cannot be null or empty", nameof(basePath));
-
-        if (path.StartsWith(basePath, StringComparison.OrdinalIgnoreCase))
-            return path;
-
-        return JoinPath(basePath, path);
+        return string.IsNullOrEmpty(path) || string.IsNullOrWhiteSpace(path)
+            ? throw new ArgumentException("Path cannot be null or empty", nameof(path))
+            : string.IsNullOrEmpty(basePath) || string.IsNullOrWhiteSpace(basePath)
+            ? throw new ArgumentException("Base path cannot be null or empty", nameof(basePath))
+            : path.StartsWith(basePath, StringComparison.OrdinalIgnoreCase) ? path : JoinPath(basePath, path);
     }
 }

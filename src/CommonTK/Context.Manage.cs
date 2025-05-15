@@ -1,12 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// ----------------------------------------------------------------------------
+//  <copyright file="Context.Manage.cs" company="SAP Team" author="Alireza Poodineh">
+//      Copyright © SAP Team
+//      Released under the MIT License. See LICENSE.md.
+//  </copyright>
+// ----------------------------------------------------------------------------
 
 namespace SAPTeam.CommonTK;
 
 public abstract partial class Context
 {
     private static readonly Dictionary<string, Context> contexts = [];
-    private static readonly object contextLockObj = new object();
+    private static readonly object contextLockObj = new();
 
     /// <summary>
     /// Creates a new Context and registers it globally.
@@ -20,7 +24,7 @@ public abstract partial class Context
     public static TContext Register<TContext>()
         where TContext : Context, new()
     {
-        TContext context = new TContext();
+        TContext context = new();
         if (!context.IsGlobal)
         {
             context.Initialize(true);

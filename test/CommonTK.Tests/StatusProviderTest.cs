@@ -1,4 +1,11 @@
-﻿using SAPTeam.CommonTK.Status;
+// ----------------------------------------------------------------------------
+//  <copyright file="StatusProviderTest.cs" company="SAP Team" author="Alireza Poodineh">
+//      Copyright © SAP Team
+//      Released under the MIT License. See LICENSE.md.
+//  </copyright>
+// ----------------------------------------------------------------------------
+
+using SAPTeam.CommonTK.Status;
 
 namespace SAPTeam.CommonTK.Tests;
 
@@ -7,7 +14,7 @@ public class StatusProviderTest
     [Fact]
     public void GlobalStatusTest()
     {
-        DummyStatusProvider status = new DummyStatusProvider();
+        DummyStatusProvider status = new();
         StatusProvider.Provider = status;
         Assert.Equal(status, StatusProvider.Provider);
         StatusProvider.Reset();
@@ -18,7 +25,7 @@ public class StatusProviderTest
     public void EnsureNotNullTest()
     {
         Assert.NotNull(StatusProvider.Provider);
-        var id = StatusProvider.Write("new");
+        StatusIdentifier id = StatusProvider.Write("new");
         Assert.Equal(id, StatusIdentifier.Empty);
         StatusProvider.Clear();
     }
@@ -26,7 +33,7 @@ public class StatusProviderTest
     [Fact]
     public void FunctionalityTest()
     {
-        DummyStatusProvider status = new DummyStatusProvider();
+        DummyStatusProvider status = new();
         StatusProvider.Provider = status;
         StatusIdentifier id = StatusProvider.Write("test");
         Assert.Equal("test", status.Input.ToString());
@@ -43,8 +50,8 @@ public class StatusProviderTest
     [Fact]
     public void SwitchingStatusesTest()
     {
-        DummyStatusProvider status1 = new DummyStatusProvider();
-        DummyProgressStatusProvider status2 = new DummyProgressStatusProvider();
+        DummyStatusProvider status1 = new();
+        DummyProgressStatusProvider status2 = new();
         StatusProvider.Provider = status1;
         Assert.Equal(status1, StatusProvider.Provider);
         StatusProvider.Provider = status2;
@@ -55,7 +62,7 @@ public class StatusProviderTest
     [Fact]
     public void WriteProgressTest()
     {
-        DummyProgressStatusProvider status = new DummyProgressStatusProvider();
+        DummyProgressStatusProvider status = new();
         StatusProvider.Provider = status;
         StatusProvider.Write("test", ProgressBarType.None);
         Assert.Equal("test", status.Input.ToString());
@@ -72,7 +79,7 @@ public class StatusProviderTest
     public void IncrementProgressTest()
     {
         Assert.Throws<InvalidOperationException>(() => StatusProvider.Increment());
-        DummyProgressStatusProvider status = new DummyProgressStatusProvider();
+        DummyProgressStatusProvider status = new();
         StatusProvider.Provider = status;
         Assert.Throws<NotImplementedException>(() => StatusProvider.Increment());
         StatusProvider.Write("test", ProgressBarType.Wait);
@@ -87,7 +94,7 @@ public class StatusProviderTest
     [Fact]
     public void MultiStatusTest()
     {
-        DummyMultiStatusProvider status = new DummyMultiStatusProvider();
+        DummyMultiStatusProvider status = new();
         StatusProvider.Provider = status;
         StatusProvider.Write("test1");
         Assert.Contains("test1", status.Input.Values);
@@ -114,7 +121,7 @@ public class StatusProviderTest
     [Fact]
     public void StatusIdentifierTest()
     {
-        DummyMultiStatusProvider status = new DummyMultiStatusProvider();
+        DummyMultiStatusProvider status = new();
         StatusProvider.Provider = status;
         StatusIdentifier id1 = StatusProvider.Write("test1");
         StatusIdentifier id2 = StatusProvider.Write("test2");
@@ -133,18 +140,16 @@ public class StatusProviderTest
                 Assert.Contains("test3", status.Input.Values);
                 Assert.Contains("test4", status.Input.Values);
 
-                using (StatusIdentifier id5 = StatusProvider.Write("test5"))
-                {
-                    Assert.Contains("test2", status.Input.Values);
-                    Assert.Contains("test3", status.Input.Values);
-                    Assert.Contains("test4", status.Input.Values);
-                    Assert.Contains("test5", status.Input.Values);
-                    id5.Dispose();
-                    Assert.Contains("test2", status.Input.Values);
-                    Assert.Contains("test3", status.Input.Values);
-                    Assert.Contains("test4", status.Input.Values);
-                    Assert.DoesNotContain("test5", status.Input.Values);
-                }
+                using StatusIdentifier id5 = StatusProvider.Write("test5");
+                Assert.Contains("test2", status.Input.Values);
+                Assert.Contains("test3", status.Input.Values);
+                Assert.Contains("test4", status.Input.Values);
+                Assert.Contains("test5", status.Input.Values);
+                id5.Dispose();
+                Assert.Contains("test2", status.Input.Values);
+                Assert.Contains("test3", status.Input.Values);
+                Assert.Contains("test4", status.Input.Values);
+                Assert.DoesNotContain("test5", status.Input.Values);
             }
 
             Assert.DoesNotContain("test4", status.Input.Values);

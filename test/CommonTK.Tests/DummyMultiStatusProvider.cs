@@ -1,4 +1,11 @@
-﻿using SAPTeam.CommonTK.Status;
+// ----------------------------------------------------------------------------
+//  <copyright file="DummyMultiStatusProvider.cs" company="SAP Team" author="Alireza Poodineh">
+//      Copyright © SAP Team
+//      Released under the MIT License. See LICENSE.md.
+//  </copyright>
+// ----------------------------------------------------------------------------
+
+using SAPTeam.CommonTK.Status;
 
 namespace SAPTeam.CommonTK.Tests;
 
@@ -6,7 +13,10 @@ public class DummyMultiStatusProvider : IMultiStatusProvider
 {
     public Dictionary<int, string> Input { get; }
 
-    public DummyMultiStatusProvider() => Input = new Dictionary<int, string>();
+    public DummyMultiStatusProvider()
+    {
+        Input = [];
+    }
 
     public void Clear() => Input.Clear();
 

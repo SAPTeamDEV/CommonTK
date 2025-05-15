@@ -1,5 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// ----------------------------------------------------------------------------
+//  <copyright file="ActionGroupException.cs" company="SAP Team" author="Alireza Poodineh">
+//      Copyright © SAP Team
+//      Released under the MIT License. See LICENSE.md.
+//  </copyright>
+// ----------------------------------------------------------------------------
 
 namespace SAPTeam.CommonTK.ExecutionPolicy;
 
@@ -11,7 +15,7 @@ public class ActionGroupException : Exception
     /// <summary>
     /// Gets the generic error messages.
     /// </summary>
-    public static Dictionary<int, string> Messages => new Dictionary<int, string>()
+    public static Dictionary<int, string> Messages => new()
     {
         [(int)ActionGroupError.Locked] = "The action group is locked.",
         [(int)ActionGroupError.AlreadyLocked] = "The action group is already locked by this context.",
@@ -46,7 +50,10 @@ public class ActionGroupException : Exception
     /// The error code that describes the problem.
     /// </param>
     public ActionGroupException(int errorCode)
-        : base(Messages[errorCode]) => ErrorCode = errorCode;
+        : base(Messages[errorCode])
+    {
+        ErrorCode = errorCode;
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ActionGroupException"/> class.
@@ -70,7 +77,10 @@ public class ActionGroupException : Exception
     /// The error code that describes the problem.
     /// </param>
     public ActionGroupException(string message, int errorCode)
-        : base(message) => ErrorCode = errorCode;
+        : base(message)
+    {
+        ErrorCode = errorCode;
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ActionGroupException"/> class.
@@ -82,7 +92,10 @@ public class ActionGroupException : Exception
     /// The error code that describes the problem.
     /// </param>
     public ActionGroupException(string message, ActionGroupError errorCode)
-        : base(message) => ErrorCode = (int)errorCode;
+        : base(message)
+    {
+        ErrorCode = (int)errorCode;
+    }
 
     /*
     /// <summary>

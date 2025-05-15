@@ -1,6 +1,11 @@
-﻿using System;
+﻿// ----------------------------------------------------------------------------
+//  <copyright file="Context.Application.cs" company="SAP Team" author="Alireza Poodineh">
+//      Copyright © SAP Team
+//      Released under the MIT License. See LICENSE.md.
+//  </copyright>
+// ----------------------------------------------------------------------------
+
 using System.Diagnostics;
-using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -58,14 +63,9 @@ public abstract partial class Context
         {
             get
             {
-                string? path = FullPath;
+                var path = FullPath;
 
-                if (string.IsNullOrEmpty(path))
-                {
-                    return null;
-                }
-
-                return Path.GetFileNameWithoutExtension(path);
+                return string.IsNullOrEmpty(path) ? null : Path.GetFileNameWithoutExtension(path);
             }
         }
 
@@ -78,7 +78,7 @@ public abstract partial class Context
             {
                 try
                 {
-                    string? path = Path.GetDirectoryName(FullPath);
+                    var path = Path.GetDirectoryName(FullPath);
 
                     if (string.IsNullOrEmpty(path))
                     {
@@ -102,10 +102,10 @@ public abstract partial class Context
         {
 #if NET6_0_OR_GREATER
             // These OSs does not have a console support.
-            bool spcOS = OperatingSystem.IsAndroid()
+            var spcOS = OperatingSystem.IsAndroid()
                          || OperatingSystem.IsIOS();
 #else
-            bool spcOS = false;
+            var spcOS = false;
 #endif
 
             if (spcOS)
@@ -130,7 +130,7 @@ public abstract partial class Context
             // Windows console behavior
             try
             {
-                int height = Console.WindowHeight;
+                var height = Console.WindowHeight;
                 return height > 0 ? InteractInterface.Console : InteractInterface.UI;
             }
             catch (Exception)
@@ -152,7 +152,7 @@ public abstract partial class Context
         {
             if (string.IsNullOrEmpty(appName))
             {
-                string? name = Name;
+                var name = Name;
 
                 if (string.IsNullOrEmpty(name) || string.IsNullOrWhiteSpace(name))
                 {
@@ -167,11 +167,11 @@ public abstract partial class Context
                 appName = appName.ToLowerInvariant();
             }
 
-            string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            string unixHome = Environment.GetEnvironmentVariable("HOME") ?? Path.GetFullPath(".");
-            string altAppData = Path.Combine(unixHome, ".config");
+            var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            var unixHome = Environment.GetEnvironmentVariable("HOME") ?? Path.GetFullPath(".");
+            var altAppData = Path.Combine(unixHome, ".config");
 
-            string path = Path.Combine(string.IsNullOrEmpty(localAppData) ? altAppData : localAppData, appName);
+            var path = Path.Combine(string.IsNullOrEmpty(localAppData) ? altAppData : localAppData, appName);
 
             return path;
         }
@@ -184,7 +184,9 @@ public abstract partial class Context
             // 1. .NET 6+: Environment.ProcessPath
             path = Environment.ProcessPath;
             if (IsValidExe(path))
+            {
                 return path;
+            }
 #endif
 
             // 2. Process.MainModule.FileName
@@ -192,7 +194,9 @@ public abstract partial class Context
             {
                 path = Process.GetCurrentProcess().MainModule?.FileName;
                 if (IsValidExe(path))
+                {
                     return path;
+                }
             }
             catch
             {
@@ -200,20 +204,24 @@ public abstract partial class Context
             }
 
             // 3. Entry assembly’s own Location
-            var entryAsm = Assembly.GetEntryAssembly();
+            Assembly? entryAsm = Assembly.GetEntryAssembly();
             if (entryAsm != null)
             {
 #pragma warning disable IL3000
                 path = entryAsm.Location;
 #pragma warning disable IL3000
                 if (IsValidExe(path))
+                {
                     return path;
+                }
 
                 // 4. Combine BaseDirectory + assembly name + ".exe"
-                string exeName = entryAsm.GetName().Name + ".exe";
+                var exeName = entryAsm.GetName().Name + ".exe";
                 path = Path.Combine(AppContext.BaseDirectory, exeName);
                 if (IsValidExe(path))
+                {
                     return path;
+                }
             }
 
             // 5. CommandLineArgs[0]
@@ -222,7 +230,9 @@ public abstract partial class Context
             {
                 path = Path.GetFullPath(args[0]);
                 if (IsValidExe(path))
+                {
                     return path;
+                }
             }
 
             return null;

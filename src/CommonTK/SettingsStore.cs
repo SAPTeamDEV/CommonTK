@@ -1,5 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// ----------------------------------------------------------------------------
+//  <copyright file="SettingsStore.cs" company="SAP Team" author="Alireza Poodineh">
+//      Copyright © SAP Team
+//      Released under the MIT License. See LICENSE.md.
+//  </copyright>
+// ----------------------------------------------------------------------------
+
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -92,7 +97,7 @@ public class SettingsStore : SettingNode
 
         if (exportPending)
         {
-            foreach (var pending in GetAllPendingSettings())
+            foreach (KeyValuePair<string, string> pending in GetAllPendingSettings())
             {
                 dict[pending.Key] = pending.Value;
             }
@@ -106,9 +111,12 @@ public class SettingsStore : SettingNode
     /// </summary>
     public readonly struct SettingAccessor
     {
-        private readonly Setting _setting;
+        private readonly Setting setting;
 
-        internal SettingAccessor(Setting setting) => _setting = setting;
+        internal SettingAccessor(Setting setting)
+        {
+            this.setting = setting;
+        }
 
         /// <summary>
         /// Updates the setting value with the specified raw value.
@@ -116,18 +124,12 @@ public class SettingsStore : SettingNode
         /// <param name="value">
         /// The raw value to set.
         /// </param>
-        public void Update(string value)
-        {
-            _setting.RawValue = value;
-        }
+        public void Update(string value) => setting.RawValue = value;
 
         /// <summary>
         /// Resets the setting to its default value.
         /// </summary>
-        public void Reset()
-        {
-            _setting.Reset();
-        }
+        public void Reset() => setting.Reset();
 
         /// <summary>
         /// Implicitly converts the setting value to a boolean value.
@@ -162,7 +164,7 @@ public class SettingsStore : SettingNode
         /// <returns>
         /// The converted value of the setting.
         /// </returns>
-        public T To<T>() => _setting.To<T>();
+        public T To<T>() => setting.To<T>();
     }
 }
 

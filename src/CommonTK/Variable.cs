@@ -1,5 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// ----------------------------------------------------------------------------
+//  <copyright file="Variable.cs" company="SAP Team" author="Alireza Poodineh">
+//      Copyright © SAP Team
+//      Released under the MIT License. See LICENSE.md.
+//  </copyright>
+// ----------------------------------------------------------------------------
 
 using SAPTeam.CommonTK.ExecutionPolicy;
 
@@ -75,7 +79,10 @@ public class Variable
     /// Determines whether this instance should accept a non-existence variable.
     /// </param>
     /// <exception cref="KeyNotFoundException"></exception>
-    public Variable(string name, EnvironmentVariableTarget target, bool acceptNonExistVariables = true) : this(name, acceptNonExistVariables) => Target = target;
+    public Variable(string name, EnvironmentVariableTarget target, bool acceptNonExistVariables = true) : this(name, acceptNonExistVariables)
+    {
+        Target = target;
+    }
 
     /// <inheritdoc/>
     public override string ToString() => Value ?? string.Empty;
@@ -169,7 +176,7 @@ public class Variable
     /// <exception cref="KeyNotFoundException"></exception>
     public static bool Exists(string name, bool throwException = false)
     {
-        string? value = GetVariable(name);
+        var value = GetVariable(name);
 
         return value == null && throwException ? throw new KeyNotFoundException($"The variable {name} is not found.") : value != null;
     }

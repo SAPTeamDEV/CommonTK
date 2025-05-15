@@ -1,4 +1,11 @@
-﻿namespace SAPTeam.CommonTK.Tests;
+// ----------------------------------------------------------------------------
+//  <copyright file="VariableTests.cs" company="SAP Team" author="Alireza Poodineh">
+//      Copyright © SAP Team
+//      Released under the MIT License. See LICENSE.md.
+//  </copyright>
+// ----------------------------------------------------------------------------
+
+namespace SAPTeam.CommonTK.Tests;
 
 public class VariableTests
 {
@@ -10,7 +17,7 @@ public class VariableTests
     {
         Assert.Null(Variable.GetVariable("test"));
         Assert.Throws<KeyNotFoundException>(() => new Variable("test", false));
-        Variable test = new Variable("test");
+        Variable test = new("test");
         Assert.Null(Variable.GetVariable("test"));
         test.Value = "test";
         Assert.Equal("test", Variable.GetVariable("test"));

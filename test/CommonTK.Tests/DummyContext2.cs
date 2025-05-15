@@ -1,4 +1,11 @@
-﻿using SAPTeam.CommonTK.ExecutionPolicy;
+// ----------------------------------------------------------------------------
+//  <copyright file="DummyContext2.cs" company="SAP Team" author="Alireza Poodineh">
+//      Copyright © SAP Team
+//      Released under the MIT License. See LICENSE.md.
+//  </copyright>
+// ----------------------------------------------------------------------------
+
+using SAPTeam.CommonTK.ExecutionPolicy;
 
 namespace SAPTeam.CommonTK.Tests;
 

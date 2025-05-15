@@ -1,5 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// ----------------------------------------------------------------------------
+//  <copyright file="Setting.cs" company="SAP Team" author="Alireza Poodineh">
+//      Copyright © SAP Team
+//      Released under the MIT License. See LICENSE.md.
+//  </copyright>
+// ----------------------------------------------------------------------------
 
 namespace SAPTeam.CommonTK.Hierarchy;
 
@@ -23,7 +27,9 @@ public class Setting<T> : Setting
         set
         {
             if (Parent is not null and SettingNode settingNode)
+            {
                 value = settingNode.ApplyInterceptors(Name, value);
+            }
 
             if (TryParse(value, out T result))
             {
@@ -49,7 +55,9 @@ public class Setting<T> : Setting
         get
         {
             if (RawValue == _cachedRaw)
+            {
                 return _cachedValue;
+            }
 
             if (TryParse(RawValue, out T result))
             {
@@ -62,7 +70,7 @@ public class Setting<T> : Setting
 
         set
         {
-            string strValue = value?.ToString() ?? throw new ArgumentNullException("Setting value cannot be null");
+            var strValue = value?.ToString() ?? throw new ArgumentNullException("Setting value cannot be null");
             RawValue = strValue;
         }
     }
@@ -90,7 +98,10 @@ public class Setting<T> : Setting
     /// </param>
     /// <exception cref="ArgumentNullException"></exception>
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-    public Setting(SettingNode? parent, string name, T defaultValue, string description = "") : base(parent, name, defaultValue?.ToString() ?? throw new ArgumentNullException(nameof(defaultValue)), description) => UpdateCache(defaultValue);
+    public Setting(SettingNode? parent, string name, T defaultValue, string description = "") : base(parent, name, defaultValue?.ToString() ?? throw new ArgumentNullException(nameof(defaultValue)), description)
+    {
+        UpdateCache(defaultValue);
+    }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 }
 
@@ -99,12 +110,12 @@ public class Setting<T> : Setting
 /// </summary>
 public abstract class Setting : Member
 {
-    private static readonly HashSet<string> _trueValues = new(StringComparer.OrdinalIgnoreCase)
+    private static readonly HashSet<string> trueValues = new(StringComparer.OrdinalIgnoreCase)
     {
         "1", "true", "t", "yes", "y", "on", "enable", "enabled"
     };
 
-    private static readonly HashSet<string> _falseValues = new(StringComparer.OrdinalIgnoreCase)
+    private static readonly HashSet<string> falseValues = new(StringComparer.OrdinalIgnoreCase)
     {
         "0", "false", "f", "no", "n", "off", "disable", "disabled"
     };
@@ -179,10 +190,7 @@ public abstract class Setting : Member
     /// <summary>
     /// Resets the setting to its default value.
     /// </summary>
-    public void Reset()
-    {
-        RawValue = DefaultValue;
-    }
+    public void Reset() => RawValue = DefaultValue;
 
     /// <summary>
     /// Tries to parse the raw value into the specified type.
@@ -239,13 +247,13 @@ public abstract class Setting : Member
             return true;
         }
 
-        if (targetType == typeof(bool) && TryParseBoolean(rawValue, out bool b))
+        if (targetType == typeof(bool) && TryParseBoolean(rawValue, out var b))
         {
             result = b;
             return true;
         }
 
-        if (targetType == typeof(int) && int.TryParse(rawValue, out int i))
+        if (targetType == typeof(int) && int.TryParse(rawValue, out var i))
         {
             result = i;
             return true;
@@ -281,16 +289,18 @@ public abstract class Setting : Member
         result = false;
 
         if (string.IsNullOrEmpty(input) || string.IsNullOrWhiteSpace(input))
+        {
             return false;
+        }
 
         var s = input!.Trim();
-        if (_trueValues.Contains(s))
+        if (trueValues.Contains(s))
         {
             result = true;
             return true;
         }
 
-        if (_falseValues.Contains(s))
+        if (falseValues.Contains(s))
         {
             result = false;
             return true;

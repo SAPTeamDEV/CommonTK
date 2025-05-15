@@ -1,4 +1,9 @@
-﻿using System;
+﻿// ----------------------------------------------------------------------------
+//  <copyright file="StatusIdentifier.cs" company="SAP Team" author="Alireza Poodineh">
+//      Copyright © SAP Team
+//      Released under the MIT License. See LICENSE.md.
+//  </copyright>
+// ----------------------------------------------------------------------------
 
 namespace SAPTeam.CommonTK.Status;
 
@@ -10,7 +15,7 @@ public struct StatusIdentifier : IDisposable
     /// <summary>
     /// Returns an invalid empty identifier
     /// </summary>
-    public readonly static StatusIdentifier Empty = default;
+    public static readonly StatusIdentifier Empty = default;
 
     /// <summary>
     /// Gets the numerical identifier of this instance.
@@ -18,7 +23,7 @@ public struct StatusIdentifier : IDisposable
     public int Identifier { get; }
 
     private IStatusProvider parent;
-    private static readonly Random random = new Random();
+    private static readonly Random random = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="StatusIdentifier"/> class.
@@ -36,7 +41,7 @@ public struct StatusIdentifier : IDisposable
     /// </summary>
     /// <param name="parent">The identifier of the status message.</param>
     /// <returns></returns>
-    public static StatusIdentifier Generate(IStatusProvider parent) => new StatusIdentifier(parent, random.Next(10000));
+    public static StatusIdentifier Generate(IStatusProvider parent) => new(parent, random.Next(10000));
 
     /// <summary>
     /// Asks the parent status provider to remove the status message.
@@ -44,10 +49,14 @@ public struct StatusIdentifier : IDisposable
     public void Dispose()
     {
         if (parent == null)
+        {
             return;
+        }
 
         if (parent is IMultiStatusProvider msp)
+        {
             msp.Clear(this);
+        }
         else
         {
             parent.Clear();

@@ -1,39 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿// ----------------------------------------------------------------------------
+//  <copyright file="Node.cs" company="SAP Team" author="Alireza Poodineh">
+//      Copyright © SAP Team
+//      Released under the MIT License. See LICENSE.md.
+//  </copyright>
+// ----------------------------------------------------------------------------
 
 namespace SAPTeam.CommonTK.Hierarchy;
 
 /// <summary>
 /// Represents a node in a hierarchical structure.
 /// </summary>
-public class Node : Member
+/// <remarks>
+/// Initializes a new instance of the <see cref="Node"/> class.
+/// </remarks>
+/// <param name="parent">
+/// The parent node of this node. If null, this node is considered as root.
+/// </param>
+/// <param name="name">
+/// The name of the node.
+/// </param>
+public class Node(Node? parent, string name) : Member(parent, name)
 {
-    private readonly Dictionary<string, Member> _members = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, Member> members = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// Gets the members of this node.
     /// </summary>
-    public IEnumerable<Member> Members => _members.Values;
+    public IEnumerable<Member> Members => members.Values;
 
     /// <summary>
     /// Gets the child nodes of this node.
     /// </summary>
     public IEnumerable<Node> Nodes => Members.OfType<Node>();
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Node"/> class.
-    /// </summary>
-    /// <param name="parent">
-    /// The parent node of this node. If null, this node is considered as root.
-    /// </param>
-    /// <param name="name">
-    /// The name of the node.
-    /// </param>
-    public Node(Node? parent, string name) : base(parent, name)
-    {
-
-    }
 
     /// <summary>
     /// Adds a member to this node.
@@ -49,18 +47,26 @@ public class Node : Member
     public bool AddMember(Member member)
     {
         if (member == null)
+        {
             throw new ArgumentNullException(nameof(member));
+        }
 
         if (member.PathSeparator != PathSeparator)
+        {
             throw new ArgumentException("Invalid path separator", nameof(member));
+        }
 
         if (member.Name.Contains(PathSeparator))
+        {
             throw new ArgumentException("Member name cannot contain '.'", nameof(member));
+        }
 
-        if (_members.ContainsKey(member.Name))
+        if (members.ContainsKey(member.Name))
+        {
             return false;
+        }
 
-        _members[member.Name] = member;
+        members[member.Name] = member;
         return true;
     }
 
@@ -93,7 +99,7 @@ public class Node : Member
             return node.GetMember(parts.Skip(1).ToArray());
         }
 
-        return !_members.TryGetValue(parts[0], out Member? member)
+        return !members.TryGetValue(parts[0], out Member? member)
             ? throw new KeyNotFoundException($"Member '{parts[0]}' not found under '{FullPath}'")
             : member;
     }
@@ -241,7 +247,7 @@ public class Node : Member
     /// </returns>
     public IEnumerable<Member> GetAllMembers()
     {
-        foreach (Member member in _members.Values)
+        foreach (Member member in members.Values)
         {
             yield return member;
 

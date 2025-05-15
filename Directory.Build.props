@@ -20,21 +20,15 @@
     <Company>SAP Team</Company>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Copyright>Copyright (c) SAP Team</Copyright>
-    <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)CommonTK.snk</AssemblyOriginatorKeyFile>
 
     <LangVersion>latest</LangVersion>
     <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
-    <InvariantGlobalization>true</InvariantGlobalization>
-    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-	
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
-    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-
+    
     <EnableBuildServer>true</EnableBuildServer>
     <UseSharedCompilation>true</UseSharedCompilation>
     <UseMSBuildFileSystem>true</UseMSBuildFileSystem>
@@ -42,7 +36,19 @@
 
   <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-	  <RestoreLockedMode>true</RestoreLockedMode>
+  	<RestoreLockedMode>true</RestoreLockedMode>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <SignAssembly>false</SignAssembly>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(Configuration)' != 'Debug'">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  	<SignAssembly>true</SignAssembly>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
 
 </Project>

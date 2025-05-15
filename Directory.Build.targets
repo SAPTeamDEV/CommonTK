@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <Target Name="EnforceFormatting"
+          BeforeTargets="Build"
+          Condition="'$(Configuration)' != 'Debug'">
+    <Exec Command='dotnet format "$(MSBuildProjectFile)" --verify-no-changes'
+          WorkingDirectory="$(MSBuildProjectDirectory)"
+          ContinueOnError="false" />
+  </Target>
+
+  <Target Name="EnforceNoVulnerablePackages"
+          BeforeTargets="Build"
+          Condition="'$(Configuration)' != 'Debug'">
+    <Exec Command='dotnet list "$(MSBuildProjectFile)" package --vulnerable'
+          WorkingDirectory="$(MSBuildProjectDirectory)"
+          ContinueOnError="false" />
+  </Target>
+</Project>

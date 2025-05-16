@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <EnforceFormatting_Stamp>$(IntermediateOutputPath)format.scan.stamp</EnforceFormatting_Stamp>
+    
+    <PackageVulnerabilityCheck_AssetFile Condition="Exists('$(ProjectDir)packages.lock.json')">$(ProjectDir)packages.lock.json</PackageVulnerabilityCheck_AssetFile>
+    <PackageVulnerabilityCheck_AssetFile Condition=" '$(PackageVulnerabilityCheck_AssetFile)' == '' ">$(ProjectAssetsFile)</PackageVulnerabilityCheck_AssetFile>
+    <PackageVulnerabilityCheck_Stamp>$(BaseIntermediateOutputPath)vulnerability.scan.stamp</PackageVulnerabilityCheck_Stamp>
+  </PropertyGroup>
+
+  <Target Name="EnforceFormatting"
+          BeforeTargets="Compile"
+          Condition="'$(Configuration)' != 'Debug'"
+          Inputs="@(Compile->'%(FullPath)')"
+          Outputs="$(EnforceFormatting_Stamp)">
+
+    <Message Importance="normal" Text="Running format checks..." />
+    
+    <Exec Command='dotnet format "$(MSBuildProjectFile)" --verify-no-changes'
+          WorkingDirectory="$(MSBuildProjectDirectory)"
+          ContinueOnError="false" />
+
+    <WriteLinesToFile File="$(EnforceFormatting_Stamp)"
+                      Lines="Checked at $([System.DateTime]::UtcNow.ToString('yyyy-MM-ddTHH:mm:ssZ'))"
+                      Overwrite="true" />
+  </Target>
+
+  <Target Name="PackageVulnerabilityCheck"
+          AfterTargets="PrepareForBuild"
+          Condition="'$(Configuration)' != 'Debug'"
+          Inputs="$(PackageVulnerabilityCheck_AssetFile)"
+          Outputs="$(PackageVulnerabilityCheck_Stamp)">
+
+    <Message Importance="normal" Text="Running package vulnerability checks..." />
+    
+    <Exec Command='dotnet list "$(MSBuildProjectFile)" package --vulnerable'
+          WorkingDirectory="$(MSBuildProjectDirectory)"
+          ContinueOnError="false" />
+
+    <WriteLinesToFile File="$(PackageVulnerabilityCheck_Stamp)"
+                      Lines="Scanned $(PackageVulnerabilityCheck_AssetFile) at $([System.DateTime]::UtcNow.ToString('yyyy-MM-ddTHH:mm:ssZ'))"
+                      Overwrite="true" />
+  </Target>
+</Project>

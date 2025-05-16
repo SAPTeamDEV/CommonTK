@@ -16,7 +16,7 @@
 
     <Message Importance="normal" Text="Running format checks..." />
     
-    <Exec Command='dotnet format "$(MSBuildProjectFile)" --verify-no-changes'
+    <Exec Command='dotnet format "$(MSBuildProjectFile)" --verify-no-changes --no-restore -v normal'
           WorkingDirectory="$(MSBuildProjectDirectory)"
           ContinueOnError="false" />
 
@@ -33,7 +33,7 @@
 
     <Message Importance="normal" Text="Running package vulnerability checks..." />
     
-    <Exec Command='dotnet list "$(MSBuildProjectFile)" package --vulnerable'
+    <Exec Command='dotnet list "$(MSBuildProjectFile)" package --vulnerable -v normal -f $(TargetFramework)'
           WorkingDirectory="$(MSBuildProjectDirectory)"
           ContinueOnError="false" />
 

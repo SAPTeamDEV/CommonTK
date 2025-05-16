@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <!-- Customize as needed -->
+    <RepositoryUrl>https://github.com/SAPTeamDEV/CommonTK</RepositoryUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Authors>Alireza Poodineh</Authors>
+    <Company>SAP Team</Company>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Copyright>Copyright (c) SAP Team</Copyright>
+    <AssemblyOriginatorKeyFile>$(RepoRootPath)CommonTK.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+</Project>

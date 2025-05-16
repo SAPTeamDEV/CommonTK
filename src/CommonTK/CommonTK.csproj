@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net6.0;net8.0</TargetFrameworks>
+	<ImportLibraryModules>true</ImportLibraryModules>
 
     <AssemblyName>SAPTeam.CommonTK</AssemblyName>
     <RootNamespace>$(AssemblyName)</RootNamespace>
@@ -22,8 +23,8 @@
   </ItemGroup>
   
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0" />
-    <PackageReference Include="System.Text.Json" Version="9.0.5" />
+    <PackageReference Include="Microsoft.Bcl.HashCode" />
+    <PackageReference Include="System.Text.Json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,6 +34,6 @@
     </None>
   </ItemGroup>
 
-  <Import Project="$(RepoRootPath)\build\Library.props" />
+  <Import Project="$(RepoEnginePath)special.props" />
 
 </Project>

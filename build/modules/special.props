@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
-  <Import Project="$(RepoEnginePath)library.special.props" Condition="'$(ImportLibraryModules)'=='true'" />
-  <Import Project="$(RepoEnginePath)unittest.special.props" Condition="'$(ImportTestModules)'=='true'" />
+  <Import Project="$(BiteModulesPath)\bite.library\*.special.props" Condition="'$(BiteImportLibraryModule)'=='true'" />
+  <Import Project="$(BiteModulesPath)\bite.gitversioning\*.special.props" Condition="'$(BiteImportGitVersioningModule)'=='true'" />
+  <Import Project="$(BiteModulesPath)\bite.unittest\*.special.props" Condition="'$(BiteImportUnitTestModule)'=='true'" />
 </Project>

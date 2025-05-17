@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Help" >
+  <PropertyGroup>
+    <BiteScriptInstance>true</BiteScriptInstance>
+	<Configuration>Bite</Configuration>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildThisFileDirectory)\Directory.Build.props" />
+  
+  <Import Project="$(BiteModulesPath)\**\*.bite.targets" />
+</Project>

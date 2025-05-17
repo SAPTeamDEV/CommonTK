@@ -2,15 +2,11 @@
 <Project>
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
-    <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
+	<GenerateAssemblyInfo>True</GenerateAssemblyInfo>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
-    
-    <EnableBuildServer>true</EnableBuildServer>
-    <UseSharedCompilation>true</UseSharedCompilation>
-    <UseMSBuildFileSystem>true</UseMSBuildFileSystem>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
@@ -20,8 +16,8 @@
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)' != 'Debug'">
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-  	<SignAssembly>true</SignAssembly>
+    <SignAssembly>true</SignAssembly>
+	<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
 </Project>

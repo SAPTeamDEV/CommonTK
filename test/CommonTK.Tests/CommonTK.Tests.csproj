@@ -2,16 +2,16 @@
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
-	<ImportTestModules>true</ImportTestModules>
+	<BiteImportUnitTestModule>true</BiteImportUnitTestModule>
     
     <AssemblyName>SAPTeam.$(MSBuildProjectName)</AssemblyName>
     <RootNamespace>SAPTeam.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="$(RepoRootPath)\src\CommonTK\CommonTK.csproj" />
+    <ProjectReference Include="$(BiteRoot)\src\CommonTK\CommonTK.csproj" />
   </ItemGroup>
 
-  <Import Project="$(RepoEnginePath)special.props" />
+  <Import Project="$(BiteModulesPath)\special.props" />
 
 </Project>

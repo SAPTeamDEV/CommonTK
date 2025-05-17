@@ -3,5 +3,5 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
-  <Import Project="$(RepoEnginePath)*.version.props" />
+  <Import Project="$(BiteModulesPath)\**\*.version.props" />
 </Project>

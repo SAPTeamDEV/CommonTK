@@ -9,7 +9,7 @@
     <Company>SAP Team</Company>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Copyright>Copyright (c) SAP Team</Copyright>
-    <AssemblyOriginatorKeyFile>$(RepoRootPath)CommonTK.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>$(BiteRoot)CommonTK.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
 </Project>

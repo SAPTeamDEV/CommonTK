@@ -1,0 +1,34 @@
+<Project>
+  <Target Name="Restore">
+    <Message Importance="Normal" Text="Running RestoreModules sync point" />
+    <!-- nothing here—you just need the target so modules can hook Before/After it -->
+  </Target>
+  
+  <Target Name="VerifyTools" BeforeTargets="RestoreTools">
+    <PropertyGroup>
+      <_AllList>@(BiteToolRequirements, ',')</_AllList>
+      <_UniqueList>@(BiteToolRequirements->Distinct(), ',')</_UniqueList>
+    </PropertyGroup>
+
+    <Error 
+      Condition="'$(_AllList)' != '$(_UniqueList)'"
+      Text="Duplicated entries found in BiteToolRequirements, got $(_AllList)." />
+	  
+	<Message
+      Condition="'$(_AllList)' == '$(_UniqueList)'"
+      Importance="Normal"
+      Text="No duplicated entry in BiteToolRequirements found, got $(_AllList)." />
+  </Target>
+  
+  <Target Name="RestoreTools"
+          AfterTargets="Restore"
+		  Condition="'@(BiteToolRequirements)' != ''">
+    <Message Importance="normal" Text="Installing requested dotnet tools" />
+    
+    <Exec Command='dotnet tool install %(BiteToolRequirements.Identity) --version %(BiteToolRequirements.Version) --create-manifest-if-needed -v d'
+          ConsoleToMSBuild="true"
+		  StandardOutputImportance="Normal"
+		  StandardErrorImportance="High"
+          ContinueOnError="false" />
+  </Target>
+</Project>

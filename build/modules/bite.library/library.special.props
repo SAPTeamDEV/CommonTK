@@ -3,7 +3,6 @@
   <PropertyGroup>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
-    <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
     <Deterministic>True</Deterministic>
 
     <IncludeSymbols>true</IncludeSymbols>
@@ -18,7 +17,6 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Nerdbank.GitVersioning" PrivateAssets="All" />
     <PackageReference Include="DotNet.ReproducibleBuilds" PrivateAssets="All" />
 	<PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All"/>
   </ItemGroup>

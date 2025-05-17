@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <BiteScriptInstance Condition=" '$(BiteScriptInstance)' == '' ">false</BiteScriptInstance>
+	<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     
-    <RepoRootPath>$(MSBuildThisFileDirectory)</RepoRootPath>
-    <RepoArtifactsPath>$(RepoRootPath)artifacts\</RepoArtifactsPath>
-    <RepoEnginePath>$(RepoRootPath)build\modules\</RepoEnginePath>
+    <BiteRoot>$(MSBuildThisFileDirectory)</BiteRoot>
+    <BiteArtifactsPath>$(BiteRoot)artifacts\</BiteArtifactsPath>
+    <BiteModulesPath>$(BiteRoot)build\modules\</BiteModulesPath>
     
-    <BaseIntermediateOutputPath>$(RepoArtifactsPath)obj\$([MSBuild]::MakeRelative($(RepoRootPath), $(MSBuildProjectDirectory)))\</BaseIntermediateOutputPath>
-    <BaseOutputPath Condition=" '$(BaseOutputPath)' == '' ">$(RepoArtifactsPath)bin\$(MSBuildProjectName)\</BaseOutputPath>
-    <PublishDir>$(RepoArtifactsPath)publish\$(MSBuildProjectName)\$(Configuration)\$(TargetFramework)\$(RuntimeIdentifier)\</PublishDir>
-    <PackageOutputPath>$(RepoArtifactsPath)packages\$(Configuration)\</PackageOutputPath>
-    <LogPath>$(RepoArtifactsPath)logs\</LogPath>
+    <BaseIntermediateOutputPath>$(BiteArtifactsPath)obj\$([MSBuild]::MakeRelative($(BiteRoot), $(MSBuildProjectDirectory)))\</BaseIntermediateOutputPath>
+    <BaseOutputPath Condition=" '$(BaseOutputPath)' == '' ">$(BiteArtifactsPath)bin\$(MSBuildProjectName)\</BaseOutputPath>
+    <PublishDir>$(BiteArtifactsPath)publish\$(MSBuildProjectName)\$(Configuration)\$(TargetFramework)\$(RuntimeIdentifier)\</PublishDir>
+    <PackageOutputPath>$(BiteArtifactsPath)packages\$(Configuration)\</PackageOutputPath>
   </PropertyGroup>
 
-  <Import Project="$(RepoEnginePath)*.common.props" />
+  <Import Project="$(BiteModulesPath)\**\*.config.props" />
+  <Import Project="$(BiteModulesPath)\**\*.common.props" Condition=" '$(BiteScriptInstance)' == 'false' " />
   
 </Project>

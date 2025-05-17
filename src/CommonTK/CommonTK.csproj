@@ -2,7 +2,8 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net6.0;net8.0</TargetFrameworks>
-	<ImportLibraryModules>true</ImportLibraryModules>
+	<BiteImportLibraryModule>true</BiteImportLibraryModule>
+	<BiteImportGitVersioningModule>true</BiteImportGitVersioningModule>
 
     <AssemblyName>SAPTeam.CommonTK</AssemblyName>
     <RootNamespace>$(AssemblyName)</RootNamespace>
@@ -28,12 +29,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="$(RepoRootPath)\README.md">
+    <None Include="$(BiteRoot)\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
 
-  <Import Project="$(RepoEnginePath)special.props" />
+  <Import Project="$(BiteModulesPath)\special.props" />
 
 </Project>

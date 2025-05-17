@@ -1,0 +1,9 @@
+<Project>
+  <Target Name="Help">
+    <Message Text="
+You could use this project file to invoke targets registered by modules
+To get a full list of registered targets, use -pp argument"
+	Importance="High" />
+  </Target>
+  
+</Project>

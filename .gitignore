@@ -370,3 +370,4 @@ FodyWeavers.xsd
 _site
 _site_pdf
 docs/api
+/.dotnet

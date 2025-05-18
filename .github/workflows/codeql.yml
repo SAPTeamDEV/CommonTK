@@ -90,7 +90,9 @@ jobs:
       name: Build
       shell: bash
       run: |
-        dotnet build -c Release
+        ./build.sh bite restore
+        ./build.sh restore
+        ./build.sh build
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3

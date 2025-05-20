@@ -4,16 +4,18 @@ import importlib.util
 import os
 import platform
 import subprocess
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, Callable
 import urllib.request
 
 from .global_json import GlobalJson
 
+
 class Host:
     """
     Host class for managing .NET SDK, environment, and project modules.
-    Handles SDK installation, environment setup, solution detection, and plugin loading.
+    Handles SDK installation, environment setup, solution detection, plugin loading, and extensible CLI commands.
     """
+
     BASE_DIR: str = os.getcwd()
     """Base directory for the project (current working directory)."""
 
@@ -37,14 +39,34 @@ class Host:
     }
     """Environment variables to set for all dotnet CLI invocations."""
 
-    def __init__(self, app: str) -> None:
+    DOTNET_COMMANDS: List[Dict[str, str]] = [
+        {'name': 'restore', 'help': 'Restore NuGet packages for the solution'},
+        {'name': 'clean',   'help': 'Clean the solution'},
+        {'name': 'build',   'help': 'Build the solution'},
+        {'name': 'test',    'help': 'Test the solution'}
+    ]
+    """List of default dotnet commands and their help descriptions."""
+
+    def __init__(
+        self,
+        app: str,
+        description: Optional[str] = None,
+        epilog: Optional[str] = None,
+        usage: Optional[str] = None,
+    ) -> None:
         """
-        Initialize the Host instance.
+        Initialize the Host instance and prepare CLI argument parser configuration.
 
         Args:
-            app: The name of the application (used for argument parsing).
+            app: The name of the application.
+            description: Description of the application.
+            usage: Usage string for the argument parser.
+            epilog: Text to display at the end of the help message.
         """
         self.name: str = app
+        self.description = description
+        self.argparser_usage = usage
+        self.argparser_epilog = epilog
 
         try:
             self.global_json: Optional[GlobalJson] = GlobalJson(os.path.join(self.BASE_DIR, 'global.json'))
@@ -59,10 +81,12 @@ class Host:
         self.requested_sdk: Optional[str] = self._resolve_requested_sdk()
         self.solution: str = self.SOLUTION_PATH or self.detect_solution()
         self.argparser: Optional[argparse.ArgumentParser] = None
+        self.handlers: Dict[str, Callable[[argparse.Namespace], None]] = {}
+        self._subparsers_action: Optional[argparse._SubParsersAction] = None
 
     def get_argparser(self) -> argparse.ArgumentParser:
         """
-        Get or create the argument parser for the CLI.
+        Get or create the argument parser for the CLI, using subparsers for each command.
 
         Returns:
             An argparse.ArgumentParser instance for parsing command-line arguments.
@@ -70,11 +94,108 @@ class Host:
         if self.argparser is not None:
             return self.argparser
 
-        parser = argparse.ArgumentParser(prog=self.name)
-        parser.add_argument('action', choices=['restore', 'clean', 'build', 'bite', 'help'])
-        parser.add_argument('extras', nargs=argparse.REMAINDER)
+        parser = argparse.ArgumentParser(
+            prog=self.name,
+            description=self.description,
+            epilog=self.argparser_epilog,
+            usage=self.argparser_usage,
+            add_help=True
+        )
+        # Hide the metavar for the subparser argument, but keep help for each command
+        subparsers = parser.add_subparsers(
+            dest='command',
+            required=False,  # Allow default
+            metavar='',  # This hides the {restore,clean,...} line in help
+        )
+        subparsers.required = False  # Explicitly allow no subcommand
+        parser.set_defaults(command='build', func=self._handle_dotnet_command)
+        self._subparsers_action = subparsers
+
+        # Register built-in dotnet commands
+        for cmd in self.DOTNET_COMMANDS:
+            sub = subparsers.add_parser(cmd['name'], help=cmd['help'])
+            sub.set_defaults(func=self._handle_dotnet_command)
+            self.handlers[cmd['name']] = self._handle_dotnet_command
+
+        # Bite command
+        bite_parser = subparsers.add_parser('bite', help='Run a custom bite target')
+        bite_parser.add_argument('target', nargs='?', default='help', help='Bite target to run')
+        bite_parser.set_defaults(func=self._handle_bite)
+        self.handlers['bite'] = self._handle_bite
+
         self.argparser = parser
         return self.argparser
+
+    def add_command(
+        self,
+        name: str,
+        handler: Callable[[argparse.Namespace], None],
+        description: Optional[str] = None,
+        help: str = "",
+        arguments: Optional[List[Dict[str, Any]]] = None,
+    ) -> None:
+        """
+        Register a new subcommand for extensibility (for modules/plugins).
+
+        Args:
+            name: The command name (e.g., 'deploy').
+            handler: The function to handle the command (called with parsed args).
+            description: Optional description for the command.
+            help: Help string for the command.
+            arguments: List of dicts with keys for add_argument (optional).
+        """
+        self.get_argparser()
+        subparsers = self._subparsers_action
+        if subparsers is None:
+            raise RuntimeError("Subparsers not found in parser")
+        sub = subparsers.add_parser(name, help=help, description=description or help)
+        if arguments:
+            for arg in arguments:
+                sub.add_argument(*arg.get('args', ()), **arg.get('kwargs', {}))
+        # Always allow extra arguments for custom commands
+        sub.add_argument('extras', nargs=argparse.REMAINDER, help='Extra arguments')
+        sub.set_defaults(func=handler)
+        self.handlers[name] = handler
+
+    def _handle_dotnet_command(self, args: argparse.Namespace, *extras: str) -> None:
+        """
+        Handle standard dotnet commands: restore, clean, build, test.
+        Passes any extra arguments to the dotnet CLI.
+        """
+        self.run(args.command, *extras)
+
+    def _handle_bite(self, args: argparse.Namespace, *extras: str) -> None:
+        """
+        Handle the 'bite' command, running a custom msbuild target.
+        Passes any extra arguments to msbuild.
+        """
+        target = getattr(args, 'target', 'help')
+        self.msbuild(target, *extras)
+
+    def register_handler(self, command: str, handler: Callable[[argparse.Namespace], None]) -> None:
+        """
+        Register a custom handler for a command.
+
+        Args:
+            command: The command name.
+            handler: The function to handle the command.
+        """
+        self.handlers[command] = handler
+
+    def dispatch(self, args: argparse.Namespace, unknown_args: Optional[List[str]] = None) -> None:
+        """
+        Dispatch the parsed arguments to the appropriate handler.
+
+        Args:
+            args: The parsed argparse.Namespace.
+            unknown_args: List of unknown arguments, if any.
+        """
+        extras = unknown_args or []
+
+        if hasattr(args, 'func'):
+            args.func(args, *extras)
+        else:
+            self.get_argparser().print_help()
 
     def _set_environment_variables(self) -> None:
         """
@@ -88,8 +209,8 @@ class Host:
         Install the required .NET SDK if not already present.
         Determines the platform and calls the appropriate installation method.
         """
-        if not self.requested_sdk:
-            return
+        if self.requested_sdk is None:
+            raise RuntimeError("No .NET SDK install required")
 
         os.makedirs(self.DOTNET_DIR, exist_ok=True)
         system = platform.system().lower()
@@ -103,6 +224,9 @@ class Host:
         """
         Download and install the .NET SDK on Windows using the official PowerShell script.
         """
+        if self.requested_sdk is None:
+            raise RuntimeError("No .NET SDK install required")
+        
         installer = os.path.join(self.DOTNET_DIR, 'dotnet-install.ps1')
         url = 'https://dot.net/v1/dotnet-install.ps1'
 
@@ -122,6 +246,9 @@ class Host:
         """
         Download and install the .NET SDK on Unix-like systems using the official Bash script.
         """
+        if self.requested_sdk is None:
+            raise RuntimeError("No .NET SDK install required")
+        
         installer = os.path.join(self.DOTNET_DIR, 'dotnet-install.sh')
         url = 'https://dot.net/v1/dotnet-install.sh'
 
@@ -187,8 +314,8 @@ class Host:
             command: The dotnet CLI command to run (e.g., 'build', 'restore').
             *args: Additional arguments to pass to the command.
         """
-        cmd = ['dotnet', command] + self.DEFAULT_ARGS + [self.solution] + list(args)
-        subprocess.check_call(cmd)
+        cmd = ['dotnet', command] + [self.solution] + self.DEFAULT_ARGS + list(args)
+        subprocess.call(cmd)
 
     def msbuild(self, target: str, *args: str) -> None:
         """
@@ -199,7 +326,7 @@ class Host:
             *args: Additional arguments to pass to msbuild.
         """
         cmd = ['dotnet', 'msbuild'] + self.DEFAULT_ARGS + [f'-t:{target}', 'bite.proj'] + list(args)
-        subprocess.check_call(cmd)
+        subprocess.call(cmd)
 
     def load_modules(self) -> Dict[str, Any]:
         """

@@ -11,6 +11,9 @@ IF NOT EXIST "%CACHE_DIR%" (
     mkdir "%CACHE_DIR%"
 )
 
+:: Set PYBITE_APP_NAME to the current script file name
+SET "PYBITE_APP_NAME=%~nx0"
+
 :: Set env var for this process and launch Python
 SET PYTHONPYCACHEPREFIX=%CACHE_DIR%
 

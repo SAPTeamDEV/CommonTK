@@ -8,7 +8,7 @@ if __name__ == '__main__':
     
     if (host.requested_sdk is not None):
         print(f'Installing .NET SDK {host.requested_sdk}')
-        host.install_sdk()
+        host._install_sdk()
     
     p = host.get_argparser()
     args = p.parse_args()

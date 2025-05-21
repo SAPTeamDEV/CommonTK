@@ -126,14 +126,14 @@ class Host:
 
         # Register built-in dotnet commands
         for cmd in self.DOTNET_COMMANDS:
-            sub = subparsers.add_parser(
+            subparsers.add_parser(
                 cmd['name'],
                 help=cmd['help'],
                 epilog=self.argparser_epilog + ' (Dotnet CLI)',
                 usage=self.argparser_usage.replace('command', cmd['name']),
+                add_help=False,
             )
-            sub.set_defaults(func=self._handle_dotnet_command)
-            self.handlers[cmd['name']] = self._handle_dotnet_command
+            self.register_handler(cmd['name'], self._handle_dotnet_command)
 
         # Register bite command only if bite.proj exists
         if os.path.isfile(self.BITE_PROJ_PATH):
@@ -144,8 +144,16 @@ class Host:
                 usage=self.argparser_usage.replace('command', 'bite') + ' [target]',
             )
             bite_parser.add_argument('target', nargs='?', default='help', help='bite.core target to run, default is "help"')
-            bite_parser.set_defaults(func=self._handle_bite)
-            self.handlers['bite'] = self._handle_bite
+            self.register_handler('bite', self._handle_bite)
+
+        dotnet_parser = subparsers.add_parser(
+            'dotnet',
+            help='Run a dotnet command',
+            epilog=self.argparser_epilog + ' (Dotnet CLI)',
+            usage=self.argparser_usage.replace('command', 'dotnet') + ' [command]',
+            add_help=False,
+        )
+        self.register_handler('dotnet', self._handle_dotnet_cli)
 
         self.argparser = parser
         return self.argparser
@@ -176,8 +184,7 @@ class Host:
         if arguments:
             for arg in arguments:
                 sub.add_argument(*arg.get('args', ()), **arg.get('kwargs', {}))
-        sub.set_defaults(func=handler)
-        self.handlers[name] = handler
+        self.register_handler(name, handler)
 
     def register_handler(self, command: str, handler: Callable[[argparse.Namespace, List[str]], None]) -> None:
         """
@@ -198,19 +205,27 @@ class Host:
             unknown_args: List of unknown arguments, if any.
         """
         extras = unknown_args or []
-        if hasattr(args, 'func'):
-            args.func(args, extras)
+        command = getattr(args, 'command', None)
+        if command and command in self.handlers:
+            self.handlers[command](args, extras)
         else:
             self.get_argparser().print_help()
 
     # --- Dotnet/MSBuild Command Handlers ---
 
-    def _handle_dotnet_command(self, args: argparse.Namespace, extras: List[str]) -> None:
+    def _handle_dotnet_cli(self, args: argparse.Namespace, extras: List[str]) -> None:
         """
-        Handle standard dotnet commands: restore, clean, build, test, pack.
+        Handle custom dotnet commands.
         Passes any extra arguments to the dotnet CLI.
         """
-        self.run(args.command, *extras)
+        self.run('', *extras)
+
+    def _handle_dotnet_command(self, args: argparse.Namespace, extras: List[str]) -> None:
+        """
+        Handle built-in dotnet commands.
+        Passes any extra arguments to the dotnet CLI.
+        """
+        self.run_builtin(args.command, *extras)
 
     def _handle_bite(self, args: argparse.Namespace, extras: List[str]) -> None:
         """
@@ -224,33 +239,36 @@ class Host:
 
     def run(self, command: str, *args: str) -> None:
         """
-        Run a dotnet command with the solution file as an argument.
+        Run a dotnet command.
 
         Args:
-            command: The dotnet CLI command to run (e.g., 'build', 'restore').
+            command: The dotnet CLI command to run.
             *args: Additional arguments to pass to the command.
         """
-        cmd = ['dotnet', command] + [self.solution] + self.DEFAULT_ARGS + list(args)
-        try:
-            subprocess.check_call(cmd)
-        except subprocess.CalledProcessError as e:
-            print(f"Error: dotnet {command} failed with exit code {e.returncode}")
-            raise
+        cmd = ['dotnet', command] + list(args)
+        subprocess.call(cmd)
+
+    def run_builtin(self, command: str, *args: str) -> None:
+        """
+        Run a built-in dotnet command with the solution file and default arguments.
+
+        Args:
+            command: The dotnet command to run (e.g., 'build', 'restore').
+            *args: Additional arguments to pass to the dotnet cli.
+        """
+        cmd = [self.solution] + self.DEFAULT_ARGS + list(args)
+        self.run(command, *cmd)
 
     def run_bite(self, target: str, *args: str) -> None:
         """
-        Run bite.core with the specified target.
+        Run bite.core with the specified target and default arguments.
 
         Args:
             target: The bite.core target to run.
             *args: Additional arguments to pass to msbuild.
         """
-        cmd = ['dotnet', 'msbuild'] + self.DEFAULT_ARGS + [f'-t:{target}', self.BITE_PROJ_PATH] + list(args)
-        try:
-            subprocess.check_call(cmd)
-        except subprocess.CalledProcessError as e:
-            print(f"Error: msbuild target '{target}' failed with exit code {e.returncode}")
-            raise
+        cmd = self.DEFAULT_ARGS + [f'-t:{target}', self.BITE_PROJ_PATH] + list(args)
+        self.run('msbuild', *cmd)
 
     # --- SDK Installation ---
 

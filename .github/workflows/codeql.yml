@@ -92,7 +92,7 @@ jobs:
       run: |
         ./build.sh bite restore
         ./build.sh restore
-        ./build.sh build
+        ./build.sh build -c Release --no-restore
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3

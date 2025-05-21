@@ -9,6 +9,7 @@ from typing import Optional, Dict, Any, List, Callable
 
 from .global_json import GlobalJson
 from .msbuild import MSBuildFile, MSBuildTarget
+from .module import Module
 
 
 class Host:
@@ -126,8 +127,8 @@ class Host:
         parser.set_defaults(command='build')
         self._subparsers_action = subparsers
 
-        # Register built-in dotnet commands
-        for cmd in self.DOTNET_COMMANDS:
+        # Register built-in dotnet commands (sorted by name)
+        for cmd in sorted(self.DOTNET_COMMANDS, key=lambda c: c['name']):
             subparsers.add_parser(
                 cmd['name'],
                 help=cmd['help'],
@@ -137,18 +138,6 @@ class Host:
             )
             self.register_handler(cmd['name'], handlers.handle_dotnet_builtin)
 
-        # Register bite command only if bite.proj exists
-        if os.path.isfile(self.BITE_PROJ_PATH):
-            run_parser = subparsers.add_parser(
-                'run',
-                help='Run a bite.core target',
-                epilog=self.argparser_epilog + ' (MSBuild)',
-                usage=self.argparser_usage.replace('command', 'run') + ' [target]',
-            )
-            run_parser.add_argument('target', nargs='?', default='help', help='bite.core target to run, default is "help"')
-            run_parser.add_argument('--list', '-l', action='store_true', help='List available targets')
-            self.register_handler('run', handlers.handle_bite_run)
-
         subparsers.add_parser(
             'dotnet',
             help='Run a dotnet command',
@@ -157,6 +146,27 @@ class Host:
             add_help=False,
         )
         self.register_handler('dotnet', handlers.handle_dotnet_cli)
+
+        list_parser = subparsers.add_parser(
+            'list',
+            help='List all bite modules',
+            usage=self.argparser_usage.replace('command', 'list'),
+        )
+        
+        list_parser.add_argument('-v', '--verbose', action='store_true', help='Show verbose output')
+        self.register_handler('list', handlers.handle_bite_list)
+
+        # Register run command only if bite.proj exists
+        if os.path.isfile(self.BITE_PROJ_PATH):
+            run_parser = subparsers.add_parser(
+                'run',
+                help='Run a bite.core target',
+                epilog=self.argparser_epilog + ' (MSBuild)',
+                usage=self.argparser_usage.replace('command', 'run') + ' [target]',
+            )
+            run_parser.add_argument('target', nargs='?', default='help', help='bite.core target to run, default is "help"')
+            run_parser.add_argument('-l', '--list', action='store_true', help='List available targets')
+            self.register_handler('run', handlers.handle_bite_run)
 
         self.argparser = parser
         return self.argparser
@@ -394,7 +404,7 @@ class Host:
             msbuild_path = f'"{msbuild_path}"'
         return msbuild_path
 
-    def _get_bite_core_targets(self) -> List[MSBuildTarget]:
+    def get_bite_core_targets(self) -> List[MSBuildTarget]:
         """
         Retrieve all available MSBuild targets from bite.core or .bite.targets files.
 
@@ -424,14 +434,28 @@ class Host:
 
         return targets
 
-    def load_modules(self) -> Dict[str, Any]:
+    def get_modules(self) -> Dict[str, Module]:
+        """
+        Get all modules from the modules directory.
+        """
+        mods: Dict[str, Module] = {}
+        
+        for root, dirs, files in os.walk(self.MODULES_DIR):
+            for dir in dirs:
+                path = os.path.join(root, dir)
+                mod = Module(path, require_json=False)
+                mods[mod.id] = mod
+        
+        return mods
+
+    def load_modules(self) -> List[Any]:
         """
         Load all .bite.py modules from the modules directory.
 
         Returns:
-            Dict[str, Any]: Mapping of plugin names to loaded module objects.
+            List[Any]: List of loaded module objects.
         """
-        mods: Dict[str, Any] = {}
+        mods: List[Any] = []
         pattern = os.path.join(self.MODULES_DIR, '**', '*.bite.py')
         for path in glob.glob(pattern, recursive=True):
             name = os.path.splitext(os.path.basename(path))[0]
@@ -446,7 +470,7 @@ class Host:
                 continue
             if hasattr(mod, 'load'):
                 try:
-                    mods[name] = mod.load(self)
+                    mods.append(mod.load(self))
                 except Exception as e:
                     print(f"Module '{name}' failed to initialize: {e}")
         return mods

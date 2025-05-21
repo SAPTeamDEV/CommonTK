@@ -29,7 +29,7 @@ def handle_bite_run(host: Host, args: argparse.Namespace, extras: List[str]) -> 
             host.get_argparser().error("The 'list' option cannot be used with other arguments.")
         
         dependant_targets: List[MSBuildTarget] = []
-        targets = host._get_bite_core_targets()
+        targets = host.get_bite_core_targets()
         print("Available independent targets:")
         for target in targets:
             if getattr(target, 'AfterTargets', None) is None and getattr(target, 'BeforeTargets', None) is None:
@@ -48,3 +48,25 @@ def handle_bite_run(host: Host, args: argparse.Namespace, extras: List[str]) -> 
         return
     target = getattr(args, 'target', 'help')
     host.run_bite(target, *extras)
+
+def handle_bite_list(host: Host, args: argparse.Namespace, extras: List[str]) -> None:
+    """
+    Handle the 'list' command, listing available modules.
+    """
+    if extras:
+        host.get_argparser().error("The 'list' option does not accept any extra arguments.")
+    
+    verbose = getattr(args, 'verbose', False)
+    modules = host.get_modules()
+    print("Available modules:")
+    for module in modules.values():
+        if not verbose:
+            print(f"  {module.id}"
+                  f"{f' ({module.name})' if module.name else ''}"
+                  f"{f' - {module.description}' if module.description else ''}")
+        else:
+            print(f"  {module.id}")
+            print(f"    Name: {module.name}")
+            print(f"    Description: {module.description}")
+            print(f"    Path: {module.path}")
+            print()

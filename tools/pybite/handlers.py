@@ -25,6 +25,9 @@ def handle_bite_run(host: Host, args: argparse.Namespace, extras: List[str]) -> 
     """
     list_targets = getattr(args, 'list', False)
     if list_targets:
+        if getattr(args, 'target', 'help') != 'help' or extras:
+            host.get_argparser().error("The 'list' option cannot be used with other arguments.")
+        
         dependant_targets: List[MSBuildTarget] = []
         targets = host._get_bite_core_targets()
         print("Available independent targets:")

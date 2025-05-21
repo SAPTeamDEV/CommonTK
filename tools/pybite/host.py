@@ -94,7 +94,7 @@ class Host:
         self.requested_sdk: Optional[str] = self._resolve_requested_sdk()
         self.solution: str = self.SOLUTION_PATH or self.detect_solution()
         self.argparser: Optional[argparse.ArgumentParser] = None
-        self.handlers: Dict[str, Callable[[argparse.Namespace, List[str]], None]] = {}
+        self.handlers: Dict[str, Callable[["Host", argparse.Namespace, List[str]], None]] = {}
         self._subparsers_action: Optional[argparse._SubParsersAction] = None
 
     # --- CLI and Command Registration ---
@@ -109,6 +109,8 @@ class Host:
         if self.argparser is not None:
             return self.argparser
 
+        from . import handlers
+
         parser = argparse.ArgumentParser(
             prog=self.name,
             description=self.description,
@@ -121,8 +123,7 @@ class Host:
             required=False,
             metavar='',
         )
-        subparsers.required = False
-        parser.set_defaults(command='build', func=self._handle_dotnet_command)
+        parser.set_defaults(command='build')
         self._subparsers_action = subparsers
 
         # Register built-in dotnet commands
@@ -134,7 +135,7 @@ class Host:
                 usage=self.argparser_usage.replace('command', cmd['name']),
                 add_help=False,
             )
-            self.register_handler(cmd['name'], self._handle_dotnet_command)
+            self.register_handler(cmd['name'], handlers.handle_dotnet_builtin)
 
         # Register bite command only if bite.proj exists
         if os.path.isfile(self.BITE_PROJ_PATH):
@@ -146,7 +147,7 @@ class Host:
             )
             run_parser.add_argument('target', nargs='?', default='help', help='bite.core target to run, default is "help"')
             run_parser.add_argument('--list', '-l', action='store_true', help='List available targets')
-            self.register_handler('run', self._handle_bite_run)
+            self.register_handler('run', handlers.handle_bite_run)
 
         subparsers.add_parser(
             'dotnet',
@@ -155,7 +156,7 @@ class Host:
             usage=self.argparser_usage.replace('command', 'dotnet') + ' [command]',
             add_help=False,
         )
-        self.register_handler('dotnet', self._handle_dotnet_cli)
+        self.register_handler('dotnet', handlers.handle_dotnet_cli)
 
         self.argparser = parser
         return self.argparser
@@ -163,7 +164,7 @@ class Host:
     def add_command(
         self,
         name: str,
-        handler: Callable[[argparse.Namespace, List[str]], None],
+        handler: Callable[["Host", argparse.Namespace, List[str]], None],
         description: Optional[str] = None,
         help: str = "",
         arguments: Optional[List[Dict[str, Any]]] = None,
@@ -188,7 +189,7 @@ class Host:
                 sub.add_argument(*arg.get('args', ()), **arg.get('kwargs', {}))
         self.register_handler(name, handler)
 
-    def register_handler(self, command: str, handler: Callable[[argparse.Namespace, List[str]], None]) -> None:
+    def register_handler(self, command: str, handler: Callable[["Host", argparse.Namespace, List[str]], None]) -> None:
         """
         Register a custom handler for a command.
 
@@ -209,53 +210,9 @@ class Host:
         extras = unknown_args or []
         command = getattr(args, 'command', None)
         if command and command in self.handlers:
-            self.handlers[command](args, extras)
+            self.handlers[command](self, args, extras)
         else:
             self.get_argparser().print_help()
-
-    # --- Dotnet/MSBuild Command Handlers ---
-
-    def _handle_dotnet_cli(self, args: argparse.Namespace, extras: List[str]) -> None:
-        """
-        Handle custom dotnet commands.
-        Passes any extra arguments to the dotnet CLI.
-        """
-        self.run('', *extras)
-
-    def _handle_dotnet_command(self, args: argparse.Namespace, extras: List[str]) -> None:
-        """
-        Handle built-in dotnet commands.
-        Passes any extra arguments to the dotnet CLI.
-        """
-        self.run_builtin(args.command, *extras)
-
-    def _handle_bite_run(self, args: argparse.Namespace, extras: List[str]) -> None:
-        """
-        Handle the 'run' command, running a custom msbuild target.
-        Passes any extra arguments to msbuild.
-        """
-        list_targets = getattr(args, 'list', False)
-        if list_targets:
-            dependant_targets: List[MSBuildTarget] = []
-            targets = self._get_bite_core_targets()
-            print("Available independent targets:")
-            for target in targets:
-                if getattr(target, 'AfterTargets', None) is None and getattr(target, 'BeforeTargets', None) is None:
-                    print(f"  {target.Name}")
-                else:
-                    dependant_targets.append(target)
-            if dependant_targets:
-                print("\nAvailable automated targets:")
-                for target in dependant_targets:
-                    print(f"  {target.Name}", end=' ')
-                    if getattr(target, 'AfterTargets', None):
-                        print(f"(after '{target.AfterTargets}')", end=' ')
-                    if getattr(target, 'BeforeTargets', None):
-                        print(f"(before '{target.BeforeTargets}')", end=' ')
-                    print()
-            return
-        target = getattr(args, 'target', 'help')
-        self.run_bite(target, *extras)
 
     # --- Dotnet/MSBuild Execution ---
 

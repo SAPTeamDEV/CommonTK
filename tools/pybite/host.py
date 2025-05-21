@@ -138,15 +138,15 @@ class Host:
 
         # Register bite command only if bite.proj exists
         if os.path.isfile(self.BITE_PROJ_PATH):
-            bite_parser = subparsers.add_parser(
-                'bite',
+            run_parser = subparsers.add_parser(
+                'run',
                 help='Run a bite.core target',
                 epilog=self.argparser_epilog + ' (MSBuild)',
-                usage=self.argparser_usage.replace('command', 'bite') + ' [target]',
+                usage=self.argparser_usage.replace('command', 'run') + ' [target]',
             )
-            bite_parser.add_argument('target', nargs='?', default='help', help='bite.core target to run, default is "help"')
-            bite_parser.add_argument('--list', '-l', action='store_true', help='List available targets')
-            self.register_handler('bite', self._handle_bite)
+            run_parser.add_argument('target', nargs='?', default='help', help='bite.core target to run, default is "help"')
+            run_parser.add_argument('--list', '-l', action='store_true', help='List available targets')
+            self.register_handler('run', self._handle_bite_run)
 
         subparsers.add_parser(
             'dotnet',
@@ -229,9 +229,9 @@ class Host:
         """
         self.run_builtin(args.command, *extras)
 
-    def _handle_bite(self, args: argparse.Namespace, extras: List[str]) -> None:
+    def _handle_bite_run(self, args: argparse.Namespace, extras: List[str]) -> None:
         """
-        Handle the 'bite' command, running a custom msbuild target.
+        Handle the 'run' command, running a custom msbuild target.
         Passes any extra arguments to msbuild.
         """
         list_targets = getattr(args, 'list', False)

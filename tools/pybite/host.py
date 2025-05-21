@@ -8,6 +8,7 @@ import urllib.request
 from typing import Optional, Dict, Any, List, Callable
 
 from .global_json import GlobalJson
+from .msbuild import MSBuildFile, MSBuildTarget
 
 
 class Host:
@@ -144,9 +145,10 @@ class Host:
                 usage=self.argparser_usage.replace('command', 'bite') + ' [target]',
             )
             bite_parser.add_argument('target', nargs='?', default='help', help='bite.core target to run, default is "help"')
+            bite_parser.add_argument('--list', '-l', action='store_true', help='List available targets')
             self.register_handler('bite', self._handle_bite)
 
-        dotnet_parser = subparsers.add_parser(
+        subparsers.add_parser(
             'dotnet',
             help='Run a dotnet command',
             epilog=self.argparser_epilog + ' (Dotnet CLI)',
@@ -232,43 +234,79 @@ class Host:
         Handle the 'bite' command, running a custom msbuild target.
         Passes any extra arguments to msbuild.
         """
+        list_targets = getattr(args, 'list', False)
+        if list_targets:
+            dependant_targets: List[MSBuildTarget] = []
+            targets = self._get_bite_core_targets()
+            print("Available independent targets:")
+            for target in targets:
+                if getattr(target, 'AfterTargets', None) is None and getattr(target, 'BeforeTargets', None) is None:
+                    print(f"  {target.Name}")
+                else:
+                    dependant_targets.append(target)
+            if dependant_targets:
+                print("\nAvailable automated targets:")
+                for target in dependant_targets:
+                    print(f"  {target.Name}", end=' ')
+                    if getattr(target, 'AfterTargets', None):
+                        print(f"(after '{target.AfterTargets}')", end=' ')
+                    if getattr(target, 'BeforeTargets', None):
+                        print(f"(before '{target.BeforeTargets}')", end=' ')
+                    print()
+            return
         target = getattr(args, 'target', 'help')
         self.run_bite(target, *extras)
 
     # --- Dotnet/MSBuild Execution ---
 
-    def run(self, command: str, *args: str) -> None:
+    def run(self, command: str, *args: str, capture_output: bool = False) -> Optional[subprocess.CompletedProcess]:
         """
         Run a dotnet command.
 
         Args:
             command: The dotnet CLI command to run.
             *args: Additional arguments to pass to the command.
+            capture_output: If True, capture and return the output.
+
+        Returns:
+            subprocess.CompletedProcess if capture_output is True, otherwise None.
         """
         cmd = ['dotnet', command] + list(args)
-        subprocess.call(cmd)
+        if capture_output:
+            return subprocess.run(cmd, capture_output=True, text=True)
+        else:
+            subprocess.call(cmd)
+            return None
 
-    def run_builtin(self, command: str, *args: str) -> None:
+    def run_builtin(self, command: str, *args: str, capture_output: bool = False) -> Optional[subprocess.CompletedProcess]:
         """
         Run a built-in dotnet command with the solution file and default arguments.
 
         Args:
             command: The dotnet command to run (e.g., 'build', 'restore').
             *args: Additional arguments to pass to the dotnet cli.
+            capture_output: If True, capture and return the output.
+
+        Returns:
+            subprocess.CompletedProcess if capture_output is True, otherwise None.
         """
         cmd = [self.solution] + self.DEFAULT_ARGS + list(args)
-        self.run(command, *cmd)
+        return self.run(command, *cmd, capture_output=capture_output)
 
-    def run_bite(self, target: str, *args: str) -> None:
+    def run_bite(self, target: str, *args: str, capture_output: bool = False) -> Optional[subprocess.CompletedProcess]:
         """
         Run bite.core with the specified target and default arguments.
 
         Args:
             target: The bite.core target to run.
             *args: Additional arguments to pass to msbuild.
+            capture_output: If True, capture and return the output.
+
+        Returns:
+            subprocess.CompletedProcess if capture_output is True, otherwise None.
         """
         cmd = self.DEFAULT_ARGS + [f'-t:{target}', self.BITE_PROJ_PATH] + list(args)
-        self.run('msbuild', *cmd)
+        return self.run('msbuild', *cmd, capture_output=capture_output)
 
     # --- SDK Installation ---
 
@@ -384,7 +422,12 @@ class Host:
     def msbuild_path(path: str) -> str:
         """
         Convert a Python path string to an MSBuild-acceptable path for directory properties.
-        Ensures absolute path, uses backslashes, and ends with a backslash.
+
+        Args:
+            path (str): The path to convert.
+
+        Returns:
+            str: The MSBuild-compatible absolute path, quoted if it contains spaces, and ending with a backslash.
         """
         abs_path = os.path.abspath(path)
         msbuild_path = abs_path
@@ -393,6 +436,36 @@ class Host:
         if ' ' in msbuild_path:
             msbuild_path = f'"{msbuild_path}"'
         return msbuild_path
+
+    def _get_bite_core_targets(self) -> List[MSBuildTarget]:
+        """
+        Retrieve all available MSBuild targets from bite.core or .bite.targets files.
+
+        Returns:
+            List[MSBuildTarget]: List of discovered MSBuildTarget objects.
+        """
+        targets: List[MSBuildTarget] = []
+
+        # Try to get targets from bite.core msbuild output
+        output = self.run_bite('help', '-pp', capture_output=True)
+        if output and output.stdout:
+            try:
+                # Parse the XML output directly if possible
+                targets = MSBuildFile(xml_string=output.stdout).get_targets()
+                return targets
+            except Exception:
+                pass
+
+        # Fallback: scan all .bite.targets files in the modules directory
+        pattern = os.path.join(self.MODULES_DIR, '**', '*.bite.targets')
+        for path in glob.glob(pattern, recursive=True):
+            try:
+                obj = MSBuildFile(path)
+                targets.extend(obj.get_targets())
+            except Exception:
+                continue
+
+        return targets
 
     def load_modules(self) -> Dict[str, Any]:
         """

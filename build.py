@@ -12,8 +12,6 @@ if __name__ == '__main__':
     host = config.pybite.Host(
         app=app_name,
         description='Bite build engine command line interface',
-        usage=f'{app_name} command [options]',
-        epilog="Any unrecognized options will be passed to the command handler.",
     )
 
     host.load_modules()

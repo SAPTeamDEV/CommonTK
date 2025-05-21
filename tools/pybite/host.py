@@ -19,14 +19,17 @@ class Host:
     BASE_DIR: str = os.getcwd()
     """Base directory for the project (current working directory)."""
 
-    MODULES_DIR: str = os.path.join(BASE_DIR, 'build', 'modules')
-    """Directory where .bite.py modules are located."""
+    MODULES_DIR: str = os.path.join('build', 'modules')
+    """Directory where the bite modules are located."""
 
-    DOTNET_DIR: str = os.path.join(BASE_DIR, '.dotnet')
+    DOTNET_DIR: str = '.dotnet'
     """Directory where the .NET SDK is or will be installed."""
 
     SOLUTION_PATH: Optional[str] = None
     """Optional override for the solution path."""
+    
+    BITE_PROJ_PATH: str = 'bite.proj'
+    """Path to the bite.core file."""
 
     DEFAULT_ARGS: List[str] = ['--nologo']
     """Default arguments to pass to dotnet CLI commands."""
@@ -41,9 +44,10 @@ class Host:
 
     DOTNET_COMMANDS: List[Dict[str, str]] = [
         {'name': 'restore', 'help': 'Restore NuGet packages for the solution'},
-        {'name': 'clean',   'help': 'Clean the solution'},
-        {'name': 'build',   'help': 'Build the solution'},
-        {'name': 'test',    'help': 'Test the solution'}
+        {'name': 'build', 'help': 'Build the solution (default)'},
+        {'name': 'pack', 'help': 'Pack the solution'},
+        {'name': 'clean', 'help': 'Clean the solution'},
+        {'name': 'test', 'help': 'Test the solution'},
     ]
     """List of default dotnet commands and their help descriptions."""
 
@@ -51,8 +55,6 @@ class Host:
         self,
         app: str,
         description: Optional[str] = None,
-        epilog: Optional[str] = None,
-        usage: Optional[str] = None,
     ) -> None:
         """
         Initialize the Host instance and prepare CLI argument parser configuration.
@@ -60,13 +62,23 @@ class Host:
         Args:
             app: The name of the application.
             description: Description of the application.
-            usage: Usage string for the argument parser.
-            epilog: Text to display at the end of the help message.
         """
         self.name: str = app
         self.description = description
-        self.argparser_usage = usage
-        self.argparser_epilog = epilog
+        self.argparser_usage = f'{self.name} command [options]'
+        self.argparser_epilog = "Any unrecognized options will be passed to the command handler."
+
+        # Only join with BASE_DIR if the path is relative
+        if not os.path.isabs(self.MODULES_DIR):
+            self.MODULES_DIR = os.path.join(self.BASE_DIR, self.MODULES_DIR)
+        if not os.path.isabs(self.DOTNET_DIR):
+            self.DOTNET_DIR = os.path.join(self.BASE_DIR, self.DOTNET_DIR)
+        if self.SOLUTION_PATH and not os.path.isabs(self.SOLUTION_PATH):
+            self.SOLUTION_PATH = os.path.join(self.BASE_DIR, self.SOLUTION_PATH)
+        if not os.path.isabs(self.BITE_PROJ_PATH):
+            self.BITE_PROJ_PATH = os.path.join(self.BASE_DIR, self.BITE_PROJ_PATH)
+
+        self.DEFAULT_ARGS.append(f'/p:BiteModulesPath={self.msbuild_path(self.MODULES_DIR)}')
 
         try:
             self.global_json: Optional[GlobalJson] = GlobalJson(os.path.join(self.BASE_DIR, 'global.json'))
@@ -107,21 +119,32 @@ class Host:
             required=False,  # Allow default
             metavar='',  # This hides the {restore,clean,...} line in help
         )
+        
         subparsers.required = False  # Explicitly allow no subcommand
         parser.set_defaults(command='build', func=self._handle_dotnet_command)
         self._subparsers_action = subparsers
 
         # Register built-in dotnet commands
         for cmd in self.DOTNET_COMMANDS:
-            sub = subparsers.add_parser(cmd['name'], help=cmd['help'])
+            sub = subparsers.add_parser(
+                cmd['name'],
+                help=cmd['help'],
+                epilog=self.argparser_epilog + ' (Dotnet CLI)',
+                usage=self.argparser_usage.replace('command', cmd['name']),
+            )
             sub.set_defaults(func=self._handle_dotnet_command)
             self.handlers[cmd['name']] = self._handle_dotnet_command
 
-        # Bite command
-        bite_parser = subparsers.add_parser('bite', help='Run a custom bite target')
-        bite_parser.add_argument('target', nargs='?', default='help', help='Bite target to run')
-        bite_parser.set_defaults(func=self._handle_bite)
-        self.handlers['bite'] = self._handle_bite
+        if os.path.isfile(self.BITE_PROJ_PATH):
+            bite_parser = subparsers.add_parser(
+                'bite',
+                help='Run a bite.core target',
+                epilog=self.argparser_epilog + ' (MSBuild)',
+                usage=self.argparser_usage.replace('command', 'bite') + ' [target]',
+            )
+            bite_parser.add_argument('target', nargs='?', default='help', help='bite.core target to run, default is "help"')
+            bite_parser.set_defaults(func=self._handle_bite)
+            self.handlers['bite'] = self._handle_bite
 
         self.argparser = parser
         return self.argparser
@@ -139,7 +162,7 @@ class Host:
 
         Args:
             name: The command name (e.g., 'deploy').
-            handler: The function to handle the command (called with parsed args).
+            handler: The function to handle the command (called with parsed args and unknown args).
             description: Optional description for the command.
             help: Help string for the command.
             arguments: List of dicts with keys for add_argument (optional).
@@ -148,7 +171,7 @@ class Host:
         subparsers = self._subparsers_action
         if subparsers is None:
             raise RuntimeError("Subparsers not found in parser")
-        sub = subparsers.add_parser(name, help=help, description=description or help)
+        sub = subparsers.add_parser(name, help=help, description=description or help, epilog=self.argparser_epilog)
         if arguments:
             for arg in arguments:
                 sub.add_argument(*arg.get('args', ()), **arg.get('kwargs', {}))
@@ -170,7 +193,7 @@ class Host:
         Passes any extra arguments to msbuild.
         """
         target = getattr(args, 'target', 'help')
-        self.msbuild(target, *extras)
+        self.run_bite(target, *extras)
 
     def register_handler(self, command: str, handler: Callable[[argparse.Namespace], None]) -> None:
         """
@@ -317,16 +340,30 @@ class Host:
         cmd = ['dotnet', command] + [self.solution] + self.DEFAULT_ARGS + list(args)
         subprocess.call(cmd)
 
-    def msbuild(self, target: str, *args: str) -> None:
+    def run_bite(self, target: str, *args: str) -> None:
         """
-        Run msbuild with a specific target using dotnet CLI.
+        Run bite.core with the specified target.
 
         Args:
-            target: The msbuild target to run.
+            target: The bite.core target to run.
             *args: Additional arguments to pass to msbuild.
         """
-        cmd = ['dotnet', 'msbuild'] + self.DEFAULT_ARGS + [f'-t:{target}', 'bite.proj'] + list(args)
+        cmd = ['dotnet', 'msbuild'] + self.DEFAULT_ARGS + [f'-t:{target}', self.BITE_PROJ_PATH] + list(args)
         subprocess.call(cmd)
+
+    @staticmethod
+    def msbuild_path(path: str) -> str:
+        """
+        Convert a Python path string to an MSBuild-acceptable path for directory properties.
+        Ensures absolute path, uses backslashes, and ends with a backslash.
+        """
+        abs_path = os.path.abspath(path)
+        msbuild_path = abs_path
+        if not msbuild_path.endswith('\\'):
+            msbuild_path += '\\'
+        if ' ' in msbuild_path:
+            msbuild_path = f'"{msbuild_path}"'
+        return msbuild_path
 
     def load_modules(self) -> Dict[str, Any]:
         """
@@ -342,8 +379,10 @@ class Host:
             spec = importlib.util.spec_from_file_location(name, path)
             if spec is None or spec.loader is None:
                 continue
+
             mod = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(mod)
+            
             if hasattr(mod, 'load'):
                 mods[name] = mod.load(self)
         return mods

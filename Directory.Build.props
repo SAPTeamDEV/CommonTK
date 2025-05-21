@@ -2,12 +2,12 @@
 <Project>
   <PropertyGroup>
     <BiteScriptInstance Condition=" '$(BiteScriptInstance)' == '' ">false</BiteScriptInstance>
-	<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+	  <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     
     <BiteRoot>$(MSBuildThisFileDirectory)</BiteRoot>
     <BiteArtifactsPath>$(BiteRoot)artifacts\</BiteArtifactsPath>
-    <BiteModulesPath>$(BiteRoot)build\modules\</BiteModulesPath>
-    
+    <BiteModulesPath Condition=" '$(BiteModulesPath)' == '' ">$(BiteRoot)build\modules\</BiteModulesPath>
+
     <BaseIntermediateOutputPath>$(BiteArtifactsPath)obj\$([MSBuild]::MakeRelative($(BiteRoot), $(MSBuildProjectDirectory)))\</BaseIntermediateOutputPath>
     <BaseOutputPath Condition=" '$(BaseOutputPath)' == '' ">$(BiteArtifactsPath)bin\$(MSBuildProjectName)\</BaseOutputPath>
     <PublishDir>$(BiteArtifactsPath)publish\$(MSBuildProjectName)\$(Configuration)\$(TargetFramework)\$(RuntimeIdentifier)\</PublishDir>

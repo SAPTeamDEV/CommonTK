@@ -116,7 +116,8 @@ def install(url: str, modules_dir: str, upgrade: bool = False) -> None:
                 if d == '__pycache__':
                     continue
                 module_path = os.path.join(root, d)
-                if 'module.json' in files:
+                mj = os.path.join(module_path, 'module.json')
+                if os.path.exists(mj):
                     module = Module(module_path, require_json=False)
                     if module.valid and not module.private:
                         modules.append(module)
@@ -131,7 +132,7 @@ def install(url: str, modules_dir: str, upgrade: bool = False) -> None:
     
     for module in modules:
         module_path = os.path.join(modules_dir, module.id)
-        if os.listdir(module_path):
+        if os.path.isdir(module_path):
             if not upgrade:
                 print(f"Module {module.id} already exists.")
                 continue

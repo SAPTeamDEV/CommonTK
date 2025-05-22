@@ -22,3 +22,5 @@ if __name__ == '__main__':
         host._install_sdk()
 
     host.dispatch(args, unknown)
+    
+    config.pybite.download.cleanup_temp_folders()

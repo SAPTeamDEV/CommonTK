@@ -70,7 +70,7 @@ def install(url: str, modules_dir: str, upgrade: bool = False) -> None:
     if temp_id.lower().endswith('.zip'):
         temp_id = temp_id[:-4]
         
-    temp_dir = os.path.join(download._create_temp_folder(), temp_id)
+    temp_dir = os.path.join(download.create_temp_folder(), temp_id)
     os.makedirs(temp_dir, exist_ok=True)
     
     download.download_folder(url, temp_dir)
@@ -112,7 +112,10 @@ def install(url: str, modules_dir: str, upgrade: bool = False) -> None:
         for f, src in module.files.items():
             dest = os.path.join(module_path, f)
             shutil.copy2(src, dest)
-    print(f"Module {module.id} installed successfully.")
+        print(f"Module {module.id} installed successfully.")
+    
+    if not modules:
+        print(f"No valid modules found in {temp_dir}.")
             
 def uninstall(module: Module):
     """

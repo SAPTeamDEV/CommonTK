@@ -162,8 +162,8 @@ class Host:
             usage=self.argparser_usage.replace('command', 'install') + ' [source]',
         )
         
-        install_parser.add_argument('source', nargs='?', help='Github directory URL or local directory or zip file containing one or more modules')
-        list_parser.add_argument('-u', '--upgrade', action='store_true', help='Upgrade existing modules')
+        install_parser.add_argument('source', help='Github directory URL or local directory or zip file containing one or more modules')
+        install_parser.add_argument('-u', '--upgrade', action='store_true', default=False, help='Upgrade existing modules')
         self.register_handler('install', handlers.handle_bite_install)
 
         # Register run command only if bite.proj exists

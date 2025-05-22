@@ -1,4 +1,6 @@
+import concurrent.futures
 import os
+import re
 import zipfile
 import tempfile
 import time
@@ -6,28 +8,31 @@ import shutil
 from urllib.parse import urlparse
 import uuid
 from typing import Optional
+import multiprocessing
+
+import concurrent
 
 CACHE_DURATION = 7200  # seconds
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", None)
 _temp_folders: list[str] = []
 
-def _get_temp_base() -> str:
+def get_temp_base() -> str:
     base = os.path.join(tempfile.gettempdir(), "pybite")
     os.makedirs(base, exist_ok=True)
     return base
 
-def _create_temp_folder() -> str:
-    folder = os.path.join(_get_temp_base(), str(uuid.uuid4()))
+def create_temp_folder() -> str:
+    folder = os.path.join(get_temp_base(), str(uuid.uuid4()))
     os.makedirs(folder, exist_ok=True)
     _temp_folders.append(folder)
     return folder
 
-def _cleanup_temp_folders() -> None:
+def cleanup_temp_folders() -> None:
     for folder in _temp_folders:
         if os.path.isdir(folder):
             shutil.rmtree(folder, ignore_errors=True)
     _temp_folders.clear()
-    base = _get_temp_base()
+    base = get_temp_base()
     now = time.time()
     for fname in os.listdir(base):
         fpath = os.path.join(base, fname)
@@ -82,7 +87,7 @@ def _is_local_path(path: str) -> bool:
         return False
     return True
 
-def is_dir_empty(path: str) -> bool:
+def _is_dir_empty(path: str) -> bool:
     """
     Return True if the directory at 'path' is empty (no files or subdirectories).
     """
@@ -92,13 +97,13 @@ def _copy_local_folder(src: str, dest: str) -> None:
     if not os.path.isdir(src):
         raise ValueError(f"Local path does not exist or is not a directory: {src}")
     # Allow if dest does not exist or exists and is empty
-    if os.path.exists(dest) and not is_dir_empty(dest):
+    if os.path.exists(dest) and not _is_dir_empty(dest):
         raise ValueError(f"Destination folder '{dest}' already exists and is not empty.")
     shutil.copytree(src, dest, dirs_exist_ok=True)
 
 def _print_progress(filename: str, downloaded: int, total: int) -> None:
     if total:
-        percent = downloaded * 100 // total
+        percent = min(100, downloaded * 100 // total)
         print(f"\rDownloading {filename}: {percent}%", end="", flush=True)
 
 def _extract_folder_from_github_zip(zip_path: str, folder_path: str, dest_dir: str, repo: str, branch: str) -> None:
@@ -118,29 +123,97 @@ def _extract_folder_from_github_zip(zip_path: str, folder_path: str, dest_dir: s
                 with z.open(member) as src, open(target, 'wb') as dst:
                     dst.write(src.read())
 
-def _download_github_api(owner: str, repo: str, branch: str, folder_path: str, dest_dir: str) -> None:
+def _has_requests_lib() -> bool:
+    """
+    Return True if the 'requests' library is available, False otherwise. Caches the result.
+    """
+    if not hasattr(_has_requests_lib, "_result"):
+        try:
+            import requests  # noqa
+            _has_requests_lib._result = True
+        except ImportError:
+            _has_requests_lib._result = False
+    return _has_requests_lib._result
+
+def _build_github_auth_header(token: str) -> str:
+    """
+    Return the correct Authorization header value for the given token.
+    - Classic PAT: 40 hex chars  -> "token <token>"
+    - Fine-grained / OAuth: JWT  -> "Bearer <token>"
+    """
+    token = token.strip()
+    # Match 40 lowercase hex digits
+    if re.fullmatch(r"[0-9a-f]{40}", token):
+        return f"token {token}"
+    # Match JWT: three base64url segments
+    if re.fullmatch(r"[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+", token):
+        return f"Bearer {token}"
+    # Fallback: assume bearer if it starts with 'v1.' or contains dots
+    if token.startswith("v1.") or "." in token:
+        return f"Bearer {token}"
+    # Last resort: default to classic
+    return f"token {token}"
+
+def _github_api_request(url: str, headers: Optional[dict] = None, token: Optional[str] = None) -> dict:
+    """
+    Perform a GitHub API GET request and return the parsed JSON response.
+    Raises ImportError if requests is not available.
+    Allows setting a custom header and/or token.
+    """
+    if not _has_requests_lib():
+        raise ImportError("The 'requests' library is required for GitHub API requests.")
     import requests
-    headers = {'Accept': 'application/vnd.github.v3+json'}
-    if GITHUB_TOKEN:
-        headers['Authorization'] = f"token {GITHUB_TOKEN}"
+    final_headers = {'Accept': 'application/vnd.github.v3+json'}
+    github_api = "https://api.github.com"
+    if url.startswith("/"):
+        url = github_api + url
+    if token is None:
+        token = GITHUB_TOKEN
+    if token:
+        final_headers['Authorization'] = _build_github_auth_header(token)
+    if headers:
+        final_headers.update(headers)
+    resp = requests.get(url, headers=final_headers)
+    resp.raise_for_status()
+    return resp.json()
+
+def _download_github_api(owner: str, repo: str, branch: str, folder_path: str, dest_dir: str) -> None:
+    max_workers = multiprocessing.cpu_count()
+    threadpool = concurrent.futures.ThreadPoolExecutor(max_workers=max_workers)
+    downloaded = []
+    requested = 0
+
     def _download_dir(path: str, dest: str) -> None:
         os.makedirs(dest, exist_ok=True)
-        api_url = f"https://api.github.com/repos/{owner}/{repo}/contents/{path}?ref={branch}" if path else f"https://api.github.com/repos/{owner}/{repo}/contents?ref={branch}"
-        r = requests.get(api_url, headers=headers)
-        r.raise_for_status()
-        items = r.json()
+        api_url = f"/repos/{owner}/{repo}/contents/{path}?ref={branch}" if path else f"/repos/{owner}/{repo}/contents?ref={branch}"
+        print(f"Getting informations from: {api_url}")
+        items = _github_api_request(api_url)
         for item in items:
             if item['type'] == 'file':
-                file_dest = os.path.join(dest, item['name'])
-                print(f"Downloading file {item['path']}")
-                download_file(item['download_url'], file_dest)
+                nonlocal requested
+                threadpool.submit(_download_file_from_github, dest, item)
+                requested += 1
             elif item['type'] == 'dir':
                 _download_dir(item['path'], os.path.join(dest, item['name']))
+
+    def _download_file_from_github(dest, item):
+        file_dest = os.path.join(dest, item['name'])
+        download_file(item['download_url'], file_dest, show_progress=False)
+        print(f"Downloaded {item['path']}")
+        downloaded.append(file_dest)
+
     _download_dir(folder_path, dest_dir)
+
+    threadpool.shutdown(wait=True)
+    
+    print(f"Downloaded {len(downloaded)} of {requested} files.")
+    
+    if requested > 0 and len(downloaded) != requested:
+        raise Exception("Partial download")
 
 def _download_github_zip(owner: str, repo: str, branch: str, folder_path: str, dest_dir: str) -> None:
     zip_url = f"https://github.com/{owner}/{repo}/archive/{branch}.zip"
-    base = _get_temp_base()
+    base = get_temp_base()
     cache_name = f"github_{owner}_{repo}_{branch}.zip"
     cache_path = os.path.join(base, cache_name)
     if os.path.exists(cache_path) and (time.time() - os.path.getmtime(cache_path)) < CACHE_DURATION:
@@ -151,16 +224,27 @@ def _download_github_zip(owner: str, repo: str, branch: str, folder_path: str, d
     print(f"Extracting '{folder_path}' into '{dest_dir}'")
     _extract_folder_from_github_zip(cache_path, folder_path, dest_dir, repo, branch)
 
+def _get_github_api_limit() -> int:
+    """
+    Get the current GitHub API rate limit.
+    Returns the remaining requests allowed in the current rate limit window.
+    """
+    result = _github_api_request("/rate_limit")
+    if 'rate' in result and 'remaining' in result['rate']:
+        return result['rate']['remaining']
+    return 0
+
 def _download_github_folder(url: str, dest_dir: str) -> None:
-    if os.path.exists(dest_dir) and not is_dir_empty(dest_dir):
+    if os.path.exists(dest_dir) and not _is_dir_empty(dest_dir):
         raise ValueError(f"Destination folder '{dest_dir}' is not empty.")
     owner, repo, branch, folder_path = _parse_github_url(url)
-    try:
-        import requests  # noqa
+    if _has_requests_lib and (rate := _get_github_api_limit()) > 10:
+        print(f"Downloading using GitHub API (remaining rate limit: {rate})...")
         _download_github_api(owner, repo, branch, folder_path, dest_dir)
-    except ImportError:
-        print("requests library not found, downloading the zip file instead.")
+    else:
+        print("Downloading repository zip file...")
         _download_github_zip(owner, repo, branch, folder_path, dest_dir)
+
     print("Download complete.")
 
 def _extract_zip(zip_path: str, dest_dir: str) -> None:
@@ -212,7 +296,7 @@ def download_file(url: str, dest_path: str, show_progress: bool = True) -> None:
             if show_progress and total:
                 print()
 
-def is_url(path: str) -> bool:
+def _is_url(path: str) -> bool:
     """
     Return True if the given path is a URL (http, https, file, etc).
     """
@@ -229,10 +313,10 @@ def download_folder(src: str, dest_dir: str) -> None:
     Raises:
         ValueError: If the destination exists and is not empty, or if the source is invalid.
     """
-    if os.path.exists(dest_dir) and not is_dir_empty(dest_dir):
+    if os.path.exists(dest_dir) and not _is_dir_empty(dest_dir):
         raise ValueError(f"Destination folder '{dest_dir}' is not empty.")
     if _is_local_path(src):
-        if is_url(src):
+        if _is_url(src):
             src = _file_url_to_path(src)
         if os.path.isdir(src):
             _copy_local_folder(src, dest_dir)

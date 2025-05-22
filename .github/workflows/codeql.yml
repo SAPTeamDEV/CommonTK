@@ -90,7 +90,7 @@ jobs:
       name: Build
       shell: bash
       run: |
-        ./build.sh bite restore
+        ./build.sh run restore
         ./build.sh restore
         ./build.sh build -c Release --no-restore
 

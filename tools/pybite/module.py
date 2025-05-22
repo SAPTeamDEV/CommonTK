@@ -16,8 +16,13 @@ class Module:
         self.path = path
         self.id: str = os.path.basename(path)
         self.name: Optional[str] = None
+        self.version: Optional[str] = None
         self.description: Optional[str] = None
+        self.author: Optional[str] = None
+        self.private: bool = False
+        self.update_url: Optional[str] = None
         self.module_info: Optional[Dict[str, Any]] = None
+        
         try:
             self._load_json()
         except:
@@ -37,7 +42,11 @@ class Module:
             if data.get('id', None) is not None:
                 self.id = data['id']
             self.name = data.get('name')
+            self.version = data.get('version')
             self.description = data.get('description')
+            self.author = data.get('author')
+            self.private = data.get('private', False)
+            self.update_url = data.get('update_url')
             self.module_info = data
 
     @property
@@ -58,6 +67,29 @@ class Module:
             return False
         folders = {f: os.path.join(self.path, f) for f in os.listdir(self.path) if os.path.isdir(os.path.join(self.path, f)) and f != '__pycache__'}
         return len(folders) == 0
+    
+    @property
+    def updatable(self):
+        return self.valid and self.update_url is not None and not self.private
+    
+    def update_info(self):
+        json_file_path = os.path.join(self.path, 'module.json')
+        
+        if not os.path.exists(json_file_path):
+            data: Dict[str, Any] = {}
+        else:
+            with open(json_file_path, 'r') as json_file:
+                data: Dict[str, Any] = json.load(json_file)
+        
+        data['name'] = self.name
+        data['version'] = self.version
+        data['description'] = self.description
+        data['author'] = self.author
+        data['private'] = self.private
+        data['update_url'] = self.update_url
+
+        with open(json_file_path, 'w') as json_file:
+            json.dump(data, json_file, indent=4)
 
 def install(url: str, modules_dir: str, upgrade: bool = False) -> None:
     """
@@ -76,8 +108,8 @@ def install(url: str, modules_dir: str, upgrade: bool = False) -> None:
     download.download_folder(url, temp_dir)
     
     # detect directory structure
-    modules = []
-    
+    modules: list[Module] = []
+
     def _get_modules(path: str) -> None:
         for root, dirs, files in os.walk(path):
             for d in dirs:
@@ -86,9 +118,11 @@ def install(url: str, modules_dir: str, upgrade: bool = False) -> None:
                 module_path = os.path.join(root, d)
                 if 'module.json' in files:
                     module = Module(module_path, require_json=False)
-                    if module.valid:
+                    if module.valid and not module.private:
                         modules.append(module)
                         print(f"Found module: {module.id}")
+                    elif module.private:
+                        print(f"Skipping private module: {module.id}")
                     else:
                         print(f"Skipping invalid module: {module.id}")
 
@@ -107,6 +141,9 @@ def install(url: str, modules_dir: str, upgrade: bool = False) -> None:
                 continue
             uninstall(old_module)
         print(f"Installing module {module.id}...")
+        module.update_url = parsed_url.geturl()
+        module.update_info()
+        
         if not os.path.exists(module_path):
             os.makedirs(module_path, exist_ok=True)
         for f, src in module.files.items():

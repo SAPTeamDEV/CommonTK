@@ -1,7 +1,0 @@
-<Project>
-  <Target Name="Modules">
-    <Message Text="Loaded modules:" Importance="High" />
-    <Message Text="%(BiteModules.Identity) - %(BiteModules.Description)" Importance="High" />
-  </Target>
-  
-</Project>

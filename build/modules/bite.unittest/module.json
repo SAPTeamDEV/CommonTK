@@ -1,0 +1,8 @@
+{
+    "id": "bite.unitest",
+    "name": "Unit Test Template",
+    "version": "1.0.0",
+    "description": "Optimize projects for unit testing",
+    "author": "Aeliux",
+    "private": false
+}

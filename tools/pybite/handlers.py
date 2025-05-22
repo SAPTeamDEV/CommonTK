@@ -67,12 +67,19 @@ def handle_bite_list(host: Host, args: argparse.Namespace, extras: List[str]) ->
         else:
             print(f"  {module.id}")
             print(f"    Name: {module.name}")
+            print(f"    Version: {module.version}")
             print(f"    Description: {module.description}")
+            print(f"    Author: {module.author}")
+            print(f"    Updateable: {module.updatable}")
+            if module.updatable:
+                print(f"    Update URL: {module.update_url}")
             print(f"    Path: {module.path}")
-            files = module.files
-            print(f"    Files: {len(files)}")
-            for file in files:
-                print(f"      - {file}")
+            
+            if False:
+                files = module.files
+                print(f"    Files: {len(files)}")
+                for file in files:
+                    print(f"      - {file}")
             print()
 
 def handle_bite_install(host: Host, args: argparse.Namespace, extras: List[str]) -> None:

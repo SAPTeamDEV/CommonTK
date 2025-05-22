@@ -1,0 +1,8 @@
+{
+    "id": "bite.core",
+    "name": "Bite Extension Core",
+    "version": "1.0.0",
+    "description": "Default Targets for bite.core",
+    "author": "Aeliux",
+    "private": false
+}

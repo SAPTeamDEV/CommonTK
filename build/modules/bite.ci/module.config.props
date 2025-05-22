@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project>
-  <ItemGroup>
-    <BiteModules Include="bite.ci" Description="Optimizations for CI build, currently supports github actions" />
-  </ItemGroup>
-</Project>

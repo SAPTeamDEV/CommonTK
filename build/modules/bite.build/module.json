@@ -1,0 +1,8 @@
+{
+    "id": "bite.build",
+    "name": "Bite Build Optimization",
+    "version": "1.0.0",
+    "description": "Speed up debug builds and harden release builds",
+    "author": "Aeliux",
+    "private": false
+}

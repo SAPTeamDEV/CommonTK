@@ -1,0 +1,8 @@
+{
+    "id": "bite.ci",
+    "name": "Continuous Integration Optimizer",
+    "version": "1.0.0",
+    "description": "Optimizations for CI build, currently supports github actions",
+    "author": "Aeliux",
+    "private": false
+}

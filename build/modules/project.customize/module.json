@@ -1,0 +1,8 @@
+{
+    "id": "project.customize",
+    "name": "Project Customization",
+    "version": "1.0.0",
+    "description": "Customizations for the project",
+    "author": "Aeliux",
+    "private": true
+}

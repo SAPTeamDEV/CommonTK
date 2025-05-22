@@ -1,0 +1,8 @@
+{
+    "id": "bite.gitversioning",
+    "name": "Git Versioning",
+    "version": "1.0.0",
+    "description": "Enable git versioning with nbgv",
+    "author": "Aeliux",
+    "private": false
+}

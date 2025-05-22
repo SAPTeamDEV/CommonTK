@@ -166,6 +166,16 @@ class Host:
         install_parser.add_argument('-u', '--upgrade', action='store_true', default=False, help='Upgrade existing modules')
         self.register_handler('install', handlers.handle_bite_install)
 
+        update_parser = subparsers.add_parser(
+            'update',
+            help='Update bite modules',
+            usage=self.argparser_usage.replace('command', 'update') + ' [module ...]',
+        )
+
+        update_parser.add_argument('modules', nargs='*', help='Module IDs to update')
+        update_parser.add_argument('-a', '--all', action='store_true', default=False, help='Update all eligible modules')
+        self.register_handler('update', handlers.handle_bite_update)
+
         # Register run command only if bite.proj exists
         if os.path.isfile(self.BITE_PROJ_PATH):
             run_parser = subparsers.add_parser(

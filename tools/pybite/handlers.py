@@ -84,7 +84,7 @@ def handle_bite_list(host: Host, args: argparse.Namespace, extras: List[str]) ->
 
 def handle_bite_install(host: Host, args: argparse.Namespace, extras: List[str]) -> None:
     """
-    Handle the 'install' command, installing a module.
+    Handle the 'install' command, installing module.
     """
     if extras:
         host.get_argparser().error(f"Invalid arguments: {extras}")
@@ -95,3 +95,40 @@ def handle_bite_install(host: Host, args: argparse.Namespace, extras: List[str])
     upgrade = args.upgrade
     
     module.install(source, host.MODULES_DIR, upgrade=upgrade)
+
+def handle_bite_update(host: Host, args: argparse.Namespace, extras: List[str]) -> None:
+    """
+    Handle the 'update' command, updating module.
+    """
+    
+    if extras:
+        host.get_argparser().error(f"Invalid arguments: {extras}")
+    
+    from . import module
+    
+    modules = getattr(args, 'modules', [])
+    all_modules = args.all
+    
+    sources: List[str] = []
+    hmods = host.get_modules()
+    if all_modules:
+        for mod in hmods.values():
+            if mod.updatable:
+                sources.append(mod.update_url)
+    elif modules:
+        for id in modules:
+            mod = hmods.get(id)
+            if mod is None:
+                host.get_argparser().error(f"Module '{id}' not found.")
+            if mod.updatable:
+                sources.append(mod.update_url)
+            else:
+                host.get_argparser().error(f"Module '{id}' is not updatable.")
+    else:
+        host.get_argparser().error("No modules specified for update.")
+
+    for source in sources:
+        module.install(source, host.MODULES_DIR, upgrade=True)
+    
+    if not sources:
+        print("No modules to update.")

@@ -139,6 +139,16 @@ def install(url: str, modules_dir: str, upgrade: bool = False) -> None:
             if not old_module.valid:
                 print(f"Can't update module {module.id}, invalid structure.")
                 continue
+            # Compare versions and skip update if not newer
+            if old_module.version and module.version:
+                def parse_version(v):
+                    return tuple(int(x) for x in v.split('.'))
+                try:
+                    if parse_version(module.version) <= parse_version(old_module.version):
+                        print(f"Current version of {module.id} {old_module.version} is newer or equal to {module.version}. Skipping update.")
+                        continue
+                except Exception as e:
+                    print(f"Error comparing versions: {e}. Proceeding with update.")
             uninstall(old_module)
         print(f"Installing module {module.id}...")
         module.update_url = parsed_url.geturl()

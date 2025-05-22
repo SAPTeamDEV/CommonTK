@@ -201,6 +201,15 @@ class Host:
         self.argparser = parser
         return self.argparser
 
+    def get_subparser(self)-> argparse._SubParsersAction:
+        """
+        Get the subparser to add new commands.
+        """
+        self.get_argparser()
+        if self._subparsers_action is None:
+            raise RuntimeError("Subparsers not found")
+        return self._subparsers_action
+
     def add_command(
         self,
         name: str,
@@ -210,7 +219,8 @@ class Host:
         arguments: Optional[List[Dict[str, Any]]] = None,
     ) -> None:
         """
-        Register a new subcommand for extensibility (for modules/plugins).
+        Register a new subcommand and its handler.
+        This allows for extensible commands to be added to the CLI.
 
         Args:
             name: The command name (e.g., 'deploy').
@@ -219,10 +229,8 @@ class Host:
             help: Help string for the command.
             arguments: List of dicts with keys for add_argument (optional).
         """
-        self.get_argparser()
-        subparsers = self._subparsers_action
-        if subparsers is None:
-            raise RuntimeError("Subparsers not found in parser")
+        subparsers = self.get_subparser()
+        
         sub = subparsers.add_parser(name, help=help, description=description or help, epilog=self.argparser_epilog)
         if arguments:
             for arg in arguments:

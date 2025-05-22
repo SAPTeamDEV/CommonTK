@@ -132,3 +132,29 @@ def handle_bite_update(host: Host, args: argparse.Namespace, extras: List[str]) 
     
     if not sources:
         print("No modules to update.")
+
+def handle_bite_uninstall(host: Host, args: argparse.Namespace, extras: List[str]) -> None:
+    """
+    Handle the 'uninstall' command, uninstalling module.
+    """
+
+    if extras:
+        host.get_argparser().error(f"Invalid arguments: {extras}")
+    
+    from . import module
+    
+    modules = getattr(args, 'modules', [])
+    force = args.force
+    
+    mods: List[module.Module] = []
+    if modules:
+        hmods = host.get_modules()
+        for id in modules:
+            mod = hmods.get(id)
+            if mod is None:
+                host.get_argparser().error(f"Module '{id}' not found.")
+    else:
+        host.get_argparser().error("No modules specified for uninstall.")
+
+    for mod in mods:
+        module.uninstall(mod, force=force)

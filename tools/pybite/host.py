@@ -176,6 +176,16 @@ class Host:
         update_parser.add_argument('-a', '--all', action='store_true', default=False, help='Update all eligible modules')
         self.register_handler('update', handlers.handle_bite_update)
 
+        uninstall_parser = subparsers.add_parser(
+            'uninstall',
+            help='Uninstall bite module',
+            usage=self.argparser_usage.replace('command', 'uninstall') + ' [module ...]',
+        )
+
+        uninstall_parser.add_argument('modules', nargs='*', help='Module IDs to uninstall')
+        uninstall_parser.add_argument('-f', '--force', action='store_true', default=False, help='Force uninstall even if module has invalid statructure. By default, modules with invalid structure are not uninstalled to prevent data loss')
+        self.register_handler('uninstall', handlers.handle_bite_uninstall)
+
         # Register run command only if bite.proj exists
         if os.path.isfile(self.BITE_PROJ_PATH):
             run_parser = subparsers.add_parser(

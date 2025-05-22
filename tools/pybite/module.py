@@ -164,14 +164,16 @@ def install(url: str, modules_dir: str, upgrade: bool = False) -> None:
     if not modules:
         print(f"No valid modules found in {temp_dir}.")
             
-def uninstall(module: Module):
+def uninstall(module: Module, force: bool = False) -> None:
     """
     Uninstall a module.
     """
     print(f"Uninstalling module {module.id}...")
-    if not module.valid:
+    if not force and not module.valid:
         raise ValueError(f"Module {module.id} is not valid.")
+    
     if not os.path.exists(module.path):
         raise ValueError(f"Module path does not exist: {module.path}")
+    
     shutil.rmtree(module.path)
     print(f"Module {module.id} uninstalled successfully.")

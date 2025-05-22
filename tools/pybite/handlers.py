@@ -153,6 +153,7 @@ def handle_bite_uninstall(host: Host, args: argparse.Namespace, extras: List[str
             mod = hmods.get(id)
             if mod is None:
                 host.get_argparser().error(f"Module '{id}' not found.")
+            mods.append(mod)
     else:
         host.get_argparser().error("No modules specified for uninstall.")
 

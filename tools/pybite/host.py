@@ -156,6 +156,16 @@ class Host:
         list_parser.add_argument('-v', '--verbose', action='store_true', help='Show verbose output')
         self.register_handler('list', handlers.handle_bite_list)
 
+        install_parser = subparsers.add_parser(
+            'install',
+            help='Install new bite module',
+            usage=self.argparser_usage.replace('command', 'install') + ' [source]',
+        )
+        
+        install_parser.add_argument('source', nargs='?', required=True, help='Github directory URL or local directory or zip file containing one or more modules')
+        list_parser.add_argument('-u', '--upgrade', action='store_true', help='Upgrade existing modules')
+        self.register_handler('install', handlers.handle_bite_install)
+
         # Register run command only if bite.proj exists
         if os.path.isfile(self.BITE_PROJ_PATH):
             run_parser = subparsers.add_parser(

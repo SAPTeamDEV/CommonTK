@@ -39,9 +39,9 @@ def _cleanup_temp_folders() -> None:
                     pass
 
 def _parse_github_url(url: str) -> tuple[str, str, str, str]:
-    if url.startswith("github://") or url.startswith("gh://"):
-        url = "https://github.com/" + url.split("://", 1)[1]
     parts = urlparse(url)
+    if parts.netloc.lower() != "github.com":
+        raise ValueError(f"URL is not a github.com URL: {url}")
     path = parts.path.strip("/").split('/')
     if len(path) < 2:
         raise ValueError(f"Invalid GitHub URL: {url}")
@@ -53,35 +53,55 @@ def _parse_github_url(url: str) -> tuple[str, str, str, str]:
         sub_path = '/'.join(path[4:]) if len(path) > 4 else ''
     return owner, repo, branch, sub_path
 
+def _file_url_to_path(url: str) -> str:
+    """
+    Convert a file:// URL to a local filesystem path.
+    """
+    parts = urlparse(url)
+    if parts.scheme.lower() != "file":
+        raise ValueError(f"Not a file URL: {url}")
+    # On Windows, parts.netloc may contain a drive letter or be empty
+    if os.name == "nt":
+        # Handle file:///C:/path or file://localhost/C:/path
+        if parts.netloc and parts.netloc != "localhost":
+            path = f"//{parts.netloc}{parts.path}"
+        else:
+            path = parts.path
+        return os.path.abspath(path.lstrip("/"))
+    else:
+        # On Unix, just join netloc and path
+        return os.path.abspath(os.path.join("/", parts.netloc, parts.path))
+
 def _is_local_path(path: str) -> bool:
     parts = urlparse(path)
+    # Support file:// URLs as local paths
+    if parts.scheme.lower() == "file":
+        _file_url_to_path(path)
+        return True
     if parts.scheme or parts.netloc:
         return False
-    if os.path.isfile(path):
-        raise ValueError(f"Local path is a file, not a directory: {path}")
     return True
+
+def is_dir_empty(path: str) -> bool:
+    """
+    Return True if the directory at 'path' is empty (no files or subdirectories).
+    """
+    return os.path.isdir(path) and not any(os.scandir(path))
 
 def _copy_local_folder(src: str, dest: str) -> None:
     if not os.path.isdir(src):
         raise ValueError(f"Local path does not exist or is not a directory: {src}")
-    if os.path.exists(dest) and os.listdir(dest):
-        raise ValueError(f"Destination folder '{dest}' is not empty.")
-    if not os.path.exists(dest):
-        shutil.copytree(src, dest)
-    else:
-        for root, dirs, files in os.walk(src):
-            rel = os.path.relpath(root, src)
-            target_root = os.path.join(dest, rel) if rel != '.' else dest
-            os.makedirs(target_root, exist_ok=True)
-            for f in files:
-                shutil.copy2(os.path.join(root, f), os.path.join(target_root, f))
+    # Allow if dest does not exist or exists and is empty
+    if os.path.exists(dest) and not is_dir_empty(dest):
+        raise ValueError(f"Destination folder '{dest}' already exists and is not empty.")
+    shutil.copytree(src, dest, dirs_exist_ok=True)
 
 def _print_progress(filename: str, downloaded: int, total: int) -> None:
     if total:
         percent = downloaded * 100 // total
         print(f"\rDownloading {filename}: {percent}%", end="", flush=True)
 
-def _extract_folder_from_zip(zip_path: str, folder_path: str, dest_dir: str, repo: str, branch: str) -> None:
+def _extract_folder_from_github_zip(zip_path: str, folder_path: str, dest_dir: str, repo: str, branch: str) -> None:
     prefix = f"{repo}-{branch}/{folder_path.rstrip('/')}/"
     with zipfile.ZipFile(zip_path) as z:
         for member in z.namelist():
@@ -129,10 +149,10 @@ def _download_github_zip(owner: str, repo: str, branch: str, folder_path: str, d
         print(f"Downloading file from {zip_url}")
         download_file(zip_url, cache_path)
     print(f"Extracting '{folder_path}' into '{dest_dir}'")
-    _extract_folder_from_zip(cache_path, folder_path, dest_dir, repo, branch)
+    _extract_folder_from_github_zip(cache_path, folder_path, dest_dir, repo, branch)
 
 def _download_github_folder(url: str, dest_dir: str) -> None:
-    if os.path.exists(dest_dir) and os.listdir(dest_dir):
+    if os.path.exists(dest_dir) and not is_dir_empty(dest_dir):
         raise ValueError(f"Destination folder '{dest_dir}' is not empty.")
     owner, repo, branch, folder_path = _parse_github_url(url)
     try:
@@ -142,6 +162,10 @@ def _download_github_folder(url: str, dest_dir: str) -> None:
         print("requests library not found, downloading the zip file instead.")
         _download_github_zip(owner, repo, branch, folder_path, dest_dir)
     print("Download complete.")
+
+def _extract_zip(zip_path: str, dest_dir: str) -> None:
+    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+        zip_ref.extractall(dest_dir)
 
 def download_file(url: str, dest_path: str, show_progress: bool = True) -> None:
     """
@@ -188,6 +212,13 @@ def download_file(url: str, dest_path: str, show_progress: bool = True) -> None:
             if show_progress and total:
                 print()
 
+def is_url(path: str) -> bool:
+    """
+    Return True if the given path is a URL (http, https, file, etc).
+    """
+    parts = urlparse(path)
+    return bool(parts.scheme)
+
 def download_folder(src: str, dest_dir: str) -> None:
     """
     Download or copy a folder from a GitHub URL or local directory to a destination directory.
@@ -198,9 +229,14 @@ def download_folder(src: str, dest_dir: str) -> None:
     Raises:
         ValueError: If the destination exists and is not empty, or if the source is invalid.
     """
-    if os.path.exists(dest_dir) and os.listdir(dest_dir):
+    if os.path.exists(dest_dir) and not is_dir_empty(dest_dir):
         raise ValueError(f"Destination folder '{dest_dir}' is not empty.")
     if _is_local_path(src):
-        _copy_local_folder(src, dest_dir)
+        if is_url(src):
+            src = _file_url_to_path(src)
+        if os.path.isdir(src):
+            _copy_local_folder(src, dest_dir)
+        elif os.path.isfile(src):
+            _extract_zip(src, dest_dir)
     else:
         _download_github_folder(src, dest_dir)

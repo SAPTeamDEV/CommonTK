@@ -69,4 +69,22 @@ def handle_bite_list(host: Host, args: argparse.Namespace, extras: List[str]) ->
             print(f"    Name: {module.name}")
             print(f"    Description: {module.description}")
             print(f"    Path: {module.path}")
+            files = module.files
+            print(f"    Files: {len(files)}")
+            for file in files:
+                print(f"      - {file}")
             print()
+
+def handle_bite_install(host: Host, args: argparse.Namespace, extras: List[str]) -> None:
+    """
+    Handle the 'install' command, installing a module.
+    """
+    if extras:
+        host.get_argparser().error(f"Invalid arguments: {extras}")
+    
+    from . import module
+    
+    source = args.source
+    upgrade = args.upgrade
+    
+    module.install(source, host.MODULES_DIR, upgrade=upgrade)

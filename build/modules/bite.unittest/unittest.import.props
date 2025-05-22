@@ -1,0 +1,3 @@
+<Project>
+  <Import Project="$(BiteModulesPath)\bite.unittest\*.special.props" Condition="'$(BiteImportUnitTestModule)'=='true'" />
+</Project>

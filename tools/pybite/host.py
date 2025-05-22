@@ -162,7 +162,7 @@ class Host:
             usage=self.argparser_usage.replace('command', 'install') + ' [source]',
         )
         
-        install_parser.add_argument('source', nargs='?', required=True, help='Github directory URL or local directory or zip file containing one or more modules')
+        install_parser.add_argument('source', nargs='?', help='Github directory URL or local directory or zip file containing one or more modules')
         list_parser.add_argument('-u', '--upgrade', action='store_true', help='Upgrade existing modules')
         self.register_handler('install', handlers.handle_bite_install)
 
@@ -175,7 +175,7 @@ class Host:
                 usage=self.argparser_usage.replace('command', 'run') + ' [target]',
             )
             run_parser.add_argument('target', nargs='?', default='help', help='bite.core target to run, default is "help"')
-            run_parser.add_argument('-l', '--list', action='store_true', help='List available targets')
+            run_parser.add_argument('-l', '-ts', '--list', action='store_true', help='List available targets')
             self.register_handler('run', handlers.handle_bite_run)
 
         self.argparser = parser

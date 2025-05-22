@@ -2,7 +2,7 @@
   <Target Name="Help">
     <Message Text="
 You could use this project file to invoke targets registered by modules
-To get a full list of registered targets, use -pp argument"
+To get a full list of registered targets, use -ts argument"
 	Importance="High" />
   </Target>
   

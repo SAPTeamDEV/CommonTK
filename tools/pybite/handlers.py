@@ -3,6 +3,7 @@ from typing import List
 
 from .msbuild import MSBuildTarget
 from .host import Host
+from .globals import Globals
 
 def handle_dotnet_cli(host: Host, args: argparse.Namespace, extras: List[str]) -> None:
     """
@@ -96,6 +97,10 @@ def handle_bite_install(host: Host, args: argparse.Namespace, extras: List[str])
     source = args.source
     upgrade = args.upgrade
     override = args.override
+    verbose = args.verbose
+
+    if verbose:
+        Globals.VERBOSE = True
 
     module.install(source, host.MODULES_DIR, upgrade=upgrade, override=override)
 
@@ -112,6 +117,7 @@ def handle_bite_update(host: Host, args: argparse.Namespace, extras: List[str]) 
     modules = getattr(args, 'modules', [])
     all_modules = args.all
     force = args.force
+    verbose = args.verbose
     
     sources: List[str] = []
     hmods = host.get_modules()
@@ -130,6 +136,9 @@ def handle_bite_update(host: Host, args: argparse.Namespace, extras: List[str]) 
                 host.get_argparser().error(f"Module '{id}' is not updatable.")
     else:
         host.get_argparser().error("No modules specified for update.")
+
+    if verbose:
+        Globals.VERBOSE = True
 
     for source in set(sources):
         module.install(source, host.MODULES_DIR, upgrade=True, override=force)

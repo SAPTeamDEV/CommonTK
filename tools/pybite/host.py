@@ -166,6 +166,7 @@ class Host:
         install_parser.add_argument('source', help='Github directory URL or local directory or zip file containing one or more modules')
         install_parser.add_argument('-u', '--upgrade', action='store_true', default=False, help='Upgrade existing modules')
         install_parser.add_argument('-o', '--override', action='store_true', default=False, help='Override existing modules, even if the existing module has invalid structure')
+        install_parser.add_argument('-v', '--verbose', action='store_true', default=False, help='Show verbose output')
         self.register_handler('install', handlers.handle_bite_install)
 
         update_parser = subparsers.add_parser(
@@ -177,6 +178,7 @@ class Host:
         update_parser.add_argument('modules', nargs='*', help='Module IDs to update')
         update_parser.add_argument('-a', '--all', action='store_true', default=False, help='Update all eligible modules')
         update_parser.add_argument('-f', '--force', action='store_true', default=False, help='Force update even if module at the latest version or has invalid structure.')
+        update_parser.add_argument('-v', '--verbose', action='store_true', default=False, help='Show verbose output')
         self.register_handler('update', handlers.handle_bite_update)
 
         uninstall_parser = subparsers.add_parser(

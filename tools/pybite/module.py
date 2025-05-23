@@ -6,6 +6,7 @@ from typing import Optional, Dict, Any
 from urllib.parse import urlparse
 
 from . import download
+from .globals import Globals
 
 class Module:
     """
@@ -112,17 +113,23 @@ def install(url: str, modules_dir: str, upgrade: bool = False, override: bool = 
     modules: list[Module] = []
 
     def _get_modules(path: str) -> None:
+        if Globals.VERBOSE:
+            print(f"Searching for modules in {path}...")
+
         # Recursively crawl directories to find modules
         mj = os.path.join(path, 'module.json')
         if os.path.exists(mj):
             module = Module(path, require_json=False)
             if module.valid and not module.private:
                 modules.append(module)
-                print(f"Found module: {module.current}")
+                if Globals.VERBOSE:
+                    print(f"Found module: {module.current}")
             elif module.private:
-                print(f"Skipping private module: {module.id}")
+                if Globals.VERBOSE:
+                    print(f"Skipping private module: {module.id}")
             else:
-                print(f"Skipping invalid module: {module.id}")
+                if Globals.VERBOSE:
+                    print(f"Skipping invalid module: {module.id}")
             return  # Stop recursion if module.json found at this level
 
         for entry in os.listdir(path):
@@ -132,14 +139,13 @@ def install(url: str, modules_dir: str, upgrade: bool = False, override: bool = 
             if os.path.isdir(entry_path):
                 _get_modules(entry_path)
 
-    print(f"Searching for modules in {temp_dir}...")
     _get_modules(temp_dir)
     
     # detect modules with the same id
     module_ids = [module.id for module in modules]
     duplicate_ids = {id for id in module_ids if module_ids.count(id) > 1}
     if duplicate_ids:
-        print(f"Found duplicate module IDs: {duplicate_ids}")
+        raise ValueError(f"Duplicate module IDs found: {', '.join(duplicate_ids)}")
 
     for module in modules:
         module_path = os.path.join(modules_dir, module.id)
@@ -175,6 +181,8 @@ def install(url: str, modules_dir: str, upgrade: bool = False, override: bool = 
             os.makedirs(module_path, exist_ok=True)
         for f, src in module.files.items():
             dest = os.path.join(module_path, f)
+            if Globals.VERBOSE:
+                print(f"Copying {src} to {dest}")
             shutil.copy2(src, dest)
         print(f"Module {module.current} installed successfully.")
 

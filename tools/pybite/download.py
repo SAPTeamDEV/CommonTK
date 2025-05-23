@@ -15,6 +15,7 @@ import concurrent
 CACHE_DURATION = 7200  # seconds
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", None)
 _temp_folders: list[str] = []
+_has_requests_lib_result: Optional[bool] = None
 
 def get_temp_base() -> str:
     base = os.path.join(tempfile.gettempdir(), "pybite")
@@ -127,13 +128,14 @@ def _has_requests_lib() -> bool:
     """
     Return True if the 'requests' library is available, False otherwise. Caches the result.
     """
-    if not hasattr(_has_requests_lib, "_result"):
+    global _has_requests_lib_result
+    if _has_requests_lib_result is None:
         try:
             import requests  # noqa
-            _has_requests_lib._result = True
+            _has_requests_lib_result = True
         except ImportError:
-            _has_requests_lib._result = False
-    return _has_requests_lib._result
+            _has_requests_lib_result = False
+    return _has_requests_lib_result
 
 def _build_github_auth_header(token: str) -> str:
     """
@@ -227,8 +229,10 @@ def _download_github_zip(owner: str, repo: str, branch: str, folder_path: str, d
 def _get_github_api_limit() -> int:
     """
     Get the current GitHub API rate limit.
-    Returns the remaining requests allowed in the current rate limit window.
+    Returns the remaining requests allowed in the current rate limit window or 0 if requests library is not available.
     """
+    if not _has_requests_lib():
+        return 0
     result = _github_api_request("/rate_limit")
     if 'rate' in result and 'remaining' in result['rate']:
         return result['rate']['remaining']

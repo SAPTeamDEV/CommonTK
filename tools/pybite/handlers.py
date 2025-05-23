@@ -157,5 +157,5 @@ def handle_bite_uninstall(host: Host, args: argparse.Namespace, extras: List[str
     else:
         host.get_argparser().error("No modules specified for uninstall.")
 
-    for mod in mods:
+    for mod in set(mods):
         module.uninstall(mod, force=force)

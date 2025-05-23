@@ -8,29 +8,29 @@ import uuid
 import multiprocessing
 from urllib.parse import urlparse
 from typing import Optional
-
 from .globals import Globals
 
-CACHE_DURATION = 7200  # seconds
+CACHE_DURATION = 7200
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", None)
 GH_URL_REGEX = re.compile(r"^gh:([^/]+)/([^/]+)(?:/([^/]+))?(?:/(.*))?$")
 _temp_folders: list[str] = []
 _has_requests_lib_result: Optional[bool] = None
 
-# === Path and URL Helpers ===
-
 def _is_url(path: str) -> bool:
-    """Return True if the given path is a URL (http, https, file, etc)."""
+    """
+    Internal: Returns True if the given path is a URL (http, https, file, etc).
+    """
     if os.name == "nt":
         if re.match(r"^[a-zA-Z]:[\\/]", path) or path.startswith("\\\\"):
             return False
     if os.name != "nt" and path.startswith("/"):
         return False
-    parts = urlparse(path)
-    return bool(parts.scheme)
+    return bool(urlparse(path).scheme)
 
 def _is_local_path(path: str) -> bool:
-    """Return True if the path is a local filesystem path (absolute or relative)."""
+    """
+    Internal: Returns True if the path is a local filesystem path (absolute or relative).
+    """
     if path.startswith("file://"):
         return True
     if os.name == "nt":
@@ -39,12 +39,13 @@ def _is_local_path(path: str) -> bool:
     if os.name != "nt" and path.startswith("/"):
         return True
     parts = urlparse(path)
-    if not parts.scheme and not parts.netloc:
-        return True
-    return False
+    return not parts.scheme and not parts.netloc
 
 def _file_url_to_path(url: str) -> str:
-    """Convert a file:// URL to a local filesystem path."""
+    """
+    Internal: Converts a file:// URL to a local filesystem path.
+    Raises ValueError if the URL is not a file URL.
+    """
     parts = urlparse(url)
     if parts.scheme.lower() != "file":
         raise ValueError(f"Not a file URL: {url}")
@@ -60,10 +61,15 @@ def _file_url_to_path(url: str) -> str:
         return os.path.abspath(os.path.join("/", parts.netloc, parts.path))
 
 def _is_dir_empty(path: str) -> bool:
-    """Return True if the directory at 'path' is empty."""
+    """
+    Internal: Returns True if the directory at 'path' is empty.
+    """
     return os.path.isdir(path) and not any(os.scandir(path))
 
 def _copy_local_folder(src: str, dest: str) -> None:
+    """
+    Internal: Copies a local folder from src to dest, raising if dest is not empty.
+    """
     print(f"Copying local folder from '{src}' to '{dest}'")
     if not os.path.isdir(src):
         raise ValueError(f"Local path does not exist or is not a directory: {src}")
@@ -72,29 +78,42 @@ def _copy_local_folder(src: str, dest: str) -> None:
     shutil.copytree(src, dest, dirs_exist_ok=True)
 
 def _extract_zip(zip_path: str, dest_dir: str) -> None:
+    """
+    Internal: Extracts a zip file to the destination directory.
+    """
     print(f"Extracting '{zip_path}' into '{dest_dir}'")
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
         zip_ref.extractall(dest_dir)
 
 def _print_progress(filename: str, downloaded: int, total: int) -> None:
+    """
+    Internal: Prints download progress for a file.
+    """
     if total:
         percent = min(100, downloaded * 100 // total)
         print(f"\rDownloading {filename}: {percent}%", end="", flush=True)
 
-# === Temp Folder Management ===
-
 def get_temp_base() -> str:
+    """
+    Returns the base directory for temporary folders used by pybite.
+    """
     base = os.path.join(tempfile.gettempdir(), "pybite")
     os.makedirs(base, exist_ok=True)
     return base
 
 def create_temp_folder() -> str:
+    """
+    Creates and returns a new temporary folder for downloads.
+    """
     folder = os.path.join(get_temp_base(), str(uuid.uuid4()))
     os.makedirs(folder, exist_ok=True)
     _temp_folders.append(folder)
     return folder
 
 def cleanup_temp_folders() -> None:
+    """
+    Deletes all tracked temporary folders and cleans up old cached zip files.
+    """
     for folder in _temp_folders:
         if os.path.isdir(folder):
             shutil.rmtree(folder, ignore_errors=True)
@@ -105,22 +124,19 @@ def cleanup_temp_folders() -> None:
         fpath = os.path.join(base, fname)
         if fname.endswith(".zip") and os.path.isfile(fpath):
             if now - os.path.getmtime(fpath) > CACHE_DURATION:
-                try:
-                    os.remove(fpath)
-                except Exception:
-                    pass
+                try: os.remove(fpath)
+                except Exception: pass
 
-# === GitHub Helpers ===
-
-def _parse_github_url(url: str) -> tuple[str, str, str, str]:
+def _parse_github_url(url: str):
+    """
+    Internal: Parses a GitHub URL or gh: shortcut and returns (owner, repo, branch, sub_path).
+    Raises ValueError if the URL is invalid.
+    """
     if url.startswith("gh:"):
         m = GH_URL_REGEX.match(url)
         if not m:
             raise ValueError(f"Invalid gh: URL: {url}")
-        owner = m.group(1)
-        repo = m.group(2)
-        branch = m.group(3) or "main"
-        sub_path = m.group(4) or ""
+        owner, repo, branch, sub_path = m.group(1), m.group(2), m.group(3) or "main", m.group(4) or ""
         return owner, repo, branch, sub_path
     parts = urlparse(url)
     if parts.netloc.lower() != "github.com":
@@ -137,18 +153,22 @@ def _parse_github_url(url: str) -> tuple[str, str, str, str]:
     return owner, repo, branch, sub_path
 
 def _has_requests_lib() -> bool:
-    """Return True if the 'requests' library is available, False otherwise. Caches the result."""
+    """
+    Internal: Returns True if the 'requests' library is available, False otherwise. Caches the result.
+    """
     global _has_requests_lib_result
     if _has_requests_lib_result is None:
         try:
-            import requests  # noqa
+            import requests
             _has_requests_lib_result = True
         except ImportError:
             _has_requests_lib_result = False
     return _has_requests_lib_result
 
 def _build_github_auth_header(token: str) -> str:
-    """Return the correct Authorization header value for the given token."""
+    """
+    Internal: Returns the correct Authorization header value for a GitHub token.
+    """
     token = token.strip()
     if re.fullmatch(r"[0-9a-f]{40}", token):
         return f"token {token}"
@@ -159,7 +179,10 @@ def _build_github_auth_header(token: str) -> str:
     return f"token {token}"
 
 def _github_api_request(url: str, headers: Optional[dict] = None, token: Optional[str] = None) -> dict:
-    """Perform a GitHub API GET request and return the parsed JSON response."""
+    """
+    Internal: Performs a GitHub API GET request and returns the parsed JSON response.
+    Raises ImportError if requests is not available.
+    """
     if not _has_requests_lib():
         raise ImportError("The 'requests' library is required for GitHub API requests.")
     import requests
@@ -178,7 +201,10 @@ def _github_api_request(url: str, headers: Optional[dict] = None, token: Optiona
     return resp.json()
 
 def _get_github_api_limit() -> int:
-    """Get the current GitHub API rate limit."""
+    """
+    Internal: Returns the current GitHub API rate limit (remaining requests).
+    Returns 0 if requests is not available.
+    """
     if not _has_requests_lib():
         return 0
     result = _github_api_request("/rate_limit")
@@ -187,6 +213,9 @@ def _get_github_api_limit() -> int:
     return 0
 
 def _extract_folder_from_github_zip(zip_path: str, folder_path: str, dest_dir: str, repo: str, branch: str) -> None:
+    """
+    Internal: Extracts a specific folder from a GitHub repository zip archive into dest_dir.
+    """
     prefix = f"{repo}-{branch}/{folder_path.rstrip('/')}/"
     with zipfile.ZipFile(zip_path) as z:
         for member in z.namelist():
@@ -206,6 +235,10 @@ def _extract_folder_from_github_zip(zip_path: str, folder_path: str, dest_dir: s
                     dst.write(src.read())
 
 def _download_github_api(owner: str, repo: str, branch: str, folder_path: str, dest_dir: str) -> None:
+    """
+    Internal: Downloads a GitHub folder using the GitHub API and saves it to dest_dir.
+    Uses a thread pool for parallel downloads.
+    """
     max_workers = multiprocessing.cpu_count()
     import concurrent.futures
     threadpool = concurrent.futures.ThreadPoolExecutor(max_workers=max_workers)
@@ -213,6 +246,9 @@ def _download_github_api(owner: str, repo: str, branch: str, folder_path: str, d
     requested = 0
 
     def _download_dir(path: str, dest: str) -> None:
+        """
+        Internal: Recursively downloads all files and subdirectories from a GitHub API path.
+        """
         os.makedirs(dest, exist_ok=True)
         api_url = f"/repos/{owner}/{repo}/contents/{path}?ref={branch}" if path else f"/repos/{owner}/{repo}/contents?ref={branch}"
         if Globals.VERBOSE:
@@ -227,6 +263,9 @@ def _download_github_api(owner: str, repo: str, branch: str, folder_path: str, d
                 _download_dir(item['path'], os.path.join(dest, item['name']))
 
     def _download_file_from_github(dest, item):
+        """
+        Internal: Downloads a single file from GitHub and saves it to dest.
+        """
         file_dest = os.path.join(dest, item['name'])
         download_file(item['download_url'], file_dest, show_progress=False)
         if Globals.VERBOSE:
@@ -241,6 +280,10 @@ def _download_github_api(owner: str, repo: str, branch: str, folder_path: str, d
         raise Exception("Partial download")
 
 def _download_github_zip(owner: str, repo: str, branch: str, folder_path: str, dest_dir: str) -> None:
+    """
+    Internal: Downloads a GitHub repository as a zip file and extracts the specified folder to dest_dir.
+    Uses a cache for repeated downloads.
+    """
     zip_url = f"https://github.com/{owner}/{repo}/archive/{branch}.zip"
     base = get_temp_base()
     cache_name = f"github_{owner}_{repo}_{branch}.zip"
@@ -257,6 +300,9 @@ def _download_github_zip(owner: str, repo: str, branch: str, folder_path: str, d
     _extract_folder_from_github_zip(cache_path, folder_path, dest_dir, repo, branch)
 
 def _download_github_folder(url: str, dest_dir: str) -> None:
+    """
+    Internal: Downloads a folder from GitHub (API or zip fallback) and saves it to dest_dir.
+    """
     if not Globals.VERBOSE:
         print(f"Downloading from GitHub URL: {url}")
     if os.path.exists(dest_dir) and not _is_dir_empty(dest_dir):
@@ -272,11 +318,10 @@ def _download_github_folder(url: str, dest_dir: str) -> None:
         _download_github_zip(owner, repo, branch, folder_path, dest_dir)
     print("Download completed successfully")
 
-# === Main Download Entrypoints ===
-
 def download_file(url: str, dest_path: str, show_progress: bool = True) -> None:
     """
-    Download a file from a URL to a local path.
+    Downloads a file from a URL to a local path.
+    Uses requests if available, otherwise falls back to urllib.
     """
     try:
         import requests
@@ -314,7 +359,8 @@ def download_file(url: str, dest_path: str, show_progress: bool = True) -> None:
 
 def download_folder(src: str, dest_dir: str) -> None:
     """
-    Download or copy a folder from a GitHub URL or local directory to a destination directory.
+    Downloads or copies a folder from a GitHub URL, local directory, or zip file to a destination directory.
+    Raises ValueError if the destination is not empty.
     """
     if os.path.exists(dest_dir) and not _is_dir_empty(dest_dir):
         raise ValueError(f"Destination folder '{dest_dir}' is not empty.")

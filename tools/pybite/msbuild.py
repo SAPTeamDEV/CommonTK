@@ -3,14 +3,19 @@ from typing import Optional, Dict, List
 
 class MSBuildElement:
     """
-    Base wrapper for an XML element in an MSBuild file.
-    Provides attribute and child element lookup.
+    Wraps an XML element from an MSBuild file, providing attribute and child element access.
     """
     def __init__(self, element: ET.Element):
+        """
+        Initialize with an ElementTree element.
+        """
         self._element = element
 
     def __getattr__(self, name: str):
-        # Try attribute first, then child element
+        """
+        Returns the value of an attribute or child element by name.
+        Raises AttributeError if not found.
+        """
         if name in self._element.attrib:
             return self._element.attrib[name]
         child = self._element.find(name)
@@ -20,78 +25,73 @@ class MSBuildElement:
 
     @property
     def tag(self) -> str:
-        """Returns the XML tag name."""
+        """
+        Returns the XML tag name of the element.
+        """
         return self._element.tag
 
     @property
     def attrib(self) -> Dict[str, str]:
-        """Returns the XML attributes as a dict."""
+        """
+        Returns the element's attributes as a dictionary.
+        """
         return self._element.attrib
 
     @property
     def text(self) -> Optional[str]:
-        """Returns the text content of the element."""
+        """
+        Returns the text content of the element, or None.
+        """
         return self._element.text
 
 class MSBuildTarget(MSBuildElement):
     """
-    Represents an MSBuild <Target> element.
-    Exposes common attributes and child elements as properties.
+    Represents an MSBuild <Target> element, exposing common attributes and child tasks.
     """
     @property
-    def Name(self) -> Optional[str]:
-        """The Name attribute of the target."""
+    def Name(self):
+        """Returns the Name attribute of the target."""
         return self._element.attrib.get("Name")
-
     @property
-    def DependsOnTargets(self) -> Optional[str]:
-        """The DependsOnTargets attribute."""
+    def DependsOnTargets(self):
+        """Returns the DependsOnTargets attribute."""
         return self._element.attrib.get("DependsOnTargets")
-
     @property
-    def Inputs(self) -> Optional[str]:
-        """The Inputs attribute."""
+    def Inputs(self):
+        """Returns the Inputs attribute."""
         return self._element.attrib.get("Inputs")
-
     @property
-    def Outputs(self) -> Optional[str]:
-        """The Outputs attribute."""
+    def Outputs(self):
+        """Returns the Outputs attribute."""
         return self._element.attrib.get("Outputs")
-
     @property
-    def Condition(self) -> Optional[str]:
-        """The Condition attribute."""
+    def Condition(self):
+        """Returns the Condition attribute."""
         return self._element.attrib.get("Condition")
-
     @property
-    def BeforeTargets(self) -> Optional[str]:
-        """The BeforeTargets attribute."""
+    def BeforeTargets(self):
+        """Returns the BeforeTargets attribute."""
         return self._element.attrib.get("BeforeTargets")
-
     @property
-    def AfterTargets(self) -> Optional[str]:
-        """The AfterTargets attribute."""
+    def AfterTargets(self):
+        """Returns the AfterTargets attribute."""
         return self._element.attrib.get("AfterTargets")
-
     @property
-    def Returns(self) -> Optional[str]:
-        """The Returns attribute."""
+    def Returns(self):
+        """Returns the Returns attribute."""
         return self._element.attrib.get("Returns")
-
     @property
-    def KeepDuplicateOutputs(self) -> Optional[str]:
-        """The KeepDuplicateOutputs attribute."""
+    def KeepDuplicateOutputs(self):
+        """Returns the KeepDuplicateOutputs attribute."""
         return self._element.attrib.get("KeepDuplicateOutputs")
-
     @property
-    def Tasks(self) -> List[MSBuildElement]:
+    def Tasks(self):
         """
-        Returns a list of child task elements (all direct children that are not PropertyGroup/ItemGroup/OnError).
+        Returns a list of child task elements (excluding PropertyGroup, ItemGroup, OnError).
         """
         return [MSBuildElement(e) for e in self._element if e.tag not in ("PropertyGroup", "ItemGroup", "OnError")]
-
     @property
-    def OnError(self) -> List[MSBuildElement]:
+    def OnError(self):
         """
         Returns a list of <OnError> child elements.
         """
@@ -99,52 +99,49 @@ class MSBuildTarget(MSBuildElement):
 
 class MSBuildProperty(MSBuildElement):
     """
-    Represents a property element in MSBuild.
+    Represents a property element in an MSBuild file.
     """
     @property
-    def name(self) -> str:
-        """The property name (tag)."""
+    def name(self):
+        """Returns the property name (XML tag)."""
         return self._element.tag
-
     @property
-    def value(self) -> Optional[str]:
-        """The property value (text)."""
+    def value(self):
+        """Returns the property value (text content)."""
         return self._element.text
 
 class MSBuildItem(MSBuildElement):
     """
-    Represents an item element in MSBuild.
+    Represents an item element in an MSBuild file.
     """
     @property
-    def Include(self) -> Optional[str]:
-        """The Include attribute."""
+    def Include(self):
+        """Returns the Include attribute."""
         return self._element.attrib.get("Include")
-
     @property
-    def Remove(self) -> Optional[str]:
-        """The Remove attribute."""
+    def Remove(self):
+        """Returns the Remove attribute."""
         return self._element.attrib.get("Remove")
-
     @property
-    def Update(self) -> Optional[str]:
-        """The Update attribute."""
+    def Update(self):
+        """Returns the Update attribute."""
         return self._element.attrib.get("Update")
-
     @property
-    def name(self) -> str:
-        """The item name (tag)."""
+    def name(self):
+        """Returns the item name (XML tag)."""
         return self._element.tag
 
 class MSBuildFile:
     """
-    Represents an MSBuild file and provides access to its structure.
+    Loads and represents an MSBuild XML file, providing access to property groups, item groups, and targets.
     """
     def __init__(self, filepath: Optional[str] = None, xml_string: Optional[str] = None):
         """
-        Initialize the MSBuildProject from a file or XML string.
+        Initialize the MSBuildFile from a file path or XML string.
 
         :param filepath: Path to the MSBuild XML file.
         :param xml_string: XML content as a string.
+        :raises ValueError: If neither filepath nor xml_string is provided.
         """
         if filepath:
             self.tree = ET.parse(filepath)
@@ -157,21 +154,21 @@ class MSBuildFile:
 
     def get_property_groups(self) -> List[ET.Element]:
         """
-        Returns a list of <PropertyGroup> elements.
+        Returns all <PropertyGroup> elements in the MSBuild file.
         """
         return self.root.findall(".//PropertyGroup")
 
     def get_item_groups(self) -> List[ET.Element]:
         """
-        Returns a list of <ItemGroup> elements.
+        Returns all <ItemGroup> elements in the MSBuild file.
         """
         return self.root.findall(".//ItemGroup")
 
     def get_properties(self) -> Dict[str, MSBuildProperty]:
         """
-        Returns a dict of all properties in all <PropertyGroup>s as MSBuildProperty objects.
+        Returns a dictionary of all properties in all <PropertyGroup>s as MSBuildProperty objects.
         """
-        props: Dict[str, MSBuildProperty] = {}
+        props = {}
         for pg in self.get_property_groups():
             for prop in pg:
                 props[prop.tag] = MSBuildProperty(prop)
@@ -179,9 +176,9 @@ class MSBuildFile:
 
     def get_items(self) -> Dict[str, List[MSBuildItem]]:
         """
-        Returns a dict of item type to list of MSBuildItem objects in all <ItemGroup>s.
+        Returns a dictionary mapping item type to a list of MSBuildItem objects in all <ItemGroup>s.
         """
-        items: Dict[str, List[MSBuildItem]] = {}
+        items = {}
         for ig in self.get_item_groups():
             for item in ig:
                 items.setdefault(item.tag, []).append(MSBuildItem(item))
@@ -189,6 +186,6 @@ class MSBuildFile:
 
     def get_targets(self) -> List[MSBuildTarget]:
         """
-        Returns a list of MSBuildTarget objects for <Target> elements.
+        Returns a list of MSBuildTarget objects for all <Target> elements in the file.
         """
         return [MSBuildTarget(e) for e in self.root.findall(".//Target")]

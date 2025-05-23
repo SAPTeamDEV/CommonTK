@@ -72,6 +72,14 @@ class Module:
     def updatable(self):
         return self.valid and self.update_url is not None and not self.private
     
+    @property
+    def current(self):
+        """Get the current module identifier, including version if available."""
+        res = self.id
+        if self.version:
+            res += f"-{self.version}"
+        return res
+    
     def update_info(self):
         json_file_path = os.path.join(self.path, 'module.json')
         
@@ -91,19 +99,12 @@ class Module:
         with open(json_file_path, 'w') as json_file:
             json.dump(data, json_file, indent=4)
 
-def install(url: str, modules_dir: str, upgrade: bool = False) -> None:
+def install(url: str, modules_dir: str, upgrade: bool = False, override: bool = False) -> None:
     """
     Install module from a URL to the specified modules directory.
     The URL can be a GitHub repository or a local path.
     """
-    parsed_url = urlparse(url)
-    temp_id = parsed_url.path.split('/')[-1]
-    # remove .zip suffix if present
-    if temp_id.lower().endswith('.zip'):
-        temp_id = temp_id[:-4]
-        
-    temp_dir = os.path.join(download.create_temp_folder(), temp_id)
-    os.makedirs(temp_dir, exist_ok=True)
+    temp_dir = download.create_temp_folder()
     
     download.download_folder(url, temp_dir)
     
@@ -111,48 +112,63 @@ def install(url: str, modules_dir: str, upgrade: bool = False) -> None:
     modules: list[Module] = []
 
     def _get_modules(path: str) -> None:
-        for root, dirs, files in os.walk(path):
-            for d in dirs:
-                if d == '__pycache__':
-                    continue
-                module_path = os.path.join(root, d)
-                mj = os.path.join(module_path, 'module.json')
-                if os.path.exists(mj):
-                    module = Module(module_path, require_json=False)
-                    if module.valid and not module.private:
-                        modules.append(module)
-                        print(f"Found module: {module.id}")
-                    elif module.private:
-                        print(f"Skipping private module: {module.id}")
-                    else:
-                        print(f"Skipping invalid module: {module.id}")
+        # Recursively crawl directories to find modules
+        mj = os.path.join(path, 'module.json')
+        if os.path.exists(mj):
+            module = Module(path, require_json=False)
+            if module.valid and not module.private:
+                modules.append(module)
+                print(f"Found module: {module.current}")
+            elif module.private:
+                print(f"Skipping private module: {module.id}")
+            else:
+                print(f"Skipping invalid module: {module.id}")
+            return  # Stop recursion if module.json found at this level
+
+        for entry in os.listdir(path):
+            if entry == '__pycache__':
+                continue
+            entry_path = os.path.join(path, entry)
+            if os.path.isdir(entry_path):
+                _get_modules(entry_path)
 
     print(f"Searching for modules in {temp_dir}...")
     _get_modules(temp_dir)
     
+    # detect modules with the same id
+    module_ids = [module.id for module in modules]
+    duplicate_ids = {id for id in module_ids if module_ids.count(id) > 1}
+    if duplicate_ids:
+        print(f"Found duplicate module IDs: {duplicate_ids}")
+
     for module in modules:
         module_path = os.path.join(modules_dir, module.id)
         if os.path.isdir(module_path):
-            if not upgrade:
+            if not override and not upgrade:
                 print(f"Module {module.id} already exists.")
                 continue
             old_module = Module(module_path, require_json=False)
-            if not old_module.valid:
+            if not override and not old_module.valid:
                 print(f"Can't update module {module.id}, invalid structure.")
                 continue
             # Compare versions and skip update if not newer
-            if old_module.version and module.version:
+            if not override and old_module.version:
+                if not module.version:
+                    print(f"Module {module.id} has no version specified. Skipping update.")
+                    continue
+                
                 def parse_version(v):
                     return tuple(int(x) for x in v.split('.'))
                 try:
                     if parse_version(module.version) <= parse_version(old_module.version):
-                        print(f"Current version of {module.id} {old_module.version} is newer or equal to {module.version}. Skipping update.")
+                        print(f"Latest version of module {old_module.current} is already installed. Skipping update.")
                         continue
                 except Exception as e:
-                    print(f"Error comparing versions: {e}. Proceeding with update.")
-            uninstall(old_module)
-        print(f"Installing module {module.id}...")
-        module.update_url = parsed_url.geturl()
+                    print(f"Error comparing versions: {e}. Skipping update.")
+                    continue
+            uninstall(old_module, force=override)
+        print(f"Installing module {module.current}...")
+        module.update_url = url
         module.update_info()
         
         if not os.path.exists(module_path):
@@ -160,8 +176,8 @@ def install(url: str, modules_dir: str, upgrade: bool = False) -> None:
         for f, src in module.files.items():
             dest = os.path.join(module_path, f)
             shutil.copy2(src, dest)
-        print(f"Module {module.id} installed successfully.")
-    
+        print(f"Module {module.current} installed successfully.")
+
     if not modules:
         print(f"No valid modules found in {temp_dir}.")
             
@@ -169,12 +185,12 @@ def uninstall(module: Module, force: bool = False) -> None:
     """
     Uninstall a module.
     """
-    print(f"Uninstalling module {module.id}...")
+    print(f"Uninstalling module {module.current}...")
     if not force and not module.valid:
-        raise ValueError(f"Module {module.id} is not valid.")
+        raise ValueError(f"Module {module.current} is not valid.")
     
     if not os.path.exists(module.path):
         raise ValueError(f"Module path does not exist: {module.path}")
     
     shutil.rmtree(module.path)
-    print(f"Module {module.id} uninstalled successfully.")
+    print(f"Module {module.current} uninstalled successfully.")

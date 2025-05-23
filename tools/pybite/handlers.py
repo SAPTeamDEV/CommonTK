@@ -70,6 +70,8 @@ def handle_bite_list(host: Host, args: argparse.Namespace, extras: List[str]) ->
             print(f"    Version: {module.version}")
             print(f"    Description: {module.description}")
             print(f"    Author: {module.author}")
+            print(f"    Private: {module.private}")
+            print(f"    Valid Structure: {module.valid}")
             print(f"    Updateable: {module.updatable}")
             if module.updatable:
                 print(f"    Update URL: {module.update_url}")
@@ -93,8 +95,9 @@ def handle_bite_install(host: Host, args: argparse.Namespace, extras: List[str])
     
     source = args.source
     upgrade = args.upgrade
-    
-    module.install(source, host.MODULES_DIR, upgrade=upgrade)
+    override = args.override
+
+    module.install(source, host.MODULES_DIR, upgrade=upgrade, override=override)
 
 def handle_bite_update(host: Host, args: argparse.Namespace, extras: List[str]) -> None:
     """
@@ -108,6 +111,7 @@ def handle_bite_update(host: Host, args: argparse.Namespace, extras: List[str]) 
     
     modules = getattr(args, 'modules', [])
     all_modules = args.all
+    force = args.force
     
     sources: List[str] = []
     hmods = host.get_modules()
@@ -127,8 +131,8 @@ def handle_bite_update(host: Host, args: argparse.Namespace, extras: List[str]) 
     else:
         host.get_argparser().error("No modules specified for update.")
 
-    for source in sources:
-        module.install(source, host.MODULES_DIR, upgrade=True)
+    for source in set(sources):
+        module.install(source, host.MODULES_DIR, upgrade=True, override=force)
     
     if not sources:
         print("No modules to update.")

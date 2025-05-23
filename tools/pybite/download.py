@@ -14,6 +14,10 @@ import concurrent
 
 CACHE_DURATION = 7200  # seconds
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", None)
+GH_URL_REGEX = re.compile(
+    r"^gh:([^/]+)/([^/]+)(?:/([^/]+))?(?:/(.*))?$"
+)
+
 _temp_folders: list[str] = []
 _has_requests_lib_result: Optional[bool] = None
 
@@ -45,6 +49,15 @@ def cleanup_temp_folders() -> None:
                     pass
 
 def _parse_github_url(url: str) -> tuple[str, str, str, str]:
+    if url.startswith("gh:"):
+        m = GH_URL_REGEX.match(url)
+        if not m:
+            raise ValueError(f"Invalid gh: URL: {url}")
+        owner = m.group(1)
+        repo = m.group(2)
+        branch = m.group(3) or "main"
+        sub_path = m.group(4) or ""
+        return owner, repo, branch, sub_path
     parts = urlparse(url)
     if parts.netloc.lower() != "github.com":
         raise ValueError(f"URL is not a github.com URL: {url}")
@@ -62,31 +75,45 @@ def _parse_github_url(url: str) -> tuple[str, str, str, str]:
 def _file_url_to_path(url: str) -> str:
     """
     Convert a file:// URL to a local filesystem path.
+    Only accepts valid file URLs, not Windows drive-letter paths.
     """
     parts = urlparse(url)
     if parts.scheme.lower() != "file":
         raise ValueError(f"Not a file URL: {url}")
-    # On Windows, parts.netloc may contain a drive letter or be empty
+    # Only accept file:// URLs, not drive-letter paths
     if os.name == "nt":
-        # Handle file:///C:/path or file://localhost/C:/path
+        # file:///C:/path or file://localhost/C:/path
         if parts.netloc and parts.netloc != "localhost":
             path = f"//{parts.netloc}{parts.path}"
         else:
             path = parts.path
+        # Only treat as file URL if it starts with a slash and a drive letter
+        if not re.match(r"^/[a-zA-Z]:/", path):
+            raise ValueError(f"Not a valid file URL: {url}")
         return os.path.abspath(path.lstrip("/"))
     else:
         # On Unix, just join netloc and path
         return os.path.abspath(os.path.join("/", parts.netloc, parts.path))
 
 def _is_local_path(path: str) -> bool:
-    parts = urlparse(path)
-    # Support file:// URLs as local paths
-    if parts.scheme.lower() == "file":
-        _file_url_to_path(path)
+    # File URL is always local
+    if path.startswith("file://"):
         return True
-    if parts.scheme or parts.netloc:
-        return False
-    return True
+    # UNC path (Windows)
+    if os.name == "nt" and path.startswith("\\\\"):
+        return True
+    # Windows drive letter (e.g., C:\ or C:/)
+    if os.name == "nt" and re.match(r"^[a-zA-Z]:[\\/]", path):
+        return True
+    # Unix absolute path
+    if os.name != "nt" and path.startswith("/"):
+        return True
+    # Relative path (does not look like a URL and does not start with / or drive letter)
+    # If it does not have a scheme and does not look like a URL, treat as local
+    parts = urlparse(path)
+    if not parts.scheme and not parts.netloc:
+        return True
+    return False
 
 def _is_dir_empty(path: str) -> bool:
     """
@@ -95,6 +122,7 @@ def _is_dir_empty(path: str) -> bool:
     return os.path.isdir(path) and not any(os.scandir(path))
 
 def _copy_local_folder(src: str, dest: str) -> None:
+    print(f"Copying local folder from '{src}' to '{dest}'")
     if not os.path.isdir(src):
         raise ValueError(f"Local path does not exist or is not a directory: {src}")
     # Allow if dest does not exist or exists and is empty
@@ -252,6 +280,7 @@ def _download_github_folder(url: str, dest_dir: str) -> None:
     print("Download complete.")
 
 def _extract_zip(zip_path: str, dest_dir: str) -> None:
+    print(f"Extracting '{zip_path}' into '{dest_dir}'")
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
         zip_ref.extractall(dest_dir)
 
@@ -303,7 +332,17 @@ def download_file(url: str, dest_path: str, show_progress: bool = True) -> None:
 def _is_url(path: str) -> bool:
     """
     Return True if the given path is a URL (http, https, file, etc).
+    Does NOT treat Windows drive-letter or UNC paths as URLs.
     """
+    # Windows drive letter (C:\ or C:/) or UNC path (\\server\share)
+    if os.name == "nt":
+        if re.match(r"^[a-zA-Z]:[\\/]", path):
+            return False
+        if path.startswith("\\\\"):
+            return False
+    # Unix absolute path
+    if os.name != "nt" and path.startswith("/"):
+        return False
     parts = urlparse(path)
     return bool(parts.scheme)
 
@@ -326,5 +365,7 @@ def download_folder(src: str, dest_dir: str) -> None:
             _copy_local_folder(src, dest_dir)
         elif os.path.isfile(src):
             _extract_zip(src, dest_dir)
+        else:
+            raise ValueError(f"File or directory does not exist: {src}")
     else:
         _download_github_folder(src, dest_dir)

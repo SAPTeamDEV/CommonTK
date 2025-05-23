@@ -4,6 +4,7 @@ import importlib.util
 import os
 import platform
 import subprocess
+from types import ModuleType
 import urllib.request
 from typing import Optional, Dict, Any, List, Callable
 
@@ -217,6 +218,7 @@ class Host:
         description: Optional[str] = None,
         help: str = "",
         arguments: Optional[List[Dict[str, Any]]] = None,
+        **kwargs: Any
     ) -> None:
         """
         Register a new subcommand and its handler.
@@ -231,7 +233,7 @@ class Host:
         """
         subparsers = self.get_subparser()
         
-        sub = subparsers.add_parser(name, help=help, description=description or help, epilog=self.argparser_epilog)
+        sub = subparsers.add_parser(name, help=help, description=description or help, epilog=self.argparser_epilog, **kwargs)
         if arguments:
             for arg in arguments:
                 sub.add_argument(*arg.get('args', ()), **arg.get('kwargs', {}))
@@ -486,29 +488,34 @@ class Host:
         
         return mods
 
-    def load_modules(self) -> List[Any]:
+    def load_extensions(self) -> List[Any]:
         """
-        Load all .bite.py modules from the modules directory.
+        Load all .bite.py extensions from installed modules.
 
         Returns:
             List[Any]: List of loaded module objects.
         """
-        mods: List[Any] = []
-        pattern = os.path.join(self.MODULES_DIR, '**', '*.bite.py')
-        for path in glob.glob(pattern, recursive=True):
-            name = os.path.splitext(os.path.basename(path))[0]
-            spec = importlib.util.spec_from_file_location(name, path)
-            if spec is None or spec.loader is None:
-                continue
-            mod = importlib.util.module_from_spec(spec)
-            try:
-                spec.loader.exec_module(mod)
-            except Exception as e:
-                print(f"Failed to load module {name} from {path}: {e}")
-                continue
-            if hasattr(mod, 'load'):
+        extensions: List[ModuleType] = []
+        hmods: dict[str, Module] = self.get_modules()
+        
+        for module in hmods.values():
+            for name, path in module.files.items():
+                if not path.lower().endswith('.bite.py'):
+                    continue
+                name = f"pybite.extensions.{module.id}.{name.split('.')[0]}"
+                spec = importlib.util.spec_from_file_location(name, path)
+                if spec is None or spec.loader is None:
+                    continue
+                extension = importlib.util.module_from_spec(spec)
                 try:
-                    mods.append(mod.load(self))
+                    spec.loader.exec_module(extension)
                 except Exception as e:
-                    print(f"Module '{name}' failed to initialize: {e}")
-        return mods
+                    print(f"Failed to load extension {name} from {path}: {e}")
+                    continue
+                if hasattr(extension, 'load'):
+                    try:
+                        extension.load(self)
+                        extensions.append(extension)
+                    except Exception as e:
+                        print(f"Extension '{name}' failed to initialize: {e}")
+        return extensions

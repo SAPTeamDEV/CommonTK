@@ -1,4 +1,8 @@
+import sys
+
 import tools.pybite as pybite
+
+sys.modules['pybite'] = pybite
 
 # This is a configuration file for the PyBite build engine.
 

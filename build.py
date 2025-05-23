@@ -14,7 +14,7 @@ if __name__ == '__main__':
         description='Bite build engine command line interface',
     )
 
-    host.load_modules()
+    host.load_extensions()
     args, unknown = host.get_argparser().parse_known_args()
 
     if host.requested_sdk is not None:

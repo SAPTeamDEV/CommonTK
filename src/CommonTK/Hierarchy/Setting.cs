@@ -28,7 +28,7 @@ public class Setting<T> : Setting
         {
             if (Parent is not null and SettingNode settingNode)
             {
-                value = settingNode.ApplyInterceptors(Name, value);
+                value = settingNode.ApplyInterceptors(this, value);
             }
 
             if (TryParse(value, out T result))

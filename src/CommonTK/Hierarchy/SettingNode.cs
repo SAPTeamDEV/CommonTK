@@ -15,8 +15,11 @@ public class SettingNode : Node
     /// <summary>
     /// Encapsulates a method that intercepts the setting value before it is set.
     /// </summary>
-    /// <param name="path">
-    /// The relative path of the setting being set.
+    /// <param name="sender">
+    /// The setting node that is sending the value.
+    /// </param>
+    /// <param name="setting">
+    /// The setting being modified.
     /// </param>
     /// <param name="value">
     /// The value being set for the setting.
@@ -24,7 +27,7 @@ public class SettingNode : Node
     /// <returns>
     /// The modified value to be set for the setting.
     /// </returns>
-    public delegate string Interceptor(string path, string value);
+    public delegate string Interceptor(SettingNode sender, Setting setting, string value);
 
     private readonly List<Interceptor> interceptors = [];
 
@@ -344,18 +347,18 @@ public class SettingNode : Node
         }
     }
 
-    internal string ApplyInterceptors(string path, string value)
+    internal string ApplyInterceptors(Setting setting, string value)
     {
         var current = value;
 
         foreach (Interceptor interceptor in interceptors)
         {
-            current = interceptor(path, current);
+            current = interceptor(this, setting, current);
         }
 
         if (Parent is not null and SettingNode settingNode)
         {
-            current = settingNode.ApplyInterceptors(JoinPath(Name, path), current);
+            current = settingNode.ApplyInterceptors(setting, current);
         }
 
         return current;

@@ -23,6 +23,11 @@ public readonly struct ResourceLocation : IEquatable<ResourceLocation>
     public string Path { get; }
 
     /// <summary>
+    /// Gets the sub-path of the resource.
+    /// </summary>
+    public string SubPath { get; }
+
+    /// <summary>
     /// Initializes a new <see cref="ResourceLocation"/>.
     /// </summary>
     /// <param name="domain">
@@ -31,10 +36,14 @@ public readonly struct ResourceLocation : IEquatable<ResourceLocation>
     /// <param name="path">
     /// The path of the resource.
     /// </param>
-    public ResourceLocation(string domain, string path)
+    /// <param name="subPath">
+    /// The sub-path of the resource. This can be <see langword="null"/> if there is no sub-path.
+    /// </param>
+    public ResourceLocation(string domain, string path, string? subPath)
     {
         Domain = domain;
         Path = path;
+        SubPath = subPath ?? string.Empty;
     }
 
     /// <summary>
@@ -49,7 +58,8 @@ public readonly struct ResourceLocation : IEquatable<ResourceLocation>
     public bool Equals(ResourceLocation other)
     {
         return string.Equals(Domain, other.Domain, StringComparison.OrdinalIgnoreCase) &&
-               string.Equals(Path, other.Path, StringComparison.OrdinalIgnoreCase);
+               string.Equals(Path, other.Path, StringComparison.OrdinalIgnoreCase) &&
+               string.Equals(SubPath, other.SubPath, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <inheritdoc/>
@@ -60,7 +70,8 @@ public readonly struct ResourceLocation : IEquatable<ResourceLocation>
     {
         return HashCode.Combine(
             StringComparer.OrdinalIgnoreCase.GetHashCode(Domain),
-            StringComparer.OrdinalIgnoreCase.GetHashCode(Path));
+            StringComparer.OrdinalIgnoreCase.GetHashCode(Path),
+            StringComparer.OrdinalIgnoreCase.GetHashCode(SubPath));
     }
 
     /// <summary>
@@ -92,5 +103,5 @@ public readonly struct ResourceLocation : IEquatable<ResourceLocation>
     public static bool operator !=(ResourceLocation left, ResourceLocation right) => !left.Equals(right);
 
     /// <inheritdoc/>
-    public override string ToString() => $"{Domain}:{Path}";
+    public override string ToString() => $"{Domain}:{Path}{(!string.IsNullOrEmpty(SubPath) ? "/" + SubPath : "")}";
 }

@@ -15,14 +15,10 @@ namespace SAPTeam.CommonTK;
 /// <typeparam name="TResource">
 /// The type of the resources stored in the registry.
 /// </typeparam>
-public class Registry<TResource> : IReadOnlyDictionary<ResourceLocation, TResource>, IDisposable
+public class Registry<TResource> : IEnumerable<ResourceLocation>, IDisposable
     where TResource : notnull
 {
-
-    /// <summary>
-    /// Gets the dictionary of resources.
-    /// </summary>
-    protected Dictionary<ResourceLocation, TResource> Resources { get; } = [];
+    Dictionary<string, Dictionary<string, Dictionary<string, TResource>>> _domains = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// Gets a value indicating whether the registry has been disposed.
@@ -72,7 +68,7 @@ public class Registry<TResource> : IReadOnlyDictionary<ResourceLocation, TResour
     /// <returns>
     /// An enumerator that iterates through the registered resources.
     /// </returns>
-    public IEnumerator<KeyValuePair<ResourceLocation, TResource>> GetEnumerator() => Resources.GetEnumerator();
+    public IEnumerator<TResource> GetEnumerator() => Resources.GetEnumerator();
 
     /// <summary>
     /// Tries to get the resource at the specified location.
@@ -102,6 +98,37 @@ public class Registry<TResource> : IReadOnlyDictionary<ResourceLocation, TResour
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Resources).GetEnumerator();
 
     /// <summary>
+    /// Creates or retrieves a domain within the registry.
+    /// </summary>
+    /// <remarks>The domain name comparison is case-insensitive. If the specified domain already exists, the
+    /// existing domain's resources are returned.</remarks>
+    /// <param name="domain">The name of the domain to create or retrieve. This value cannot be null, empty, or consist only of whitespace.</param>
+    /// <returns>A dictionary representing the resources associated with the specified domain.  If the domain does not already
+    /// exist, a new domain is created and returned.</returns>
+    /// <exception cref="ObjectDisposedException">Thrown if the registry has been disposed and is no longer usable.</exception>
+    /// <exception cref="ArgumentException">Thrown if <paramref name="domain"/> is null, empty, or consists only of whitespace.</exception>
+    protected Dictionary<string, Dictionary<string, TResource>> CreateDomain(string domain)
+    {
+        if (Disposed)
+        {
+            throw new ObjectDisposedException(nameof(Registry<TResource>), "The registry has been disposed.");
+        }
+
+        if (string.IsNullOrEmpty(domain) || string.IsNullOrWhiteSpace(domain))
+        {
+            throw new ArgumentException("Domain cannot be null or empty.", nameof(domain));
+        }
+
+        if (!_domains.TryGetValue(domain, out Dictionary<string, Dictionary<string, TResource>>? domainResources))
+        {
+            domainResources = new(StringComparer.OrdinalIgnoreCase);
+            _domains[domain] = domainResources;
+        }
+
+        return domainResources;
+    }
+
+    /// <summary>
     /// Tries to add a resource to the registry.
     /// </summary>
     /// <param name="key">
@@ -119,6 +146,8 @@ public class Registry<TResource> : IReadOnlyDictionary<ResourceLocation, TResour
         {
             throw new ObjectDisposedException(nameof(Registry<TResource>), "The registry has been disposed.");
         }
+
+
 
         if (Resources.ContainsKey(key))
         {
@@ -145,7 +174,7 @@ public class Registry<TResource> : IReadOnlyDictionary<ResourceLocation, TResour
         {
             if (disposing)
             {
-                Resources.Clear();
+                _domains.Clear();
             }
 
             Disposed = true;
